@@ -278,11 +278,11 @@ myLayoutHook = toggleLayouts expand normal
     full   = minimize . boringWindows . noBorders . avoidStruts
            $ Full
     icon = printf "<icon=%s/>"
-    normal =     named (icon "layout-tall-right.xbm") tall
-             ||| named (icon "layout-im-mirror.xbm")  mirror
-             ||| named (icon "layout-im-tall.xbm")    circle
-             ||| named (icon "layout-float.xbm")      float
-    expand =     named (icon "layout-full.xbm")       full
+    normal =     named (icon "layout-tall.xbm")   tall
+             ||| named (icon "layout-mirror.xbm") mirror
+             ||| named (icon "layout-circle.xbm") circle
+             ||| named (icon "layout-float.xbm")  float
+    expand =     named (icon "layout-full.xbm")   full
 
 -- Manage Hook
 
