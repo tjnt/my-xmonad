@@ -36,6 +36,7 @@ import           XMonad.Layout.Named         (named)
 import           XMonad.Layout.NoBorders     (noBorders, smartBorders)
 import           XMonad.Layout.ResizableTile (MirrorResize (..),
                                               ResizableTall (..))
+import           XMonad.Layout.SimplestFloat (simplestFloat)
 import           XMonad.Layout.Spacing       (spacing)
 import           XMonad.Layout.ToggleLayouts (ToggleLayout (..), toggleLayouts)
 import           XMonad.Operations           (floatLocation)
@@ -272,12 +273,15 @@ myLayoutHook = toggleLayouts expand normal
            $ Mirror (Tall 1 (3/100) (1/2))
     circle = minimize . boringWindows . smartBorders . avoidStruts
            $ Circle
+    float = minimize . boringWindows . smartBorders . avoidStruts
+           $ simplestFloat
     full   = minimize . boringWindows . noBorders . avoidStruts
            $ Full
     icon = printf "<icon=%s/>"
     normal =     named (icon "layout-tall-right.xbm") tall
              ||| named (icon "layout-im-mirror.xbm")  mirror
              ||| named (icon "layout-im-tall.xbm")    circle
+             ||| named (icon "layout-float.xbm")      float
     expand =     named (icon "layout-full.xbm")       full
 
 -- Manage Hook
