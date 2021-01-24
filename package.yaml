@@ -39,3 +39,14 @@ executables:
     - containers
     - data-default
     - my-xmonad
+
+# tests:
+#   my-xmonad-test:
+#     main:                Spec.hs
+#     source-dirs:         test
+#     ghc-options:
+#     - -threaded
+#     - -rtsopts
+#     - -with-rtsopts=-N
+#     dependencies:
+#     - my-xmonad
