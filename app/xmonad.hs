@@ -1,52 +1,60 @@
 import           ColorScheme.JellyBeans
-import           Control.Applicative         ((<$>))
-import           Control.Exception           (catch)
-import           Data.Default                (def)
-import qualified Data.Map                    as M
-import           Data.Tree                   (Tree (Node))
-import           GHC.IO.Exception            (IOException)
-import           System.IO                   (readFile, writeFile)
-import           Text.Printf                 (printf)
+import           Control.Applicative              ((<$>))
+import           Control.Exception                (catch)
+import           Data.Default                     (def)
+import qualified Data.Map                         as M
+import           Data.Tree                        (Tree (Node))
+import           GHC.IO.Exception                 (IOException)
+import           System.IO                        (readFile, writeFile)
+import           Text.Printf                      (printf)
 import           XMonad
-import           XMonad.Actions.CopyWindow   (kill1)
-import           XMonad.Actions.CycleWS      (nextWS, prevWS, shiftToNext,
-                                              shiftToPrev, toggleWS)
-import           XMonad.Actions.FloatKeys    (keysMoveWindow, keysResizeWindow)
-import           XMonad.Actions.FloatSnap    (afterDrag, snapGrow,
-                                              snapMagicMove, snapMagicResize,
-                                              snapMove, snapShrink)
-import           XMonad.Actions.Minimize     (maximizeWindowAndFocus,
-                                              minimizeWindow, withLastMinimized)
-import           XMonad.Actions.SpawnOn      (manageSpawn, spawnAndDo)
-import           XMonad.Actions.TreeSelect   (TSConfig (..), TSNode (..),
-                                              treeselectAction, tsDefaultConfig)
-import qualified XMonad.Actions.TreeSelect   as TS
-import           XMonad.Hooks.DynamicLog     (PP (..), statusBar, xmobarColor,
-                                              xmobarPP)
-import           XMonad.Hooks.EwmhDesktops   (ewmh, fullscreenEventHook)
-import           XMonad.Hooks.ManageDocks    (avoidStruts, manageDocks)
-import           XMonad.Hooks.ManageHelpers  (doCenterFloat, doFullFloat,
-                                              doRectFloat, isDialog,
-                                              isFullscreen)
-import           XMonad.Layout.BoringWindows (boringWindows)
-import           XMonad.Layout.Circle        (Circle (..))
-import           XMonad.Layout.Gaps          (Direction2D (..))
-import           XMonad.Layout.Minimize      (minimize)
-import           XMonad.Layout.Named         (named)
-import           XMonad.Layout.NoBorders     (noBorders, smartBorders)
-import           XMonad.Layout.SimplestFloat (simplestFloat)
-import           XMonad.Layout.Spacing       (spacingRaw, Border(..))
-import           XMonad.Layout.ToggleLayouts (ToggleLayout (..), toggleLayouts)
-import           XMonad.Layout.MouseResizableTile (MRTMessage(..), mouseResizableTile, mouseResizableTileMirrored)
-import           XMonad.Operations           (floatLocation)
-import           XMonad.Prompt               (XPPosition (..), alwaysHighlight,
-                                              bgColor, fgColor, font, height,
-                                              position, promptBorderWidth)
-import           XMonad.Prompt.Shell         (shellPrompt)
-import qualified XMonad.StackSet             as W
-import           XMonad.Util.EZConfig        (additionalKeysP,
-                                              additionalMouseBindings)
-import           XMonad.Util.SpawnOnce       (spawnOnce)
+import           XMonad.Actions.CopyWindow        (kill1)
+import           XMonad.Actions.CycleWS           (nextWS, prevWS, shiftToNext,
+                                                   shiftToPrev, toggleWS)
+import           XMonad.Actions.FloatKeys         (keysMoveWindow,
+                                                   keysResizeWindow)
+import           XMonad.Actions.FloatSnap         (afterDrag, snapGrow,
+                                                   snapMagicMove,
+                                                   snapMagicResize, snapMove,
+                                                   snapShrink)
+import           XMonad.Actions.Minimize          (maximizeWindowAndFocus,
+                                                   minimizeWindow,
+                                                   withLastMinimized)
+import           XMonad.Actions.SpawnOn           (manageSpawn, spawnAndDo)
+import           XMonad.Actions.TreeSelect        (TSConfig (..), TSNode (..),
+                                                   treeselectAction,
+                                                   tsDefaultConfig)
+import qualified XMonad.Actions.TreeSelect        as TS
+import           XMonad.Hooks.DynamicLog          (PP (..), statusBar,
+                                                   xmobarColor, xmobarPP)
+import           XMonad.Hooks.EwmhDesktops        (ewmh, fullscreenEventHook)
+import           XMonad.Hooks.ManageDocks         (avoidStruts, manageDocks)
+import           XMonad.Hooks.ManageHelpers       (doCenterFloat, doFullFloat,
+                                                   doRectFloat, isDialog,
+                                                   isFullscreen)
+import           XMonad.Layout.BoringWindows      (boringWindows)
+import           XMonad.Layout.Circle             (Circle (..))
+import           XMonad.Layout.Gaps               (Direction2D (..))
+import           XMonad.Layout.Minimize           (minimize)
+import           XMonad.Layout.MouseResizableTile (MRTMessage (..),
+                                                   mouseResizableTile,
+                                                   mouseResizableTileMirrored)
+import           XMonad.Layout.Named              (named)
+import           XMonad.Layout.NoBorders          (noBorders, smartBorders)
+import           XMonad.Layout.SimplestFloat      (simplestFloat)
+import           XMonad.Layout.Spacing            (Border (..), spacingRaw)
+import           XMonad.Layout.ToggleLayouts      (ToggleLayout (..),
+                                                   toggleLayouts)
+import           XMonad.Operations                (floatLocation)
+import           XMonad.Prompt                    (XPPosition (..),
+                                                   alwaysHighlight, bgColor,
+                                                   fgColor, font, height,
+                                                   position, promptBorderWidth)
+import           XMonad.Prompt.Shell              (shellPrompt)
+import qualified XMonad.StackSet                  as W
+import           XMonad.Util.EZConfig             (additionalKeysP,
+                                                   additionalMouseBindings)
+import           XMonad.Util.SpawnOnce            (spawnOnce)
 -- import           XMonad.Util.Run             (runProcessWithInput)
 
 myModMask = mod4Mask
@@ -261,7 +269,7 @@ myMouseBindings =
 
 myLayoutHook = toggleLayouts expand normal
   where
-    spacing = spacingRaw True (Border 2 2 4 4) True (Border 0 0 0 0) False 
+    spacing = spacingRaw True (Border 2 2 4 4) True (Border 0 0 0 0) False
     tall   = minimize . boringWindows . smartBorders . avoidStruts . spacing
            $ mouseResizableTile
     mirror = minimize . boringWindows . smartBorders . avoidStruts . spacing
