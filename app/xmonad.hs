@@ -34,11 +34,10 @@ import           XMonad.Layout.Gaps          (Direction2D (..), gaps)
 import           XMonad.Layout.Minimize      (minimize)
 import           XMonad.Layout.Named         (named)
 import           XMonad.Layout.NoBorders     (noBorders, smartBorders)
-import           XMonad.Layout.ResizableTile (MirrorResize (..),
-                                              ResizableTall (..))
 import           XMonad.Layout.SimplestFloat (simplestFloat)
 import           XMonad.Layout.Spacing       (spacing)
 import           XMonad.Layout.ToggleLayouts (ToggleLayout (..), toggleLayouts)
+import           XMonad.Layout.MouseResizableTile (MRTMessage(..), mouseResizableTile, mouseResizableTileMirrored)
 import           XMonad.Operations           (floatLocation)
 import           XMonad.Prompt               (XPPosition (..), alwaysHighlight,
                                               bgColor, fgColor, font, height,
@@ -188,8 +187,8 @@ myKeys =
     , ("M-y",           spawnAndDo (doRectFloat (W.RationalRect 0 0 0.4 1.0))
                                    "termite --exec=clip.sh --title=clipboard")
       -- resizing window ratio
-    , ("M-u",           sendMessage MirrorExpand)
-    , ("M-n",           sendMessage MirrorShrink)
+    , ("M-u",           sendMessage ShrinkSlave)
+    , ("M-n",           sendMessage ExpandSlave)
       -- minimize window
     , ("M-z",           withFocused minimizeWindow)
     , ("M-x",           withLastMinimized maximizeWindowAndFocus)
@@ -266,11 +265,11 @@ myLayoutHook = toggleLayouts expand normal
     gwD = (D, 2)
     gwL = (L, 4)
     gwR = (R, 4)
-    gapW = spacing 2 . gaps [gwU, gwD, gwL, gwR]
+    gapW = spacing 1 . gaps [gwU, gwD, gwL, gwR]
     tall   = minimize . boringWindows . smartBorders . avoidStruts . gapW
-           $ ResizableTall 1 (3/100) (3/5) []
+           $ mouseResizableTile
     mirror = minimize . boringWindows . smartBorders . avoidStruts . gapW
-           $ Mirror (Tall 1 (3/100) (1/2))
+           $ mouseResizableTileMirrored
     circle = minimize . boringWindows . smartBorders . avoidStruts
            $ Circle
     float = minimize . boringWindows . smartBorders . avoidStruts
