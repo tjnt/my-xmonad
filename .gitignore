@@ -2,4 +2,5 @@
 my-xmonad.cabal
 xmonad-x86_64-linux
 xmonad.*
+prompt-history
 *~
