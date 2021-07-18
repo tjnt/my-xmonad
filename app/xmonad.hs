@@ -30,12 +30,12 @@ import           XMonad.Hooks.ManageHelpers  (doCenterFloat, doFullFloat,
                                               isFullscreen)
 import           XMonad.Layout.BoringWindows (boringWindows)
 import           XMonad.Layout.Circle        (Circle (..))
-import           XMonad.Layout.Gaps          (Direction2D (..), gaps)
+import           XMonad.Layout.Gaps          (Direction2D (..))
 import           XMonad.Layout.Minimize      (minimize)
 import           XMonad.Layout.Named         (named)
 import           XMonad.Layout.NoBorders     (noBorders, smartBorders)
 import           XMonad.Layout.SimplestFloat (simplestFloat)
-import           XMonad.Layout.Spacing       (spacing)
+import           XMonad.Layout.Spacing       (spacingRaw, Border(..))
 import           XMonad.Layout.ToggleLayouts (ToggleLayout (..), toggleLayouts)
 import           XMonad.Layout.MouseResizableTile (MRTMessage(..), mouseResizableTile, mouseResizableTileMirrored)
 import           XMonad.Operations           (floatLocation)
@@ -261,14 +261,10 @@ myMouseBindings =
 
 myLayoutHook = toggleLayouts expand normal
   where
-    gwU = (U, 2)
-    gwD = (D, 2)
-    gwL = (L, 4)
-    gwR = (R, 4)
-    gapW = spacing 1 . gaps [gwU, gwD, gwL, gwR]
-    tall   = minimize . boringWindows . smartBorders . avoidStruts . gapW
+    spacing = spacingRaw True (Border 2 2 4 4) True (Border 0 0 0 0) False 
+    tall   = minimize . boringWindows . smartBorders . avoidStruts . spacing
            $ mouseResizableTile
-    mirror = minimize . boringWindows . smartBorders . avoidStruts . gapW
+    mirror = minimize . boringWindows . smartBorders . avoidStruts . spacing
            $ mouseResizableTileMirrored
     circle = minimize . boringWindows . smartBorders . avoidStruts
            $ Circle
