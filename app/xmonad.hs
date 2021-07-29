@@ -32,7 +32,7 @@ import           XMonad.Hooks.ManageDocks         (avoidStruts, manageDocks)
 import           XMonad.Hooks.ManageHelpers       (doCenterFloat, doFullFloat,
                                                    doRectFloat, isDialog,
                                                    isFullscreen)
-import           XMonad.Layout.BoringWindows      (boringWindows)
+import           XMonad.Layout.BoringWindows      (boringWindows, focusUp, focusDown, focusMaster)
 import           XMonad.Layout.Circle             (Circle (..))
 import           XMonad.Layout.Gaps               (Direction2D (..))
 import           XMonad.Layout.Minimize           (minimize)
@@ -184,8 +184,12 @@ myTsNavigation = M.union
 -- Keys
 
 myKeys =
-    [ -- launch
-      ("M-S-<Return>",  spawn "termite --exec=tmux --title=termite")
+    [ -- focus
+      ("M-j",           focusDown)
+    , ("M-k",           focusUp)
+    , ("M-m",           focusMaster)
+      -- launch
+    , ("M-S-<Return>",  spawn "termite --exec=tmux --title=termite")
     , ("M-C-<Return>",  spawnAndDo doCenterFloat "termite --exec=tmux --title=termite")
       -- shell prompt
     , ("M-p",           shellPrompt myXPConfig)
@@ -272,15 +276,15 @@ myMouseBindings =
 myLayoutHook = toggleLayouts expand normal
   where
     spacing = spacingRaw True (Border 2 2 4 4) True (Border 0 0 0 0) False
-    tall   = minimize . boringWindows . smartBorders . avoidStruts . spacing
+    tall   = boringWindows . minimize . smartBorders . avoidStruts . spacing
            $ mouseResizableTile
-    mirror = minimize . boringWindows . smartBorders . avoidStruts . spacing
+    mirror = boringWindows . minimize . smartBorders . avoidStruts . spacing
            $ mouseResizableTileMirrored
-    circle = minimize . boringWindows . smartBorders . avoidStruts
+    circle = boringWindows . minimize . smartBorders . avoidStruts
            $ Circle
-    float = minimize . boringWindows . smartBorders . avoidStruts
+    float  = boringWindows . minimize . smartBorders . avoidStruts
            $ simplestFloat
-    full   = minimize . boringWindows . noBorders . avoidStruts
+    full   = boringWindows . minimize . noBorders . avoidStruts
            $ Full
     icon = printf "<icon=%s/>"
     normal =     named (icon "layout-tall.xbm")   tall
