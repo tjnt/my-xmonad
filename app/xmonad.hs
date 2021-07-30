@@ -197,9 +197,9 @@ myKeys =
     , ("M-o",           treeselectAction myTreeSelectConfig myTreeSelect)
       -- clipboard history
     , ("M-y",           spawnAndDo (doRectFloat (W.RationalRect 0 0 0.4 1.0))
-                                   "termite --exec=clip-sel.sh --title=clipboard")
+                                   "termite --exec=\"clip.sh sel\" --title=clipboard")
     , ("M-S-y",         spawnAndDo (doRectFloat (W.RationalRect 0 0 0.4 1.0))
-                                   "termite --exec=clip-del.sh --title=clipboard")
+                                   "termite --exec=\"clip.sh del\" --title=clipboard")
       -- resizing window ratio
     , ("M-u",           sendMessage ShrinkSlave)
     , ("M-n",           sendMessage ExpandSlave)
