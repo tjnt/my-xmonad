@@ -11,7 +11,7 @@ Config
     , iconRoot = "/home/tjnt/.xmonad/icons"
     , sepChar = "%"
     , alignSep = "}{"
-    , template = " %UnsafeStdinReader% }{| %cpu% | %memory% | %dynnetwork% | %wlp3s0wi% | %bright% | %default:Master% | %battery% | %date% | %trayerpad%"
+    , template = " %UnsafeStdinReader% }{| %cpu% | %memory% | %multicoretemp% | %dynnetwork% | %wlp3s0wi% | %bright% | %default:Master% | %battery% | %date% | %trayerpad%"
     , commands =
         [ Run UnsafeStdinReader
         , Run Cpu
@@ -34,6 +34,14 @@ Config
             , "--"
             , "--used-icon-pattern", "<icon=mem.xbm/>"
             ] 10
+        , Run MultiCoreTemp
+            [ "--template", "<icon=temp.xbm/> <avg> ℃"
+            , "--Low",      "40"
+            , "--High",     "60"
+            , "--low",      "lightblue"
+            , "--normal",   "#fad07a"
+            , "--high",     "#cf6a4c"
+            ] 50
         , Run DynNetwork
             [ "--template", "<rxipat> <rx>kb : <txipat> <tx>kb"
             , "--Low",      "102400"
