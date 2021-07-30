@@ -39,7 +39,7 @@ import           XMonad.Layout.Minimize           (minimize)
 import           XMonad.Layout.MouseResizableTile (MRTMessage (..),
                                                    mouseResizableTile,
                                                    mouseResizableTileMirrored)
-import           XMonad.Layout.Named              (named)
+import           XMonad.Layout.Renamed            (renamed, Rename(..))
 import           XMonad.Layout.NoBorders          (noBorders, smartBorders)
 import           XMonad.Layout.SimplestFloat      (simplestFloat)
 import           XMonad.Layout.Spacing            (Border (..), spacingRaw)
@@ -287,11 +287,11 @@ myLayoutHook = toggleLayouts expand normal
     full   = boringWindows . minimize . noBorders . avoidStruts
            $ Full
     icon = printf "<icon=%s/>"
-    normal =     named (icon "layout-tall.xbm")   tall
-             ||| named (icon "layout-mirror.xbm") mirror
-             ||| named (icon "layout-circle.xbm") circle
-             ||| named (icon "layout-float.xbm")  float
-    expand =     named (icon "layout-full.xbm")   full
+    normal =     renamed [ Replace (icon "layout-tall.xbm")  ] tall
+             ||| renamed [ Replace (icon "layout-mirror.xbm")] mirror
+             ||| renamed [ Replace (icon "layout-circle.xbm")] circle
+             ||| renamed [ Replace (icon "layout-float.xbm") ] float
+    expand =     renamed [ Replace (icon "layout-full.xbm")  ] full
 
 -- Manage Hook
 
