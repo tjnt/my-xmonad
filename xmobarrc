@@ -38,7 +38,6 @@ Config
             [ "--template", "<icon=temp.xbm/> <avg> ℃"
             , "--Low",      "40"
             , "--High",     "60"
-            , "--low",      "lightblue"
             , "--normal",   "#fad07a"
             , "--high",     "#cf6a4c"
             ] 50
