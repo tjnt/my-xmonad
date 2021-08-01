@@ -261,17 +261,17 @@ myKeys =
 -- Mouse bindings
 
 myMouseBindings =
-    [ ((myModMask, button1), (\w ->
+    [ ((myModMask, button1), \w ->
             focus w >> mouseMoveWindow w >>
-            afterDrag (snapMagicMove (Just 50) (Just 50) w)))
-    , ((myModMask .|. shiftMask, button1), (\w ->
+            afterDrag (snapMagicMove (Just 50) (Just 50) w))
+    , ((myModMask .|. shiftMask, button1), \w ->
             focus w >> mouseMoveWindow w >>
-            afterDrag (snapMagicResize [L,R,U,D] (Just 50) (Just 50) w)))
-    , ((myModMask, button3), (\w ->
+            afterDrag (snapMagicResize [L,R,U,D] (Just 50) (Just 50) w))
+    , ((myModMask, button3), \w ->
             focus w >> mouseResizeWindow w >>
-            afterDrag (snapMagicResize [R,D] (Just 50) (Just 50) w)))
-    , ((myModMask, button4), (\_ -> windows W.swapUp))
-    , ((myModMask, button5), (\_ -> windows W.swapDown))
+            afterDrag (snapMagicResize [R,D] (Just 50) (Just 50) w))
+    , ((myModMask, button4), \_ -> windows W.swapUp)
+    , ((myModMask, button5), \_ -> windows W.swapDown)
     ]
 
 -- Layout Hook
