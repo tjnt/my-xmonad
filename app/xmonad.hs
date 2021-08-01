@@ -347,7 +347,7 @@ myPP = xmobarPP
     , ppSep             = "  "
     }
   where
-    clickable s n = "<action=xdotool key super+" ++ n ++ ">" ++ s ++ "</action>"
+    clickable s n = printf "<action=xdotool key super+%s>%s</action>" n s
 
 toggleStrutsKey XConfig { XMonad.modMask = modMask } = (modMask, xK_b)
 
