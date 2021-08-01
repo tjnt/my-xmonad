@@ -32,15 +32,16 @@ import           XMonad.Hooks.ManageDocks         (avoidStruts, manageDocks)
 import           XMonad.Hooks.ManageHelpers       (doCenterFloat, doFullFloat,
                                                    doRectFloat, isDialog,
                                                    isFullscreen)
-import           XMonad.Layout.BoringWindows      (boringWindows, focusUp, focusDown, focusMaster)
+import           XMonad.Layout.BoringWindows      (boringWindows, focusDown,
+                                                   focusMaster, focusUp)
 import           XMonad.Layout.Circle             (Circle (..))
 import           XMonad.Layout.Gaps               (Direction2D (..))
 import           XMonad.Layout.Minimize           (minimize)
 import           XMonad.Layout.MouseResizableTile (MRTMessage (..),
                                                    mouseResizableTile,
                                                    mouseResizableTileMirrored)
-import           XMonad.Layout.Renamed            (renamed, Rename(..))
 import           XMonad.Layout.NoBorders          (noBorders, smartBorders)
+import           XMonad.Layout.Renamed            (Rename (..), renamed)
 import           XMonad.Layout.SimplestFloat      (simplestFloat)
 import           XMonad.Layout.Spacing            (Border (..), spacingRaw)
 import           XMonad.Layout.ToggleLayouts      (ToggleLayout (..),
