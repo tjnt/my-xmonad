@@ -188,7 +188,7 @@ myTsNavigation = M.union
 -- Keys
 
 myKeys =
-    [ -- focus
+    [ -- focus (BoringWindows)
       ("M-j",           focusDown)
     , ("M-k",           focusUp)
     , ("M-m",           focusMaster)
