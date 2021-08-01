@@ -96,13 +96,15 @@ brightnessCtrl param = do
 cycleMonitor :: (String, String) -> X ()
 cycleMonitor (primary, secondary) = do
     x <- io $ (read <$> readFile file) `catch` handler :: X Int
-    io $ x `seq` writeFile file $ show (succ x `rem` 4)
+    let x' = succ x `rem` 4
+    io $ x' `seq` writeFile file $ show x'
     spawn $ "xrandr " ++
-        case x of
+        case x' of
             0 -> single
             1 -> rightof
             2 -> leftof
             3 -> external
+            _ -> single
   where
     handler :: IOException -> IO Int
     handler e = return 0
