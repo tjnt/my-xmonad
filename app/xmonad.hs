@@ -1,6 +1,7 @@
 import           ColorScheme.JellyBeans
 import           Control.Applicative              ((<$>))
 import           Control.Exception                (catch)
+import           Data.Bifunctor                   (bimap)
 import           Data.Default                     (def)
 import qualified Data.Map                         as M
 import           Data.Tree                        (Tree (Node))
@@ -226,22 +227,22 @@ myKeys =
     , ("M-S-d",         shiftToNext)
     , ("M-S-s",         shiftToPrev)
       -- float keys
-    , ("M-<Up>",        withFocused $ keysMoveWindow   (0,-10))
-    , ("M-<Down>",      withFocused $ keysMoveWindow   (0,10))
-    , ("M-<Left>",      withFocused $ keysMoveWindow   (-10,0))
-    , ("M-<Right>",     withFocused $ keysMoveWindow   (10,0))
-    , ("M-S-<Up>",      withFocused $ keysResizeWindow (0,-10) (0,0))
-    , ("M-S-<Down>",    withFocused $ keysResizeWindow (0, 10) (0,0))
-    , ("M-S-<Left>",    withFocused $ keysResizeWindow (-10,0) (0,0))
-    , ("M-S-<Right>",   withFocused $ keysResizeWindow (10,0) (0,0))
-    , ("M-C-<Up>",      withFocused $ snapMove         U Nothing)
-    , ("M-C-<Down>",    withFocused $ snapMove         D Nothing)
-    , ("M-C-<Left>",    withFocused $ snapMove         L Nothing)
-    , ("M-C-<Right>",   withFocused $ snapMove         R Nothing)
-    , ("M-C-S-<Up>",    withFocused $ snapShrink       D Nothing)
-    , ("M-C-S-<Down>" , withFocused $ snapGrow         D Nothing)
-    , ("M-C-S-<Left>" , withFocused $ snapShrink       R Nothing)
-    , ("M-C-S-<Right>", withFocused $ snapGrow         R Nothing)
+    , ("M-<Up>",        withFocused $ keysMoveWindow'   (0,-10))
+    , ("M-<Down>",      withFocused $ keysMoveWindow'   (0,10))
+    , ("M-<Left>",      withFocused $ keysMoveWindow'   (-10,0))
+    , ("M-<Right>",     withFocused $ keysMoveWindow'   (10,0))
+    , ("M-S-<Up>",      withFocused $ keysResizeWindow' (0,-10) (0,0))
+    , ("M-S-<Down>",    withFocused $ keysResizeWindow' (0, 10) (0,0))
+    , ("M-S-<Left>",    withFocused $ keysResizeWindow' (-10,0) (0,0))
+    , ("M-S-<Right>",   withFocused $ keysResizeWindow' (10,0) (0,0))
+    , ("M-C-<Up>",      withFocused $ snapMove          U Nothing)
+    , ("M-C-<Down>",    withFocused $ snapMove          D Nothing)
+    , ("M-C-<Left>",    withFocused $ snapMove          L Nothing)
+    , ("M-C-<Right>",   withFocused $ snapMove          R Nothing)
+    , ("M-C-S-<Up>",    withFocused $ snapShrink        D Nothing)
+    , ("M-C-S-<Down>" , withFocused $ snapGrow          D Nothing)
+    , ("M-C-S-<Left>" , withFocused $ snapShrink        R Nothing)
+    , ("M-C-S-<Right>", withFocused $ snapGrow          R Nothing)
       -- screenshot
     , ("<Print>", spawn "sleep 0.2; scrot -s $(xdg-user-dir PICTURES)/%Y-%m-%d-%T-shot.png")
       -- volume control
@@ -257,6 +258,11 @@ myKeys =
       -- toggle wifi
     , ("<XF86WLAN>",             spawn "wifi toggle")
     ]
+  where
+    convert :: (Integral a, Num b) => (a,a) -> (b,b)
+    convert = bimap fromIntegral fromIntegral
+    keysMoveWindow' = keysMoveWindow . convert
+    keysResizeWindow' d g = keysResizeWindow (convert d) (convert g)
 
 -- Mouse bindings
 
