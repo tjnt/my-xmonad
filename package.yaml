@@ -22,13 +22,11 @@ description:         Please see the README on GitHub at <https://github.com/gith
 dependencies:
 - base >= 4.7 && < 5
 
-library:
-  source-dirs: src
+source-dirs: src
 
 executables:
   xmonad:
     main: xmonad.hs
-    source-dirs: app
     ghc-options:
     - -threaded
     - -rtsopts
@@ -38,7 +36,6 @@ executables:
     - xmonad-contrib
     - containers
     - data-default
-    - my-xmonad
 
 # tests:
 #   my-xmonad-test:
