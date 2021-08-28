@@ -29,7 +29,7 @@ import qualified XMonad.Actions.TreeSelect        as TS
 import           XMonad.Hooks.DynamicLog          (PP (..), statusBar,
                                                    xmobarColor, xmobarPP)
 import           XMonad.Hooks.EwmhDesktops        (ewmh, fullscreenEventHook)
-import           XMonad.Hooks.ManageDocks         (avoidStruts, manageDocks)
+import           XMonad.Hooks.ManageDocks         (manageDocks)
 import           XMonad.Hooks.ManageHelpers       (doCenterFloat, doFullFloat,
                                                    doRectFloat, isDialog,
                                                    isFullscreen)
@@ -285,15 +285,15 @@ myMouseBindings =
 myLayoutHook = toggleLayouts expand normal
   where
     spacing = spacingRaw True (Border 2 2 4 4) True (Border 0 0 0 0) False
-    tall   = boringWindows . minimize . smartBorders . avoidStruts . spacing
+    tall   = boringWindows . minimize . smartBorders . spacing
            $ mouseResizableTile
-    mirror = boringWindows . minimize . smartBorders . avoidStruts . spacing
+    mirror = boringWindows . minimize . smartBorders . spacing
            $ mouseResizableTileMirrored
-    circle = boringWindows . minimize . smartBorders . avoidStruts
+    circle = boringWindows . minimize . smartBorders
            $ Circle
-    float  = boringWindows . minimize . smartBorders . avoidStruts
+    float  = boringWindows . minimize . smartBorders
            $ simplestFloat
-    full   = boringWindows . minimize . noBorders . avoidStruts
+    full   = boringWindows . minimize . noBorders
            $ Full
     icon = printf "<icon=%s/>"
     normal =     renamed [ Replace (icon "layout-tall.xbm")  ] tall
