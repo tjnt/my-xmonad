@@ -3,7 +3,28 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: xmobar-0.39@sha256:59d15adf16a0ca95b65ddbd62f330d628ccf07282f8928e3f7b4ce00250a468f,12547
+    pantry-tree:
+      size: 6747
+      sha256: 7da55b2b265bef7c53bb4b5bf1ebc5fcae1e6e9cee54e1b30482ceab05ffdc6e
+  original:
+    hackage: xmobar-0.39
+- completed:
+    hackage: netlink-1.1.1.0@sha256:d83424b5ba9921191449e4b1f53c7cba7f4375f2c55a9b737c77e982e1f40d00,3689
+    pantry-tree:
+      size: 1598
+      sha256: 42a57a2db0d8b44e04a04905ed56994b7293d2f244595bf3e65480c36d114ac3
+  original:
+    hackage: netlink-1.1.1.0
+- completed:
+    hackage: libmpd-0.9.2.0@sha256:b514fe25cb131a8a563f1162524358b374c8ce7dde0de073f8a6849496fbe8c8,4010
+    pantry-tree:
+      size: 3772
+      sha256: 4af2758d0bd5fb52612d76b154bb4f5a2bae36fd2a668fca8d227041f600f477
+  original:
+    hackage: libmpd-0.9.2.0
 snapshots:
 - completed:
     size: 585392
