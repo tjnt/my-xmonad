@@ -43,7 +43,8 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-      - xmobar
+    - xmobar
+    - xmonad-contrib
 
 # tests:
 #   my-xmonad-test:

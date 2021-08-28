@@ -332,7 +332,7 @@ myStartupHook = do
 
 -- xmobar
 
-myBar = "xmobar $HOME/.xmonad/xmobarrc"
+myBar = "xmobar"
 
 myPP = xmobarPP
     { ppOrder           = \(ws:l:t:_)  -> [ws, l, t]

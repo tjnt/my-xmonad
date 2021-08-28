@@ -1,11 +1,13 @@
+import           Text.Printf (printf)
+import           Theme.Theme
 import           Xmobar
 
 config :: Config
 config =
     defaultConfig
         { font = "xft:VL Gothic-10, Unifont-10, Unifont Upper-10"
-        , bgColor = "#151515"
-        , fgColor = "#a8a897"
+        , bgColor = basebg
+        , fgColor = base07
         , position = TopSize L 100 30
         , lowerOnStart = True
         , overrideRedirect = True
@@ -20,8 +22,8 @@ config =
                 [ "--template", "<ipat> <total>%"
                 , "--Low",      "40"
                 , "--High",     "85"
-                , "--normal",   "#fad07a"
-                , "--high",     "#cf6a4c"
+                , "--normal",   base0B
+                , "--high",     base01
                 , "--width",    "3"
                 , "--"
                 , "--load-icon-pattern", "<icon=cpu.xbm/>"
@@ -30,8 +32,8 @@ config =
                 [ "--template", "<usedipat> <usedratio>%"
                 , "--Low",      "40"
                 , "--High",     "90"
-                , "--normal",   "#fad07a"
-                , "--high",     "#cf6a4c"
+                , "--normal",   base0B
+                , "--high",     base01
                 , "--width",    "3"
                 , "--"
                 , "--used-icon-pattern", "<icon=mem.xbm/>"
@@ -40,15 +42,15 @@ config =
                 [ "--template", "<icon=temp.xbm/> <avg> ℃"
                 , "--Low",      "40"
                 , "--High",     "60"
-                , "--normal",   "#fad07a"
-                , "--high",     "#cf6a4c"
+                , "--normal",   base0B
+                , "--high",     base01
                 ] 50
             , Run $ DynNetwork
                 [ "--template", "<rxipat> <rx>kb : <txipat> <tx>kb"
                 , "--Low",      "102400"
                 , "--High",     "1024000"
-                , "--normal",   "#fad07a"
-                , "--high",     "#cf6a4c"
+                , "--normal",   base0B
+                , "--high",     base01
                 , "--width",    "4"
                 , "--"
                 , "--rx-icon-pattern", "<icon=arrow_down.xbm/>"
@@ -70,21 +72,21 @@ config =
                 , "--"
                 , "--on",       "🔉"
                 , "--off",      "🔇"
-                , "--onc",      "#fad07a"
-                , "--offc",     "#cf6a4c"
+                , "--onc",      base0B
+                , "--offc",     base01
                 ] 10
             , Run $ Battery
                 [ "--template", "<leftipat>  <left>% <acstatus> <watts>w"
                 , "--Low",      "20"
                 , "--High",     "80"
-                , "--low",      "#cf6a4c"
-                , "--high",     "#99ad6a"
+                , "--low",      base01
+                , "--high",     base02
                 , "--"
                 , "-a", "notify-send -u critical 'Battery running out!!'"
                 , "-A", "10"
-                , "-o",                  "<fc=#a8a897>(<timeleft>)</fc>"
-                , "-O",                  "<fc=#a8a897>(charge)</fc>"
-                , "-i",                  "<fc=#a8a897>(idle)</fc>"
+                , "-o",                  printf "<fc=%s>(<timeleft>)</fc>" base07
+                , "-O",                  printf "<fc=%s>(charge)</fc>" base07
+                , "-i",                  printf "<fc=%s>(idle)</fc>" base07
                 , "--on-icon-pattern",   "<icon=power-ac.xbm/>"
                 , "--off-icon-pattern",  "<icon=power-bat2.xbm/>"
                 , "--idle-icon-pattern", "<icon=power-ac.xbm/>"
