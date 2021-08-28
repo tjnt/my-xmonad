@@ -1,4 +1,6 @@
-import           Text.Printf (printf)
+import           System.Environment (getEnv)
+import           System.IO.Unsafe   (unsafeDupablePerformIO)
+import           Text.Printf        (printf)
 import           Theme.Theme
 import           Xmobar
 
@@ -12,7 +14,7 @@ config =
         , lowerOnStart = True
         , overrideRedirect = True
         , persistent = True
-        , iconRoot = "/home/tjnt/.xmonad/icons"
+        , iconRoot = homeDir <> "/.xmonad/icons"
         , sepChar = "%"
         , alignSep = "}{"
         , template = " %UnsafeStdinReader% }{| %cpu% | %memory% | %multicoretemp% | %dynnetwork% | %wlp3s0wi% | %bright% | %default:Master% | %battery% | %date% | %trayerpad%"
@@ -95,6 +97,9 @@ config =
             , Run $ Com "trayer-padding-icon.sh" [] "trayerpad" 100
             ]
       }
+
+homeDir :: String
+homeDir = unsafeDupablePerformIO (getEnv "HOME")
 
 main :: IO ()
 main = xmobar config
