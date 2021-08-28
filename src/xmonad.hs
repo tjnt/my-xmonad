@@ -42,7 +42,7 @@ import           XMonad.Actions.TreeSelect        (TSConfig (..), TSNode (..),
                                                    treeselectAction,
                                                    tsDefaultConfig)
 import qualified XMonad.Actions.TreeSelect        as TS
-import           XMonad.Hooks.DynamicLog          (PP (..), statusBar,
+import           XMonad.Hooks.DynamicLog          (PP (..), shorten, statusBar,
                                                    xmobarColor, xmobarPP)
 import           XMonad.Hooks.EwmhDesktops        (ewmh, fullscreenEventHook)
 import           XMonad.Hooks.ManageDocks         (manageDocks)
@@ -366,7 +366,7 @@ myPP = xmobarPP
     , ppVisible         = xmobarColor base01 basebg . clickable "⦿"
     , ppHidden          = xmobarColor base06 basebg . clickable "●"
     , ppHiddenNoWindows = xmobarColor base06 basebg . clickable "○"
-    , ppTitle           = xmobarColor base04 basebg
+    , ppTitle           = xmobarColor base04 basebg . shorten 32
     , ppOutput          = putStrLn
     , ppWsSep           = " "
     , ppSep             = "  "
