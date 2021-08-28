@@ -2,6 +2,6 @@
 
 set -e
 
-stack build :xmonad --verbosity error
-stack install :xmonad --local-bin-path bin/ --verbosity error
+stack install --local-bin-path bin/ --verbosity error
 mv bin/xmonad "$1"
+mv bin/xmobar $HOME/.local/bin/xmobar
