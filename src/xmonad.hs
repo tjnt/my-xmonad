@@ -1,4 +1,3 @@
-import           ColorScheme.JellyBeans
 import           Control.Applicative              ((<$>))
 import           Control.Exception                (catch)
 import           Data.Bifunctor                   (bimap)
@@ -8,6 +7,7 @@ import           Data.Tree                        (Tree (Node))
 import           GHC.IO.Exception                 (IOException)
 import           System.IO                        (readFile, writeFile)
 import           Text.Printf                      (printf)
+import           Theme.Theme
 import           XMonad
 import           XMonad.Actions.CopyWindow        (kill1)
 import           XMonad.Actions.CycleWS           (nextWS, prevWS, shiftToNext,
@@ -119,8 +119,8 @@ cycleMonitor (primary, secondary) = do
 
 myXPConfig = def
     { font              = "xft:VL Gothic-10"
-    , bgColor           = colorbg
-    , fgColor           = colorfg
+    , bgColor           = basebg
+    , fgColor           = basefg
     , promptBorderWidth = 0
     , position          = Top
     , alwaysHighlight   = True
@@ -161,10 +161,10 @@ myTreeSelect =
 myTreeSelectConfig = tsDefaultConfig
     { ts_hidechildren = True
     , ts_font         = "xft:VL Gothic-10"
-    , ts_background   = readColor colorbg "C0"
-    , ts_node         = (0xff000000, readColor color12 "FF")
-    , ts_nodealt      = (0xff000000, readColor color4  "FF")
-    , ts_highlight    = (0xffffffff, readColor color1  "FF")
+    , ts_background   = readColor basebg "C0"
+    , ts_node         = (0xff000000, readColor base0C "FF")
+    , ts_nodealt      = (0xff000000, readColor base04  "FF")
+    , ts_highlight    = (0xffffffff, readColor base01  "FF")
     , ts_extra        = 0xffffffff
     , ts_node_width   = 200
     , ts_node_height  = 30
@@ -336,12 +336,12 @@ myBar = "xmobar"
 
 myPP = xmobarPP
     { ppOrder           = \(ws:l:t:_)  -> [ws, l, t]
-    , ppCurrent         = xmobarColor color1 colorbg . clickable "●"
-    , ppUrgent          = xmobarColor color6 colorbg . clickable "●"
-    , ppVisible         = xmobarColor color1 colorbg . clickable "⦿"
-    , ppHidden          = xmobarColor color6 colorbg . clickable "●"
-    , ppHiddenNoWindows = xmobarColor color6 colorbg . clickable "○"
-    , ppTitle           = xmobarColor color4 colorbg
+    , ppCurrent         = xmobarColor base01 basebg . clickable "●"
+    , ppUrgent          = xmobarColor base06 basebg . clickable "●"
+    , ppVisible         = xmobarColor base01 basebg . clickable "⦿"
+    , ppHidden          = xmobarColor base06 basebg . clickable "●"
+    , ppHiddenNoWindows = xmobarColor base06 basebg . clickable "○"
+    , ppTitle           = xmobarColor base04 basebg
     , ppOutput          = putStrLn
     , ppWsSep           = " "
     , ppSep             = "  "
@@ -358,8 +358,8 @@ myConfig = ewmh def
     , terminal = "termite"
     , workspaces = myWorkspaces
     , focusFollowsMouse = True
-    , normalBorderColor = color6
-    , focusedBorderColor = color1
+    , normalBorderColor = base06
+    , focusedBorderColor = base01
     , borderWidth = 4
     , layoutHook = myLayoutHook
     , manageHook = myManageHook
