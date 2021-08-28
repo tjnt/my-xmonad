@@ -1,14 +1,30 @@
-import           Control.Applicative              ((<$>))
+{-# OPTIONS_GHC -fno-warn-type-defaults #-}
+{-# OPTIONS_GHC -fno-warn-missing-signatures #-}
+
 import           Control.Exception                (catch)
 import           Data.Bifunctor                   (bimap)
-import           Data.Default                     (def)
 import qualified Data.Map                         as M
 import           Data.Tree                        (Tree (Node))
 import           GHC.IO.Exception                 (IOException)
-import           System.IO                        (readFile, writeFile)
 import           Text.Printf                      (printf)
 import           Theme.Theme
-import           XMonad
+import           XMonad                           (Button, Full (Full), KeyMask,
+                                                   KeySym, ManageHook, Window,
+                                                   X, XConfig (..), button1,
+                                                   button3, button4, button5,
+                                                   className, composeAll,
+                                                   controlMask, def, doFloat,
+                                                   floatLocation, focus, gets,
+                                                   io, mod4Mask,
+                                                   mouseMoveWindow,
+                                                   mouseResizeWindow, noModMask,
+                                                   refresh, sendMessage,
+                                                   shiftMask, spawn, whenX,
+                                                   windows, windowset,
+                                                   withFocused, xK_b,
+                                                   xK_bracketleft, xK_q, xmonad,
+                                                   (-->), (.|.), (<+>), (=?),
+                                                   (|||))
 import           XMonad.Actions.CopyWindow        (kill1)
 import           XMonad.Actions.CycleWS           (nextWS, prevWS, shiftToNext,
                                                    shiftToPrev, toggleWS)
@@ -47,8 +63,7 @@ import           XMonad.Layout.SimplestFloat      (simplestFloat)
 import           XMonad.Layout.Spacing            (Border (..), spacingRaw)
 import           XMonad.Layout.ToggleLayouts      (ToggleLayout (..),
                                                    toggleLayouts)
-import           XMonad.Operations                (floatLocation)
-import           XMonad.Prompt                    (XPPosition (..),
+import           XMonad.Prompt                    (XPConfig, XPPosition (..),
                                                    alwaysHighlight, bgColor,
                                                    fgColor, font, height,
                                                    position, promptBorderWidth)
@@ -59,7 +74,10 @@ import           XMonad.Util.EZConfig             (additionalKeysP,
 import           XMonad.Util.SpawnOnce            (spawnOnce)
 -- import           XMonad.Util.Run             (runProcessWithInput)
 
+myModMask :: KeyMask
 myModMask = mod4Mask
+
+myWorkspaces :: [String]
 myWorkspaces = [ show x | x <- [1..5] ]
 
 -- Functions
@@ -108,7 +126,7 @@ cycleMonitor (primary, secondary) = do
             _ -> single
   where
     handler :: IOException -> IO Int
-    handler e = return 0
+    handler _ = return 0
     file     = "/tmp/monitor-mode"
     single   = printf "--output %s --auto --output %s --off" primary secondary
     rightof  = printf "--output %s --auto --output %s --auto --right-of eDP-1" primary secondary
@@ -117,6 +135,7 @@ cycleMonitor (primary, secondary) = do
 
 -- shell prompt
 
+myXPConfig :: XPConfig
 myXPConfig = def
     { font              = myFont
     , bgColor           = basebg
@@ -129,6 +148,7 @@ myXPConfig = def
 
 -- tree select
 
+myTreeSelect :: [Tree (TSNode (X ()))]
 myTreeSelect =
    [ Node (TSNode "Application Menu" "Open application menu" (return ()))
        [
@@ -158,6 +178,7 @@ myTreeSelect =
        ]
    ]
 
+myTreeSelectConfig :: TSConfig a
 myTreeSelectConfig = tsDefaultConfig
     { ts_hidechildren = True
     , ts_font         = myFont
@@ -171,22 +192,21 @@ myTreeSelectConfig = tsDefaultConfig
     , ts_originX      = 0
     , ts_originY      = 0
     , ts_indent       = 80
-    , ts_navigate     = myTsNavigation
+    , ts_navigate     = navigation
     }
   where
     readColor color alpha =
         read . (++) "0x" . (++) alpha . tail $ color
-
-myTsNavigation = M.union
-    TS.defaultNavigation
-    (M.fromList
-    [
-        ((noModMask, xK_q), TS.cancel)
-    ,   ((controlMask, xK_bracketleft), TS.cancel)
-    ])
+    navigation = M.union
+        TS.defaultNavigation $
+        M.fromList
+            [ ((noModMask, xK_q), TS.cancel)
+            , ((controlMask, xK_bracketleft), TS.cancel)
+            ]
 
 -- Keys
 
+myKeys :: [([Char], X ())]
 myKeys =
     [ -- focus (BoringWindows)
       ("M-j",           focusDown)
@@ -266,6 +286,7 @@ myKeys =
 
 -- Mouse bindings
 
+myMouseBindings :: [((KeyMask, Button), Window -> X ())]
 myMouseBindings =
     [ ((myModMask, button1), \w ->
             focus w >> mouseMoveWindow w >>
@@ -304,6 +325,7 @@ myLayoutHook = toggleLayouts expand normal
 
 -- Manage Hook
 
+myManageHook :: ManageHook
 myManageHook = manageSpawn <+> manageDocks <+> composeAll
     [ className =? "Xmessage"    --> doFloat
     , className =? "MPlayer"     --> doFloat
@@ -316,6 +338,7 @@ myManageHook = manageSpawn <+> manageDocks <+> composeAll
 
 -- Startup Hook
 
+myStartupHook :: X ()
 myStartupHook = do
     spawnOnce "compton -b"
     spawnOnce "trayer --edge top --align right --widthtype request --height 31 \
@@ -332,8 +355,10 @@ myStartupHook = do
 
 -- xmobar
 
+myBar :: String
 myBar = "xmobar"
 
+myPP :: PP
 myPP = xmobarPP
     { ppOrder           = \(ws:l:t:_)  -> [ws, l, t]
     , ppCurrent         = xmobarColor base01 basebg . clickable "●"
@@ -349,7 +374,8 @@ myPP = xmobarPP
   where
     clickable s n = printf "<action=xdotool key super+%s>%s</action>" n s
 
-toggleStrutsKey XConfig { XMonad.modMask = modMask } = (modMask, xK_b)
+toggleStrutsKey :: XConfig l -> (KeyMask, KeySym)
+toggleStrutsKey XConfig { XMonad.modMask = m } = (m, xK_b)
 
 -- main
 
@@ -369,4 +395,5 @@ myConfig = ewmh def
     `additionalKeysP` myKeys
     `additionalMouseBindings` myMouseBindings
 
+main :: IO ()
 main = xmonad =<< statusBar myBar myPP toggleStrutsKey myConfig

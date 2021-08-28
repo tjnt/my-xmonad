@@ -1,8 +1,14 @@
 import           System.Environment (getEnv)
 import           System.IO.Unsafe   (unsafeDupablePerformIO)
 import           Text.Printf        (printf)
-import           Theme.Theme
-import           Xmobar
+import           Theme.Theme        (base01, base02, base07, base0B, basebg,
+                                     myFont)
+import           Xmobar             (Align (L), Command (Com), Config (..),
+                                     Date (Date),
+                                     Monitors (Battery, Brightness, Cpu, DynNetwork, Memory, MultiCoreTemp, Volume, Wireless),
+                                     Runnable (Run),
+                                     StdinReader (UnsafeStdinReader),
+                                     XPosition (TopSize), defaultConfig, xmobar)
 
 config :: Config
 config =
