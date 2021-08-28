@@ -27,7 +27,7 @@ config =
         , commands =
             [ Run UnsafeStdinReader
             , Run $ Cpu
-                [ "--template", "<ipat> <total>%"
+                [ "--template", "<ipat><total>%"
                 , "--Low",      "40"
                 , "--High",     "85"
                 , "--normal",   base0B
@@ -37,7 +37,7 @@ config =
                 , "--load-icon-pattern", "<icon=cpu.xbm/>"
                 ] 10
             , Run $ Memory
-                [ "--template", "<usedipat> <usedratio>%"
+                [ "--template", "<usedipat><usedratio>%"
                 , "--Low",      "40"
                 , "--High",     "90"
                 , "--normal",   base0B
@@ -47,14 +47,17 @@ config =
                 , "--used-icon-pattern", "<icon=mem.xbm/>"
                 ] 10
             , Run $ MultiCoreTemp
-                [ "--template", "<icon=temp.xbm/> <avg> ℃"
+                [ "--template", "<avgipat><avg> ℃"
                 , "--Low",      "40"
                 , "--High",     "60"
                 , "--normal",   base0B
                 , "--high",     base01
+                , "--width",    "3"
+                , "--"
+                , "--avg-icon-pattern", "<icon=temp.xbm/>"
                 ] 50
             , Run $ DynNetwork
-                [ "--template", "<rxipat> <rx>kb : <txipat> <tx>kb"
+                [ "--template", "<rxipat><rx>kb : <txipat><tx>kb"
                 , "--Low",      "102400"
                 , "--High",     "1024000"
                 , "--normal",   base0B
@@ -65,17 +68,17 @@ config =
                 , "--tx-icon-pattern", "<icon=arrow_up.xbm/>"
                 ] 10
             , Run $ Wireless "wlp3s0"
-                [ "--template", "<icon=wifi.xbm/> <quality>%"
+                [ "--template", "<icon=wifi.xbm/><quality>%"
                 , "--width",    "3"
                 ] 10
             , Run $ Brightness
-                [ "--template", "💡 <percent>%"
+                [ "--template", "💡<percent>%"
                 , "--width",    "3"
                 , "--"
                 , "-D",         "intel_backlight"
                 ] 10
             , Run $ Volume "default" "Master"
-                [ "--template", "<status> <volume>%"
+                [ "--template", "<status><volume>%"
                 , "--width",    "3"
                 , "--"
                 , "--on",       "🔉"
@@ -84,7 +87,7 @@ config =
                 , "--offc",     base01
                 ] 10
             , Run $ Battery
-                [ "--template", "<leftipat>  <left>% <acstatus> <watts>w"
+                [ "--template", "<leftipat> <left>% <acstatus> <watts>w"
                 , "--Low",      "20"
                 , "--High",     "80"
                 , "--low",      base01
