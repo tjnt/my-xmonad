@@ -118,7 +118,7 @@ cycleMonitor (primary, secondary) = do
 -- shell prompt
 
 myXPConfig = def
-    { font              = "xft:VL Gothic-10"
+    { font              = myFont
     , bgColor           = basebg
     , fgColor           = basefg
     , promptBorderWidth = 0
@@ -160,7 +160,7 @@ myTreeSelect =
 
 myTreeSelectConfig = tsDefaultConfig
     { ts_hidechildren = True
-    , ts_font         = "xft:VL Gothic-10"
+    , ts_font         = myFont
     , ts_background   = readColor basebg "C0"
     , ts_node         = (0xff000000, readColor base0C "FF")
     , ts_nodealt      = (0xff000000, readColor base04  "FF")

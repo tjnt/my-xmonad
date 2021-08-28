@@ -5,7 +5,7 @@ import           Xmobar
 config :: Config
 config =
     defaultConfig
-        { font = "xft:VL Gothic-10, Unifont-10, Unifont Upper-10"
+        { font = myFont
         , bgColor = basebg
         , fgColor = base07
         , position = TopSize L 100 30
