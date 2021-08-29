@@ -332,6 +332,7 @@ myManageHook = manageSpawn <+> manageDocks <+> composeAll
     , className =? "mplayer2"    --> doFloat
     , className =? "Pavucontrol" --> doFloat
     , className =? "Peek"        --> doFloat
+    , title =? "htop"            --> doFloat
     , title =? "pulsemixer"      --> doFloat
     , title =? "nmtui"           --> doFloat
     , title =? "nmtui-edit"      --> doFloat

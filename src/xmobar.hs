@@ -27,15 +27,15 @@ config =
         , alignSep = "}{"
         , template = " %UnsafeStdinReader% }{" <>
             concatMap (wrap "  " "")
-                [ "%cpu%"
-                , "%memory%"
+                [ runTUI "htop -s PERCENT_CPU" "htop" "3" "%cpu%"
+                , runTUI "htop -s PERCENT_MEM" "htop" "3" "%memory%"
                 , "%multicoretemp%"
-                , runTUI "nmtui-edit" "3" "%dynnetwork%"
+                , runTUI "nmtui-edit" "" "3" "%dynnetwork%"
                 , xmobarAction "wifi toggle" "1" $
-                  runTUI "nmtui-connect" "3" "%wlp3s0wi%"
+                  runTUI "nmtui-connect" "" "3" "%wlp3s0wi%"
                 , "%bright%"
                 , xmobarAction "amixer -q set Master toggle" "1" $
-                  runTUI "pulsemixer" "3" "%default:Master%"
+                  runTUI "pulsemixer" "" "3" "%default:Master%"
                 , "%battery%"
                 , "%date%"
                 , "%trayerpad%"
@@ -123,8 +123,10 @@ config =
             ]
       }
 
-runTUI :: String -> String -> String -> String
-runTUI cmd = xmobarAction ("termite --exec " <> cmd)
+runTUI :: String -> String -> String -> String -> String
+runTUI cmd title = xmobarAction
+                 $ "termite --exec " <> wrap "\"" "\"" cmd
+                 <> if null title then "" else " --title " <> title
 
 homeDir :: String
 homeDir = unsafeDupablePerformIO (getEnv "HOME")
