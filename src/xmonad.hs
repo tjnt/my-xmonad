@@ -345,9 +345,10 @@ myManageHook = manageSpawn <+> manageDocks <+> composeAll
 myStartupHook :: X ()
 myStartupHook = do
     spawnOnce "compton -b"
-    spawnOnce "trayer --edge top --align right --widthtype request --height 31 \
-               \--expand true --transparent true --alpha 0 --tint 0x080808 \
-               \--SetDockType true --SetPartialStrut true"
+    spawnOnce $ printf
+              "trayer --edge top --align right --widthtype request --height 31 \
+               \--expand true --transparent true --alpha 0 --tint %s \
+               \--SetDockType true --SetPartialStrut true" ("0x" <> tail basebg)
     spawnOnce "feh --randomize --bg-fill $HOME/.wallpaper/*"
     spawnOnce "xbindkeys"
     spawnOnce "nm-tray"
