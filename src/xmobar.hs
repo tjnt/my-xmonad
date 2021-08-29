@@ -1,14 +1,16 @@
-import           System.Environment (getEnv)
-import           System.IO.Unsafe   (unsafeDupablePerformIO)
-import           Text.Printf        (printf)
-import           Theme.Theme        (base01, base02, base07, base0B, basebg,
-                                     myFont)
-import           Xmobar             (Align (L), Command (Com), Config (..),
-                                     Date (Date),
-                                     Monitors (Battery, Brightness, Cpu, DynNetwork, Memory, MultiCoreTemp, Volume, Wireless),
-                                     Runnable (Run),
-                                     StdinReader (UnsafeStdinReader),
-                                     XPosition (TopSize), defaultConfig, xmobar)
+import           System.Environment      (getEnv)
+import           System.IO.Unsafe        (unsafeDupablePerformIO)
+import           Text.Printf             (printf)
+import           Theme.Theme             (base01, base02, base07, base0B,
+                                          basebg, myFont)
+import           XMonad.Hooks.DynamicLog (wrap)
+import           Xmobar                  (Align (L), Command (Com), Config (..),
+                                          Date (Date),
+                                          Monitors (Battery, Brightness, Cpu, DynNetwork, Memory, MultiCoreTemp, Volume, Wireless),
+                                          Runnable (Run),
+                                          StdinReader (UnsafeStdinReader),
+                                          XPosition (TopSize), defaultConfig,
+                                          xmobar)
 
 config :: Config
 config =
@@ -23,7 +25,19 @@ config =
         , iconRoot = homeDir <> "/.xmonad/icons"
         , sepChar = "%"
         , alignSep = "}{"
-        , template = " %UnsafeStdinReader% }{| %cpu% | %memory% | %multicoretemp% | %dynnetwork% | %wlp3s0wi% | %bright% | %default:Master% | %battery% | %date% | %trayerpad%"
+        , template = " %UnsafeStdinReader% }{" <>
+            concatMap (wrap "  " "")
+                [ "%cpu%"
+                , "%memory%"
+                , "%multicoretemp%"
+                , "%dynnetwork%"
+                , "%wlp3s0wi%"
+                , "%bright%"
+                , "%default:Master%"
+                , "%battery%"
+                , "%date%"
+                , "%trayerpad%"
+                ]
         , commands =
             [ Run UnsafeStdinReader
             , Run $ Cpu
