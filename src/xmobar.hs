@@ -3,7 +3,7 @@ import           System.IO.Unsafe        (unsafeDupablePerformIO)
 import           Text.Printf             (printf)
 import           Theme.Theme             (base01, base02, base07, base0B,
                                           basebg, myFont)
-import           XMonad.Hooks.DynamicLog (wrap)
+import           XMonad.Hooks.DynamicLog (wrap, xmobarAction)
 import           Xmobar                  (Align (L), Command (Com), Config (..),
                                           Date (Date),
                                           Monitors (Battery, Brightness, Cpu, DynNetwork, Memory, MultiCoreTemp, Volume, Wireless),
@@ -30,10 +30,12 @@ config =
                 [ "%cpu%"
                 , "%memory%"
                 , "%multicoretemp%"
-                , "%dynnetwork%"
-                , "%wlp3s0wi%"
+                , runTUI "nmtui-edit" "3" "%dynnetwork%"
+                , xmobarAction "wifi toggle" "1" $
+                  runTUI "nmtui-connect" "3" "%wlp3s0wi%"
                 , "%bright%"
-                , "%default:Master%"
+                , xmobarAction "amixer -q set Master toggle" "1" $
+                  runTUI "pulsemixer" "3" "%default:Master%"
                 , "%battery%"
                 , "%date%"
                 , "%trayerpad%"
@@ -120,6 +122,9 @@ config =
             , Run $ Com "trayer-padding-icon.sh" [] "trayerpad" 100
             ]
       }
+
+runTUI :: String -> String -> String -> String
+runTUI cmd = xmobarAction ("termite --exec " <> cmd)
 
 homeDir :: String
 homeDir = unsafeDupablePerformIO (getEnv "HOME")

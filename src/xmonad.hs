@@ -24,7 +24,7 @@ import           XMonad                           (Button, Full (Full), KeyMask,
                                                    withFocused, xK_b,
                                                    xK_bracketleft, xK_q, xmonad,
                                                    (-->), (.|.), (<+>), (=?),
-                                                   (|||))
+                                                   (|||), title)
 import           XMonad.Actions.CopyWindow        (kill1)
 import           XMonad.Actions.CycleWS           (nextWS, prevWS, shiftToNext,
                                                    shiftToPrev, toggleWS)
@@ -332,6 +332,10 @@ myManageHook = manageSpawn <+> manageDocks <+> composeAll
     , className =? "mplayer2"    --> doFloat
     , className =? "Pavucontrol" --> doFloat
     , className =? "Peek"        --> doFloat
+    , title =? "pulsemixer"      --> doFloat
+    , title =? "nmtui"           --> doFloat
+    , title =? "nmtui-edit"      --> doFloat
+    , title =? "nmtui-connect"   --> doFloat
     , isFullscreen               --> doFullFloat
     , isDialog                   --> doFloat
     ]
