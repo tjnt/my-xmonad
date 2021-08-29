@@ -73,7 +73,7 @@ config =
                 , "--avg-icon-pattern", "<icon=temp.xbm/>"
                 ] 50
             , Run $ DynNetwork
-                [ "--template", "<rxipat><rx>kb : <txipat><tx>kb"
+                [ "--template", "<rxipat><rx>kb  <txipat><tx>kb"
                 , "--Low",      "102400"
                 , "--High",     "1024000"
                 , "--normal",   base0B
@@ -118,7 +118,7 @@ config =
                 , "--off-icon-pattern",  "<icon=power-bat2.xbm/>"
                 , "--idle-icon-pattern", "<icon=power-ac.xbm/>"
                 ] 100
-            , Run $ Date "%m/%d (%a) %H:%M" "date" 100
+            , Run $ Date "%m/%d %a %H:%M" "date" 100
             , Run $ Com "trayer-padding-icon.sh" [] "trayerpad" 100
             ]
       }
