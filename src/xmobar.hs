@@ -115,8 +115,8 @@ config =
                 , "--on-icon-pattern",   "<icon=power-ac.xbm/>"
                 , "--off-icon-pattern",  "<icon=power-bat2.xbm/>"
                 , "--idle-icon-pattern", "<icon=power-ac.xbm/>"
-                ] 50
-            , Run $ Date "%m/%d (%a) %H:%M" "date" 10
+                ] 100
+            , Run $ Date "%m/%d (%a) %H:%M" "date" 100
             , Run $ Com "trayer-padding-icon.sh" [] "trayerpad" 100
             ]
       }
