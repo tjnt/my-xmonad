@@ -73,22 +73,19 @@ config =
                 , "--avg-icon-pattern", "<icon=temp.xbm/>"
                 ] 50
             , Run $ DynNetwork
-                [ "--template", "<rxipat><rx>kb  <txipat><tx>kb"
+                [ "--template", "\x2b07<rx>kb  \x2b06<tx>kb"
                 , "--Low",      "102400"
                 , "--High",     "1024000"
                 , "--normal",   base0B
                 , "--high",     base01
                 , "--width",    "4"
-                , "--"
-                , "--rx-icon-pattern", "<icon=arrow_down.xbm/>"
-                , "--tx-icon-pattern", "<icon=arrow_up.xbm/>"
                 ] 10
             , Run $ Wireless "wlp3s0"
                 [ "--template", "<icon=wifi.xbm/><quality>%"
                 , "--width",    "3"
                 ] 10
             , Run $ Brightness
-                [ "--template", "💡<percent>%"
+                [ "--template", "\x1f4a1<percent>%"
                 , "--width",    "3"
                 , "--"
                 , "-D",         "intel_backlight"
@@ -97,8 +94,8 @@ config =
                 [ "--template", "<status><volume>%"
                 , "--width",    "3"
                 , "--"
-                , "--on",       "🔉"
-                , "--off",      "🔇"
+                , "--on",       "\x1f508"
+                , "--off",      "\x1f507"
                 , "--onc",      base0B
                 , "--offc",     base01
                 ] 10
