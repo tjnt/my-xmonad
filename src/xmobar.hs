@@ -111,20 +111,19 @@ config =
                 , "--offc",     base01
                 ] 10
             , Run $ Battery
-                [ "--template", "<leftipat> <left>% <acstatus><watts>w"
+                [ "--template", "<acstatus>"
+                , "--bwidth",   "0"
+                , "--bfore",    "\xf244\xf243\xf243\xf243\xf242\xf242\xf242\xf241\xf241\xf240"
                 , "--Low",      "20"
                 , "--High",     "80"
-                , "--low",      base01
-                , "--high",     base02
+                -- , "--low",      base01
+                -- , "--high",     base02
                 , "--"
-                , "-a", "notify-send -u critical 'Battery running out!!'"
-                , "-A", "10"
-                , "-o",                  printf "<fc=%s>(<timeleft>)</fc> " base07
-                , "-O",                  ""
-                , "-i",                  ""
-                , "--on-icon-pattern",   xmobarFont 1 "\xf583"
-                , "--off-icon-pattern",  xmobarFont 1 "\xf58b"
-                , "--idle-icon-pattern", xmobarFont 1 "\xf578"
+                , "-a",         "notify-send -u critical 'Battery running out!!'"
+                , "-A",         "10"
+                , "-o",         xmobarFont 1 "<leftbar> " <> "<left>% " <> "(<timeleft>) " <> "<watts>w"
+                , "-O",         xmobarFont 1 "<leftbar> " <> "<left>% " <> xmobarFont 1 "\xf0e7 " <> "<watts>w"
+                , "-i",         xmobarFont 1 "\xf1e6 " <> "<left>%"
                 ] 100
             , Run $ Date "%m/%d %a %H:%M" "date" 100
             , Run $ Com "trayer-padding-icon.sh" [] "trayerpad" 100
