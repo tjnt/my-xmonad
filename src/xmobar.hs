@@ -16,6 +16,7 @@ config :: Config
 config =
     defaultConfig
         { font = myFont
+        , additionalFonts = ["xft:RictyDiminished Nerd Font:style=Regular:size=20"]
         , bgColor = basebg
         , fgColor = base07
         , position = TopSize L 100 30
@@ -25,21 +26,22 @@ config =
         , iconRoot = homeDir <> "/.xmonad/icons"
         , sepChar = "%"
         , alignSep = "}{"
-        , template = " %UnsafeStdinReader% }{" <>
-            concatMap (wrap "  " "")
-                [ runTUI "htop -s PERCENT_CPU" "htop" "3" "%cpu%"
-                , runTUI "htop -s PERCENT_MEM" "htop" "3" "%memory%"
-                , "%multicoretemp%"
-                , runTUI "nmtui-edit" "" "3" "%dynnetwork%"
-                , xmobarAction "wifi toggle" "1" $
-                  runTUI "nmtui-connect" "" "3" "%wlp3s0wi%"
-                , "%bright%"
-                , xmobarAction "amixer -q set Master toggle" "1" $
-                  runTUI "pulsemixer" "" "3" "%default:Master%"
-                , "%battery%"
-                , "%date%"
-                , "%trayerpad%"
-                ]
+        , template = xmobarFont 1 "\xe777"
+                   <> " %UnsafeStdinReader% }{"
+                   <> concatMap (wrap " " " ")
+                    [ runTUI "htop -s PERCENT_CPU" "htop" "3" "%cpu%"
+                    , runTUI "htop -s PERCENT_MEM" "htop" "3" "%memory%"
+                    , "%multicoretemp%"
+                    , runTUI "nmtui-edit" "" "3" "%dynnetwork%"
+                    , xmobarAction "wifi toggle" "1" $
+                      runTUI "nmtui-connect" "" "3" "%wlp3s0wi%"
+                    , "%bright%"
+                    , xmobarAction "amixer -q set Master toggle" "1" $
+                      runTUI "pulsemixer" "" "3" "%default:Master%"
+                    , "%battery%"
+                    , "%date%"
+                    , "%trayerpad%"
+                    ]
         , commands =
             [ Run UnsafeStdinReader
             , Run $ Cpu
@@ -127,6 +129,9 @@ runTUI cmd title = xmobarAction
 
 homeDir :: String
 homeDir = unsafeDupablePerformIO (getEnv "HOME")
+
+xmobarFont :: Int -> String -> String
+xmobarFont n = wrap (printf "<fn=%d>" n) "</fn>"
 
 main :: IO ()
 main = xmobar config
