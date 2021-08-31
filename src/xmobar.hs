@@ -16,7 +16,10 @@ config :: Config
 config =
     defaultConfig
         { font = myFont
-        , additionalFonts = ["xft:RictyDiminished Nerd Font:style=Regular:size=20"]
+        , additionalFonts =
+                    [ "xft:RictyDiminished Nerd Font:style=Regular:size=10"
+                    , "xft:RictyDiminished Nerd Font:style=Regular:size=20"
+                    ]
         , bgColor = basebg
         , fgColor = base07
         , position = TopSize L 100 30
@@ -26,7 +29,7 @@ config =
         , iconRoot = homeDir <> "/.xmonad/icons"
         , sepChar = "%"
         , alignSep = "}{"
-        , template = xmobarFont 1 "\xe777"
+        , template = xmobarFont 2 "\xe777"
                    <> " %UnsafeStdinReader% }{"
                    <> concatMap (wrap " " " ")
                     [ runTUI "htop -s PERCENT_CPU" "htop" "3" "%cpu%"
@@ -52,7 +55,7 @@ config =
                 , "--high",     base01
                 , "--width",    "3"
                 , "--"
-                , "--load-icon-pattern", "<icon=cpu.xbm/>"
+                , "--load-icon-pattern", xmobarFont 1 "\xfb19"
                 ] 10
             , Run $ Memory
                 [ "--template", "<usedipat><usedratio>%"
@@ -62,7 +65,7 @@ config =
                 , "--high",     base01
                 , "--width",    "3"
                 , "--"
-                , "--used-icon-pattern", "<icon=mem.xbm/>"
+                , "--used-icon-pattern", xmobarFont 1 "\xf85a"
                 ] 10
             , Run $ MultiCoreTemp
                 [ "--template", "<avgipat><avg> ℃"
@@ -72,37 +75,43 @@ config =
                 , "--high",     base01
                 , "--width",    "3"
                 , "--"
-                , "--avg-icon-pattern", "<icon=temp.xbm/>"
+                , "--avg-icon-pattern", xmobarFont 1 "\xf2c7"
                 ] 50
             , Run $ DynNetwork
-                [ "--template", "\x2b07<rx>kb  \x2b06<tx>kb"
+                [ "--template", "<rxipat><rx>kb  <txipat><tx>kb"
                 , "--Low",      "102400"
                 , "--High",     "1024000"
                 , "--normal",   base0B
                 , "--high",     base01
                 , "--width",    "4"
+                , "--"
+                , "--rx-icon-pattern", xmobarFont 1 "\xf6d9"
+                , "--tx-icon-pattern", xmobarFont 1 "\xfa51"
                 ] 10
             , Run $ Wireless "wlp3s0"
-                [ "--template", "<icon=wifi.xbm/><quality>%"
+                [ "--template", "<qualityipat><quality>%"
                 , "--width",    "3"
+                , "--"
+                , "--quality-icon-pattern", xmobarFont 1 "\xf1eb"
                 ] 10
             , Run $ Brightness
-                [ "--template", "\x1f4a1<percent>%"
+                [ "--template", "<ipat><percent>%"
                 , "--width",    "3"
                 , "--"
                 , "-D",         "intel_backlight"
+                , "--brightness-icon-pattern", xmobarFont 1 "\xf5df"
                 ] 10
             , Run $ Volume "default" "Master"
                 [ "--template", "<status><volume>%"
                 , "--width",    "3"
                 , "--"
-                , "--on",       "\x1f508"
-                , "--off",      "\x1f507"
+                , "--on",       xmobarFont 1 "\xfa7d"
+                , "--off",      xmobarFont 1 "\xfa80"
                 , "--onc",      base0B
                 , "--offc",     base01
                 ] 10
             , Run $ Battery
-                [ "--template", "<leftipat> <left>% <acstatus> <watts>w"
+                [ "--template", "<leftipat> <left>% <acstatus><watts>w"
                 , "--Low",      "20"
                 , "--High",     "80"
                 , "--low",      base01
@@ -110,12 +119,12 @@ config =
                 , "--"
                 , "-a", "notify-send -u critical 'Battery running out!!'"
                 , "-A", "10"
-                , "-o",                  printf "<fc=%s>(<timeleft>)</fc>" base07
-                , "-O",                  printf "<fc=%s>(charge)</fc>" base07
-                , "-i",                  printf "<fc=%s>(idle)</fc>" base07
-                , "--on-icon-pattern",   "<icon=power-ac.xbm/>"
-                , "--off-icon-pattern",  "<icon=power-bat2.xbm/>"
-                , "--idle-icon-pattern", "<icon=power-ac.xbm/>"
+                , "-o",                  printf "<fc=%s>(<timeleft>)</fc> " base07
+                , "-O",                  ""
+                , "-i",                  ""
+                , "--on-icon-pattern",   xmobarFont 1 "\xf583"
+                , "--off-icon-pattern",  xmobarFont 1 "\xf58b"
+                , "--idle-icon-pattern", xmobarFont 1 "\xf578"
                 ] 100
             , Run $ Date "%m/%d %a %H:%M" "date" 100
             , Run $ Com "trayer-padding-icon.sh" [] "trayerpad" 100
