@@ -68,14 +68,14 @@ config =
                 , "--used-icon-pattern", xmobarFont 1 "\xf85a"
                 ] 10
             , Run $ MultiCoreTemp
-                [ "--template", "<avgipat><avg> ℃"
+                [ "--template", xmobarFont 1 "<avgbar>" <> "<avg> ℃"
+                , "--bfore",    "\xf2cb\xf2cb\xf2ca\xf2ca\xf2c9\xf2c9\xf2c8\xf2c8\xf2c7\xf2c7"
+                , "--bwidth",   "0"
                 , "--Low",      "40"
                 , "--High",     "60"
-                , "--normal",   base0B
-                , "--high",     base01
                 , "--width",    "3"
-                , "--"
-                , "--avg-icon-pattern", xmobarFont 1 "\xf2c7"
+                -- , "--normal",   base0B
+                -- , "--high",     base01
                 ] 50
             , Run $ DynNetwork
                 [ "--template", "<rxipat><rx>kb  <txipat><tx>kb"
@@ -112,8 +112,8 @@ config =
                 ] 10
             , Run $ Battery
                 [ "--template", "<acstatus>"
-                , "--bwidth",   "0"
                 , "--bfore",    "\xf244\xf243\xf243\xf243\xf242\xf242\xf242\xf241\xf241\xf240"
+                , "--bwidth",   "0"
                 , "--Low",      "20"
                 , "--High",     "80"
                 -- , "--low",      base01
