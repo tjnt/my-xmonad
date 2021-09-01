@@ -95,11 +95,12 @@ config =
                 , "--width",    "3"
                 ] 10
             , Run $ Brightness
-                [ "--template", "<ipat><percent>%"
+                [ "--template", xmobarFont 1 "<bar>" <> "<percent>%"
+                , "--bfore",    "\xf5d9\xf5da\xf5db\xf5dc\xf5dd\xf5dd\xf5de\xf5de\xf5df\xf5df"
+                , "--bwidth",   "0"
                 , "--width",    "3"
                 , "--"
                 , "-D",         "intel_backlight"
-                , "--brightness-icon-pattern", xmobarFont 1 "\xf5df"
                 ] 10
             , Run $ Volume "default" "Master"
                 [ "--template", "<status><volume>%"
