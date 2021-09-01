@@ -89,10 +89,10 @@ config =
                 , "--tx-icon-pattern", xmobarFont 1 "\xfa51"
                 ] 10
             , Run $ Wireless "wlp3s0"
-                [ "--template", "<qualityipat><quality>%"
+                [ "--template", xmobarFont 1 "<qualitybar>" <> "<quality>%"
+                , "--bfore",    "\xfaa9\xfaa8\xfaa8\xfaa8\xfaa8\xfaa8\xfaa8\xfaa8\xfaa8\xfaa8"
+                , "--bwidth",   "0"
                 , "--width",    "3"
-                , "--"
-                , "--quality-icon-pattern", xmobarFont 1 "\xf1eb"
                 ] 10
             , Run $ Brightness
                 [ "--template", "<ipat><percent>%"
