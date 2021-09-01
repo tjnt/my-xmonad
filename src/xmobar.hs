@@ -104,11 +104,13 @@ config =
                 ] 10
             , Run $ Volume "default" "Master"
                 [ "--template", "<status><volume>%"
+                , "--bfore",    "\xfa7e\xfa7e\xfa7f\xfa7f\xfa7f\xfa7d\xfa7d\xfa7d\xf028\xf028"
+                , "--bwidth",   "0"
                 , "--width",    "3"
                 , "--"
-                , "--on",       xmobarFont 1 "\xfa7d"
+                , "--on",       xmobarFont 1 "<volumebar>"
                 , "--off",      xmobarFont 1 "\xfa80"
-                , "--onc",      base0B
+                , "--onc",      base02
                 , "--offc",     base01
                 ] 10
             , Run $ Battery
