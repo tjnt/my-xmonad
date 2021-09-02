@@ -26,6 +26,7 @@ library:
   source-dirs: src/lib
   exposed-modules: 
   - Theme.Theme
+  - Plugins.SimpleReader
   dependencies:
   - xmobar
   - xmonad-contrib
