@@ -1,3 +1,4 @@
+import           Data.Function           ((&))
 import           Data.List               (isSubsequenceOf)
 import           Plugins.SimpleReader    (SimpleReader (..))
 import           System.Environment      (getEnv)
@@ -35,16 +36,17 @@ config =
         , template = xmobarFont 2 "\xe777"
                    <> " %UnsafeStdinReader% }{"
                    <> concatMap (wrap " " " ")
-                    [ runTUI "htop -s PERCENT_CPU" "htop" "3" "%cpu%"
-                    , runTUI "htop -s PERCENT_MEM" "htop" "3" "%memory%"
+                    [ "%cpu%" & runTUI "htop -s PERCENT_CPU" "htop" "3"
+                    , "%memory%" & runTUI "htop -s PERCENT_MEM" "htop" "3"
                     , "%multicoretemp%"
-                    , runTUI "nmtui-edit" "" "3" "%dynnetwork%"
+                    , "%dynnetwork%" & runTUI "nmtui-edit" "" "3"
                     , "%bright%"
-                    , xmobarAction "amixer -q set Master toggle" "1" $
-                      runTUI "pulsemixer" "" "3" "%default:Master%"
-                    , xmobarAction "wifi toggle" "1" $
-                      runTUI "nmtui-connect" "" "3" "%wifi%%wlp3s0wi%"
-                    , "%bluetooth%"
+                    , "%default:Master%" & xmobarAction "amixer -q set Master toggle" "1"
+                                         . runTUI "pulsemixer" "" "3"
+                    , "%wifi%%wlp3s0wi%" & xmobarAction "wifi toggle" "1"
+                                         . runTUI "nmtui-connect" "" "3"
+                    , "%bluetooth%" & xmobarAction "bluetooth toggle" "1"
+                                    . xmobarAction "blueman-manager" "3"
                     , "%battery%"
                     , "%date%"
                     , "%trayerpad%"
@@ -111,12 +113,12 @@ config =
                 , "--onc",      base02
                 , "--offc",     base01
                 ] 20
-            , Run $ SimpleReader runWifi "wifi" 100
+            , Run $ SimpleReader wifiIcon "wifi" 100
             , Run $ Wireless "wlp3s0"
                 [ "--template", "<quality>%"
                 , "--width",    "3"
                 ] 10
-            , Run $ SimpleReader runBluetooth "bluetooth" 100
+            , Run $ SimpleReader bluetoothIcon "bluetooth" 100
             , Run $ Battery
                 [ "--template", "<acstatus>"
                 , "--bfore",    "\xf244\xf243\xf243\xf243\xf242\xf242\xf242\xf241\xf241\xf240"
@@ -137,20 +139,18 @@ config =
             ]
       }
 
-runWifi :: IO String
-runWifi = do
+wifiIcon :: IO String
+wifiIcon = do
     stdout <- trim <$> runProcessWithInput "wifi" [] ""
     return . xmobarFont 1
            $ if isSubsequenceOf "on" stdout
                 then xmobarColor base02 "" "\xfaa8"
                 else "\xfaa9"
 
-runBluetooth :: IO String
-runBluetooth = do
+bluetoothIcon :: IO String
+bluetoothIcon = do
     stdout <- trim <$> runProcessWithInput "bluetooth" [] ""
-    return . xmobarAction "bluetooth toggle" "1"
-           . xmobarAction "blueman-manager" "3"
-           . xmobarFont 1
+    return . xmobarFont 1
            $ if isSubsequenceOf "on" stdout
                 then xmobarColor base0C "" "\xf5ae"
                 else "\xf5b1"
