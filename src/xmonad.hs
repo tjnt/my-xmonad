@@ -354,9 +354,9 @@ myStartupHook = do
     spawnOnce "xbindkeys"
     spawnOnce "nm-tray"
     spawnOnce "pnmixer"
-    spawnOnce "blueman-applet"
     spawnOnce "dropbox start"
     spawnOnce "clipd"
+    -- spawnOnce "blueman-applet"
     -- spawnOnce "conky -bd"
 
 -- xmobar
