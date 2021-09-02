@@ -19,12 +19,12 @@ import           XMonad                           (Button, Full (Full), KeyMask,
                                                    mouseMoveWindow,
                                                    mouseResizeWindow, noModMask,
                                                    refresh, sendMessage,
-                                                   shiftMask, spawn, whenX,
-                                                   windows, windowset,
+                                                   shiftMask, spawn, title,
+                                                   whenX, windows, windowset,
                                                    withFocused, xK_b,
                                                    xK_bracketleft, xK_q, xmonad,
                                                    (-->), (.|.), (<+>), (=?),
-                                                   (|||), title)
+                                                   (|||))
 import           XMonad.Actions.CopyWindow        (kill1)
 import           XMonad.Actions.CycleWS           (nextWS, prevWS, shiftToNext,
                                                    shiftToPrev, toggleWS)
@@ -374,7 +374,7 @@ myPP = xmobarPP
     , ppVisible         = xmobarColor base01 basebg . clickable "⦿"
     , ppHidden          = xmobarColor base06 basebg . clickable "●"
     , ppHiddenNoWindows = xmobarColor base06 basebg . clickable "○"
-    , ppTitle           = xmobarColor base04 basebg . shorten 40
+    , ppTitle           = xmobarColor base04 basebg . shorten 80
     , ppOutput          = putStrLn
     , ppWsSep           = " "
     , ppSep             = "  "
