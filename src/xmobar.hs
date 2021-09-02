@@ -105,7 +105,7 @@ config =
                 , "--width",    "3"
                 , "--"
                 , "-D",         "intel_backlight"
-                ] 10
+                ] 20
             , Run $ Volume "default" "Master"
                 [ "--template", "<status><volume>%"
                 , "--bfore",    "\xfa7e\xfa7e\xfa7f\xfa7f\xfa7f\xfa7d\xfa7d\xfa7d\xf028\xf028"
@@ -116,7 +116,7 @@ config =
                 , "--off",      xmobarFont 1 "\xfa80"
                 , "--onc",      base02
                 , "--offc",     base01
-                ] 10
+                ] 20
             , Run $ SimpleReader runBluetooth "bluetooth" 100
             , Run $ Battery
                 [ "--template", "<acstatus>"
