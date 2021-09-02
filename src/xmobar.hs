@@ -21,9 +21,9 @@ config =
     defaultConfig
         { font = myFont
         , additionalFonts =
-                    [ "xft:RictyDiminished Nerd Font:style=Regular:size=10"
-                    , "xft:RictyDiminished Nerd Font:style=Regular:size=20"
-                    ]
+            [ "xft:RictyDiminished Nerd Font:style=Regular:size=10"
+            , "xft:RictyDiminished Nerd Font:style=Regular:size=20"
+            ]
         , bgColor = basebg
         , fgColor = base07
         , position = TopSize L 100 30
@@ -33,24 +33,25 @@ config =
         , iconRoot = homeDir <> "/.xmonad/icons"
         , sepChar = "%"
         , alignSep = "}{"
-        , template = xmobarFont 2 "\xe777"
-                   <> " %UnsafeStdinReader% }{"
-                   <> concatMap (wrap " " " ")
-                    [ "%cpu%" & runTUI "htop -s PERCENT_CPU" "htop" "3"
-                    , "%memory%" & runTUI "htop -s PERCENT_MEM" "htop" "3"
-                    , "%multicoretemp%"
-                    , "%dynnetwork%" & runTUI "nmtui-edit" "" "3"
-                    , "%bright%"
-                    , "%default:Master%" & xmobarAction "amixer -q set Master toggle" "1"
-                                         . runTUI "pulsemixer" "" "3"
-                    , "%wifi%%wlp3s0wi%" & xmobarAction "wifi toggle" "1"
-                                         . runTUI "nmtui-connect" "" "3"
-                    , "%bluetooth%" & xmobarAction "bluetooth toggle" "1"
-                                    . xmobarAction "blueman-manager" "3"
-                    , "%battery%"
-                    , "%date%"
-                    , "%trayerpad%"
-                    ]
+        , template =
+            xmobarFont 2 "\xe777"
+            <> " %UnsafeStdinReader% }{"
+            <> concatMap (wrap " " " ")
+                [ "%cpu%" & runTUI "htop -s PERCENT_CPU" "htop" "3"
+                , "%memory%" & runTUI "htop -s PERCENT_MEM" "htop" "3"
+                , "%multicoretemp%"
+                , "%dynnetwork%" & runTUI "nmtui-edit" "" "3"
+                , "%bright%"
+                , "%default:Master%" & xmobarAction "amixer -q set Master toggle" "1"
+                                     . runTUI "pulsemixer" "" "3"
+                , "%wifi%%wlp3s0wi%" & xmobarAction "wifi toggle" "1"
+                                     . runTUI "nmtui-connect" "" "3"
+                , "%bluetooth%" & xmobarAction "bluetooth toggle" "1"
+                                . xmobarAction "blueman-manager" "3"
+                , "%battery%"
+                , "%date%"
+                ]
+            <> "%trayerpad%"
         , commands =
             [ Run UnsafeStdinReader
             , Run $ Cpu
