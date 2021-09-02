@@ -22,10 +22,17 @@ description:         Please see the README on GitHub at <https://github.com/gith
 dependencies:
 - base >= 4.7 && < 5
 
-source-dirs: src
+library:
+  source-dirs: src/lib
+  exposed-modules: 
+  - Theme.Theme
+  dependencies:
+  - xmobar
+  - xmonad-contrib
 
 executables:
   xmonad:
+    source-dirs: src
     main: xmonad.hs
     ghc-options:
     - -threaded
@@ -37,7 +44,9 @@ executables:
     - xmonad-contrib
     - containers
     - data-default
+    - my-xmonad
   xmobar:
+    source-dirs: src
     main: xmobar.hs
     ghc-options:
     - -threaded
@@ -47,6 +56,7 @@ executables:
     dependencies:
     - xmobar
     - xmonad-contrib
+    - my-xmonad
 
 # tests:
 #   my-xmonad-test:
