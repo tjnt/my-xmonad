@@ -1,9 +1,12 @@
+import           Data.List               (isSubsequenceOf)
+import           Plugins.SimpleReader    (SimpleReader (..))
 import           System.Environment      (getEnv)
 import           System.IO.Unsafe        (unsafeDupablePerformIO)
 import           Text.Printf             (printf)
 import           Theme.Theme             (base01, base02, base07, base0B,
-                                          basebg, myFont)
-import           XMonad.Hooks.DynamicLog (wrap, xmobarAction)
+                                          base0C, basebg, myFont)
+import           XMonad.Hooks.DynamicLog (trim, wrap, xmobarAction, xmobarColor)
+import           XMonad.Util.Run         (runProcessWithInput)
 import           Xmobar                  (Align (L), Command (Com), Config (..),
                                           Date (Date),
                                           Monitors (Battery, Brightness, Cpu, DynNetwork, Memory, MultiCoreTemp, Volume, Wireless),
@@ -41,6 +44,7 @@ config =
                     , "%bright%"
                     , xmobarAction "amixer -q set Master toggle" "1" $
                       runTUI "pulsemixer" "" "3" "%default:Master%"
+                    , "%bluetooth%"
                     , "%battery%"
                     , "%date%"
                     , "%trayerpad%"
@@ -113,6 +117,7 @@ config =
                 , "--onc",      base02
                 , "--offc",     base01
                 ] 10
+            , Run $ SimpleReader runBluetooth "bluetooth" 100
             , Run $ Battery
                 [ "--template", "<acstatus>"
                 , "--bfore",    "\xf244\xf243\xf243\xf243\xf242\xf242\xf242\xf241\xf241\xf240"
@@ -132,6 +137,16 @@ config =
             , Run $ Com "trayer-padding-icon.sh" [] "trayerpad" 100
             ]
       }
+
+runBluetooth :: IO String
+runBluetooth = do
+    stdout <- trim <$> runProcessWithInput "bluetooth" [] ""
+    return . xmobarAction "bluetooth toggle" "1"
+           . xmobarAction "blueman-manager" "3"
+           . xmobarFont 1
+           $ if isSubsequenceOf "on" stdout
+                then xmobarColor base0C "" "\xf5ae"
+                else "\xf5b1"
 
 runTUI :: String -> String -> String -> String -> String
 runTUI cmd title = xmobarAction
