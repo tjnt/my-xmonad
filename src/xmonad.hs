@@ -354,10 +354,10 @@ myStartupHook = do
                \--SetDockType true --SetPartialStrut true" ("0x" <> tail basebg)
     spawnOnce "feh --randomize --bg-fill $HOME/.wallpaper/*"
     spawnOnce "xbindkeys"
-    spawnOnce "nm-tray"
-    spawnOnce "pnmixer"
     spawnOnce "dropbox start"
     spawnOnce "clipd"
+    -- spawnOnce "nm-tray"
+    -- spawnOnce "pnmixer"
     -- spawnOnce "blueman-applet"
     -- spawnOnce "conky -bd"
 
