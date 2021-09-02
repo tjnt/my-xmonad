@@ -39,11 +39,11 @@ config =
                     , runTUI "htop -s PERCENT_MEM" "htop" "3" "%memory%"
                     , "%multicoretemp%"
                     , runTUI "nmtui-edit" "" "3" "%dynnetwork%"
-                    , xmobarAction "wifi toggle" "1" $
-                      runTUI "nmtui-connect" "" "3" "%wlp3s0wi%"
                     , "%bright%"
                     , xmobarAction "amixer -q set Master toggle" "1" $
                       runTUI "pulsemixer" "" "3" "%default:Master%"
+                    , xmobarAction "wifi toggle" "1" $
+                      runTUI "nmtui-connect" "" "3" "%wifi%%wlp3s0wi%"
                     , "%bluetooth%"
                     , "%battery%"
                     , "%date%"
@@ -92,12 +92,6 @@ config =
                 , "--rx-icon-pattern", xmobarFont 1 "\xf6d9"
                 , "--tx-icon-pattern", xmobarFont 1 "\xfa51"
                 ] 10
-            , Run $ Wireless "wlp3s0"
-                [ "--template", xmobarFont 1 "<qualitybar>" <> "<quality>%"
-                , "--bfore",    "\xfaa9\xfaa8\xfaa8\xfaa8\xfaa8\xfaa8\xfaa8\xfaa8\xfaa8\xfaa8"
-                , "--bwidth",   "0"
-                , "--width",    "3"
-                ] 10
             , Run $ Brightness
                 [ "--template", xmobarFont 1 "<bar>" <> "<percent>%"
                 , "--bfore",    "\xf5d9\xf5da\xf5db\xf5dc\xf5dd\xf5dd\xf5de\xf5de\xf5df\xf5df"
@@ -117,6 +111,11 @@ config =
                 , "--onc",      base02
                 , "--offc",     base01
                 ] 20
+            , Run $ SimpleReader runWifi "wifi" 100
+            , Run $ Wireless "wlp3s0"
+                [ "--template", "<quality>%"
+                , "--width",    "3"
+                ] 10
             , Run $ SimpleReader runBluetooth "bluetooth" 100
             , Run $ Battery
                 [ "--template", "<acstatus>"
@@ -137,6 +136,14 @@ config =
             , Run $ Com "trayer-padding-icon.sh" [] "trayerpad" 100
             ]
       }
+
+runWifi :: IO String
+runWifi = do
+    stdout <- trim <$> runProcessWithInput "wifi" [] ""
+    return . xmobarFont 1
+           $ if isSubsequenceOf "on" stdout
+                then xmobarColor base02 "" "\xfaa8"
+                else "\xfaa9"
 
 runBluetooth :: IO String
 runBluetooth = do
