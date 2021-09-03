@@ -204,11 +204,16 @@ deviceIcons = do
       where
         deviceIconMap1 :: M.Map String String
         deviceIconMap1 = M.fromList
-            [ ("AKG K371-BT", "\xf7ca")
+            [ ("HHKB-BT", "\xf812")
+            , ("AKG K371-BT", "\xf7ca")
+            , ("Bose Mini II SoundLink", "\xf9c2")
             ]
         deviceIconMap2 :: M.Map String String
         deviceIconMap2 = M.fromList
-            [ ("input-mouse", "\xf87c")
+            [ ("audio-card", "\xf5af")
+            , ("input-mouse", "\xf87c")
+            , ("input-keyboard", "\xf80b")
+            , ("input-gaming", "\xf11b")
             ]
 
 
