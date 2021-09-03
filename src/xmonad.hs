@@ -7,7 +7,9 @@ import qualified Data.Map                         as M
 import           Data.Tree                        (Tree (Node))
 import           GHC.IO.Exception                 (IOException)
 import           Text.Printf                      (printf)
-import           Theme.Theme
+import           Theme.Theme                      (base01, base04, base06,
+                                                   base0C, basebg, basefg,
+                                                   myFont)
 import           XMonad                           (Button, Full (Full), KeyMask,
                                                    KeySym, ManageHook, Window,
                                                    X, XConfig (..), button1,
@@ -42,7 +44,7 @@ import           XMonad.Actions.TreeSelect        (TSConfig (..), TSNode (..),
                                                    treeselectAction,
                                                    tsDefaultConfig)
 import qualified XMonad.Actions.TreeSelect        as TS
-import           XMonad.Hooks.DynamicLog          (PP (..), shorten, statusBar,
+import           XMonad.Hooks.DynamicLog          (PP (..), statusBar,
                                                    xmobarColor, xmobarPP)
 import           XMonad.Hooks.EwmhDesktops        (ewmh, fullscreenEventHook)
 import           XMonad.Hooks.ManageDocks         (manageDocks)
@@ -368,13 +370,13 @@ myBar = "xmobar"
 
 myPP :: PP
 myPP = xmobarPP
-    { ppOrder           = \(ws:l:t:_)  -> [ws, l, t]
+    { ppOrder           = id
     , ppCurrent         = xmobarColor base01 basebg . clickable "●"
     , ppUrgent          = xmobarColor base06 basebg . clickable "●"
     , ppVisible         = xmobarColor base01 basebg . clickable "⦿"
     , ppHidden          = xmobarColor base06 basebg . clickable "●"
     , ppHiddenNoWindows = xmobarColor base06 basebg . clickable "○"
-    , ppTitle           = xmobarColor base04 basebg . shorten 80
+    , ppTitle           = xmobarColor base04 basebg
     , ppOutput          = putStrLn
     , ppWsSep           = " "
     , ppSep             = "  "
