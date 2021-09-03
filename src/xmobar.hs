@@ -1,5 +1,8 @@
+import           Control.Monad           (msum)
 import           Data.Function           ((&))
 import           Data.List               (isSubsequenceOf)
+import qualified Data.Map.Strict         as M
+import           Data.Maybe              (fromMaybe)
 import           Plugins.SimpleReader    (SimpleReader (..))
 import           System.Environment      (getEnv)
 import           System.IO.Unsafe        (unsafeDupablePerformIO)
@@ -194,13 +197,20 @@ deviceIcons = do
             ]
         dbusTrimValue s = drop 17 s
 
-    convertIcon dev =
-        xmobarFont 1 $ case devName dev of
-            "AKG K371-BT" -> "\xf7ca"
-            _             -> case devIcon dev of
-                "input-mouse" -> "\xf87c"
-                _             -> "\xf128"
-                -- _             -> devName dev -- for debug
+    convertIcon dev = xmobarFont 1 . fromMaybe "\xf128"
+                    $ msum [ devName dev `M.lookup` deviceIconMap1
+                           , devIcon dev `M.lookup` deviceIconMap2
+                           ]
+      where
+        deviceIconMap1 :: M.Map String String
+        deviceIconMap1 = M.fromList
+            [ ("AKG K371-BT", "\xf7ca")
+            ]
+        deviceIconMap2 :: M.Map String String
+        deviceIconMap2 = M.fromList
+            [ ("input-mouse", "\xf87c")
+            ]
+
 
 runTUI :: String -> String -> String -> String -> String
 runTUI cmd title = xmobarAction
