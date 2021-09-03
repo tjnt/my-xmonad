@@ -46,7 +46,8 @@ config =
                                      . runTUI "pulsemixer" "" "3"
                 , "%wifi%%wlp3s0wi%" & xmobarAction "wifi toggle" "1"
                                      . runTUI "nmtui-connect" "" "3"
-                , "%bluetooth%" & xmobarAction "bluetooth toggle" "1"
+                , "%bluetooth%" & (<> "%deviceicons%")
+                                . xmobarAction "bluetooth toggle" "1"
                                 . xmobarAction "blueman-manager" "3"
                 , "%battery%"
                 , "%date%"
@@ -120,6 +121,7 @@ config =
                 , "--width",    "3"
                 ] 10
             , Run $ SimpleReader bluetoothIcon "bluetooth" 100
+            , Run $ SimpleReader deviceIcons "deviceicons" 100
             , Run $ Battery
                 [ "--template", "<acstatus>"
                 , "--bfore",    "\xf244\xf243\xf243\xf243\xf242\xf242\xf242\xf241\xf241\xf240"
@@ -155,6 +157,50 @@ bluetoothIcon = do
            $ if isSubsequenceOf "on" stdout
                 then xmobarColor base0C "" "\xf5ae"
                 else "\xf5b1"
+
+data DeviceInfo = DeviceInfo
+    { devConnected :: Bool
+    , devName      :: String
+    , devIcon      :: String
+    }
+  deriving (Show)
+
+deviceIcons :: IO String
+deviceIcons = do
+    devices <- map (replace ':' '_' . (!! 1) . words) . lines
+        <$> runProcessWithInput "bluetoothctl" ["paired-devices"] ""
+    res <- filter devConnected <$> mapM getDeviceInfo devices
+    return . concatMap ((' ' :) . convertIcon) $ res
+  where
+    replace a b = map (\x -> if x == a then b else x)
+
+    getDeviceInfo :: String -> IO DeviceInfo
+    getDeviceInfo addr = do
+        conn <- isSubsequenceOf "true" <$> runProcessWithInput "dbus-send" (dbusArgs addr "Connected") ""
+        (name,icon) <-
+            if conn then (,) <$> (dbusTrimValue <$> runProcessWithInput "dbus-send" (dbusArgs addr "Name") "")
+                             <*> (dbusTrimValue <$> runProcessWithInput "dbus-send" (dbusArgs addr "Icon") "")
+                    else return ("","")
+        return $ DeviceInfo { devConnected=conn, devName=name, devIcon=icon }
+      where
+        dbusArgs s p =
+            [ "--print-reply=literal"
+            , "--system"
+            , "--dest=org.bluez"
+            , "/org/bluez/hci0/dev_" <> s
+            , "org.freedesktop.DBus.Properties.Get"
+            , "string:org.bluez.Device1"
+            , "string:" <> p
+            ]
+        dbusTrimValue s = drop 17 s
+
+    convertIcon dev =
+        xmobarFont 1 $ case devName dev of
+            "AKG K371-BT" -> "\xf7ca"
+            _             -> case devIcon dev of
+                "input-mouse" -> "\xf87c"
+                _             -> "\xf128"
+                -- _             -> devName dev -- for debug
 
 runTUI :: String -> String -> String -> String -> String
 runTUI cmd title = xmobarAction
