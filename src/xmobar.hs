@@ -195,7 +195,7 @@ deviceIcons = do
             , "string:org.bluez.Device1"
             , "string:" <> p
             ]
-        dbusTrimValue s = drop 17 s
+        dbusTrimValue s = last . words $ s
 
     convertIcon dev = xmobarFont 1 . fromMaybe "\xf128"
                     $ msum [ devName dev `M.lookup` deviceIconMap1
