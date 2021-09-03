@@ -45,7 +45,8 @@ import           XMonad.Actions.TreeSelect        (TSConfig (..), TSNode (..),
                                                    tsDefaultConfig)
 import qualified XMonad.Actions.TreeSelect        as TS
 import           XMonad.Hooks.DynamicLog          (PP (..), statusBar,
-                                                   xmobarColor, xmobarPP)
+                                                   xmobarAction, xmobarColor,
+                                                   xmobarPP)
 import           XMonad.Hooks.EwmhDesktops        (ewmh, fullscreenEventHook)
 import           XMonad.Hooks.ManageDocks         (manageDocks)
 import           XMonad.Hooks.ManageHelpers       (doCenterFloat, doFullFloat,
@@ -80,7 +81,7 @@ myModMask :: KeyMask
 myModMask = mod4Mask
 
 myWorkspaces :: [String]
-myWorkspaces = [ show x | x <- [1..5] ]
+myWorkspaces = map show [1..5]
 
 -- Functions
 
@@ -352,8 +353,8 @@ myStartupHook = do
     spawnOnce "compton -b"
     spawnOnce $ printf
               "trayer --edge top --align right --widthtype request --height 31 \
-               \--expand true --transparent true --alpha 0 --tint %s \
-               \--SetDockType true --SetPartialStrut true" ("0x" <> tail basebg)
+               \--expand true --transparent true --alpha 0 --tint 0x%s \
+               \--SetDockType true --SetPartialStrut true" $ tail basebg
     spawnOnce "feh --randomize --bg-fill $HOME/.wallpaper/*"
     spawnOnce "xbindkeys"
     spawnOnce "dropbox start"
@@ -382,7 +383,7 @@ myPP = xmobarPP
     , ppSep             = "  "
     }
   where
-    clickable s n = printf "<action=xdotool key super+%s>%s</action>" n s
+    clickable s n = xmobarAction ("xdotool key super+" <> n) "1" s
 
 toggleStrutsKey :: XConfig l -> (KeyMask, KeySym)
 toggleStrutsKey XConfig { XMonad.modMask = m } = (m, xK_b)
