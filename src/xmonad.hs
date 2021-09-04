@@ -42,9 +42,9 @@ import           XMonad.Actions.Minimize          (maximizeWindowAndFocus,
                                                    withLastMinimized)
 import           XMonad.Actions.SpawnOn           (manageSpawn, spawnAndDo)
 import           XMonad.Actions.TreeSelect        (TSConfig (..), TSNode (..),
+                                                   cancel, defaultNavigation,
                                                    treeselectAction,
                                                    tsDefaultConfig)
-import qualified XMonad.Actions.TreeSelect        as TS
 import           XMonad.Hooks.DynamicLog          (PP (..), statusBar,
                                                    xmobarAction, xmobarColor,
                                                    xmobarPP)
@@ -203,10 +203,10 @@ myTreeSelectConfig = tsDefaultConfig
     readColor color alpha =
         read . (++) "0x" . (++) alpha . tail $ color
     navigation = M.union
-        TS.defaultNavigation $
+        defaultNavigation $
         M.fromList
-            [ ((noModMask, xK_q), TS.cancel)
-            , ((controlMask, xK_bracketleft), TS.cancel)
+            [ ((noModMask, xK_q), cancel)
+            , ((controlMask, xK_bracketleft), cancel)
             ]
 
 -- Keys
