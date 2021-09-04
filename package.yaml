@@ -49,7 +49,6 @@ executables:
       - xmonad
       - xmonad-contrib
       - containers
-      - data-default
       - my-xmonad
   xmobar:
     source-dirs: src
