@@ -4,20 +4,21 @@
 import           Control.Exception                (catch)
 import           Data.Bifunctor                   (bimap)
 import qualified Data.Map                         as M
+import           Data.Monoid                      (All)
 import           Data.Tree                        (Tree (Node))
 import           GHC.IO.Exception                 (IOException)
 import           Text.Printf                      (printf)
 import           Theme.Theme                      (base01, base04, base06,
                                                    base0C, basebg, basefg,
                                                    myFont)
-import           XMonad                           (Button, Full (Full), KeyMask,
-                                                   KeySym, ManageHook, Window,
-                                                   X, XConfig (..), button1,
-                                                   button3, button4, button5,
-                                                   className, composeAll,
-                                                   controlMask, def, doFloat,
-                                                   floatLocation, focus, gets,
-                                                   io, mod4Mask,
+import           XMonad                           (Button, Event, Full (Full),
+                                                   KeyMask, KeySym, ManageHook,
+                                                   Window, X, XConfig (..),
+                                                   button1, button3, button4,
+                                                   button5, className,
+                                                   composeAll, controlMask, def,
+                                                   doFloat, floatLocation,
+                                                   focus, gets, io, mod4Mask,
                                                    mouseMoveWindow,
                                                    mouseResizeWindow, noModMask,
                                                    refresh, sendMessage,
@@ -48,10 +49,11 @@ import           XMonad.Hooks.DynamicLog          (PP (..), statusBar,
                                                    xmobarAction, xmobarColor,
                                                    xmobarPP)
 import           XMonad.Hooks.EwmhDesktops        (ewmh, fullscreenEventHook)
-import           XMonad.Hooks.ManageDocks         (manageDocks)
+import           XMonad.Hooks.ManageDocks         (docksEventHook, manageDocks)
 import           XMonad.Hooks.ManageHelpers       (doCenterFloat, doFullFloat,
                                                    doRectFloat, isDialog,
                                                    isFullscreen)
+import           XMonad.Hooks.Minimize            (minimizeEventHook)
 import           XMonad.Layout.BoringWindows      (boringWindows, focusDown,
                                                    focusMaster, focusUp)
 import           XMonad.Layout.Circle             (Circle (..))
@@ -346,6 +348,14 @@ myManageHook = manageSpawn <+> manageDocks <+> composeAll
     , isDialog                   --> doFloat
     ]
 
+-- Event Hook
+
+myEventHook :: Event -> X All
+myEventHook = handleEventHook def
+              <+> docksEventHook
+              <+> fullscreenEventHook
+              <+> minimizeEventHook
+
 -- Startup Hook
 
 myStartupHook :: X ()
@@ -400,7 +410,7 @@ myConfig = ewmh def
     , borderWidth = 4
     , layoutHook = myLayoutHook
     , manageHook = myManageHook
-    , handleEventHook = fullscreenEventHook
+    , handleEventHook = myEventHook
     , startupHook = myStartupHook
     }
     `additionalKeysP` myKeys
