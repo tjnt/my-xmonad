@@ -12,13 +12,13 @@ import           Theme.Theme                      (base01, base04, base06,
                                                    base0C, basebg, basefg,
                                                    myFont)
 import           XMonad                           (Button, Event, Full (Full),
-                                                   KeyMask, KeySym, ManageHook,
-                                                   Window, X, XConfig (..),
-                                                   button1, button3, button4,
-                                                   button5, className,
-                                                   composeAll, controlMask, def,
-                                                   doFloat, floatLocation,
-                                                   focus, gets, io, mod4Mask,
+                                                   KeyMask, ManageHook, Window,
+                                                   X, XConfig (..), button1,
+                                                   button3, button4, button5,
+                                                   className, composeAll,
+                                                   controlMask, def, doFloat,
+                                                   floatLocation, focus, gets,
+                                                   io, mod4Mask,
                                                    mouseMoveWindow,
                                                    mouseResizeWindow, noModMask,
                                                    refresh, sendMessage,
@@ -376,27 +376,23 @@ myStartupHook = do
 
 -- xmobar
 
-myBar :: String
-myBar = "xmobar"
-
-myPP :: PP
-myPP = xmobarPP
-    { ppOrder           = id
-    , ppCurrent         = xmobarColor base01 basebg . clickable "●"
-    , ppUrgent          = xmobarColor base06 basebg . clickable "●"
-    , ppVisible         = xmobarColor base01 basebg . clickable "⦿"
-    , ppHidden          = xmobarColor base06 basebg . clickable "●"
-    , ppHiddenNoWindows = xmobarColor base06 basebg . clickable "○"
-    , ppTitle           = xmobarColor base04 basebg
-    , ppOutput          = putStrLn
-    , ppWsSep           = " "
-    , ppSep             = "  "
-    }
+myXMobar = statusBar "xmobar"
+    xmobarPP
+        { ppOrder           = id
+        , ppCurrent         = xmobarColor base01 basebg . clickable "●"
+        , ppUrgent          = xmobarColor base06 basebg . clickable "●"
+        , ppVisible         = xmobarColor base01 basebg . clickable "⦿"
+        , ppHidden          = xmobarColor base06 basebg . clickable "●"
+        , ppHiddenNoWindows = xmobarColor base06 basebg . clickable "○"
+        , ppTitle           = xmobarColor base04 basebg
+        , ppOutput          = putStrLn
+        , ppWsSep           = " "
+        , ppSep             = "  "
+        }
+    toggleStrutsKey
   where
     clickable s n = xmobarAction ("xdotool key super+" <> n) "1" s
-
-toggleStrutsKey :: XConfig l -> (KeyMask, KeySym)
-toggleStrutsKey XConfig { XMonad.modMask = m } = (m, xK_b)
+    toggleStrutsKey XConfig { XMonad.modMask = m } = (m, xK_b)
 
 -- main
 
@@ -417,4 +413,4 @@ myConfig = ewmh def
     `additionalMouseBindings` myMouseBindings
 
 main :: IO ()
-main = xmonad =<< statusBar myBar myPP toggleStrutsKey myConfig
+main = xmonad =<< myXMobar myConfig
