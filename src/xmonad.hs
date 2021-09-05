@@ -19,8 +19,7 @@ import           XMonad                           (Button, Event, Full (Full),
                                                    controlMask, def, doFloat,
                                                    floatLocation, focus, gets,
                                                    io, mod4Mask,
-                                                   mouseMoveWindow,
-                                                   mouseResizeWindow, noModMask,
+                                                   mouseMoveWindow, noModMask,
                                                    refresh, sendMessage,
                                                    shiftMask, spawn, title,
                                                    whenX, windows, windowset,
@@ -31,6 +30,7 @@ import           XMonad                           (Button, Event, Full (Full),
 import           XMonad.Actions.CopyWindow        (kill1)
 import           XMonad.Actions.CycleWS           (nextWS, prevWS, shiftToNext,
                                                    shiftToPrev, toggleWS)
+import           XMonad.Actions.FlexibleResize    (mouseResizeWindow)
 import           XMonad.Actions.FloatKeys         (keysMoveWindow,
                                                    keysResizeWindow)
 import           XMonad.Actions.FloatSnap         (afterDrag, snapGrow,
