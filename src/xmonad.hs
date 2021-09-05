@@ -40,6 +40,7 @@ import           XMonad.Actions.FloatSnap         (afterDrag, snapGrow,
 import           XMonad.Actions.Minimize          (maximizeWindowAndFocus,
                                                    minimizeWindow,
                                                    withLastMinimized)
+import           XMonad.Actions.SinkAll           (sinkAll)
 import           XMonad.Actions.SpawnOn           (manageSpawn, spawnAndDo)
 import           XMonad.Actions.TreeSelect        (TSConfig (..), TSNode (..),
                                                    cancel, defaultNavigation,
@@ -239,8 +240,10 @@ myKeys =
     , ("M-r",           refresh)
       -- toggle fullscreen
     , ("M-f",           sendMessage ToggleLayout)
-      -- toggle float on center
+      -- toggle float
     , ("M-t",           toggleFloat)
+      -- sink all
+    , ("M-S-t",         sinkAll)
       -- move to center
     , ("M-g",           moveToCenter)
       -- cycle workspaces
