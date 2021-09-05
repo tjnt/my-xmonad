@@ -99,9 +99,7 @@ toggleFloat = withFocused $ \win -> do
     floats <- gets $ W.floating . windowset
     if win `M.member` floats
        then withFocused $ windows . W.sink
-       else do
-           (_, W.RationalRect _ _ w h) <- floatLocation win
-           windows $ W.float win $ W.RationalRect ((1 - w) / 2) ((1 - h) / 2) w h
+       else floatLocation win >>= windows . W.float win . snd
 
 brightnessCtrl :: Int -> X ()
 brightnessCtrl param = do
