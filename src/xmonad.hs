@@ -223,10 +223,10 @@ myTreeSelectAction = do
            ]
        ]
 
--- Keys
+-- Key bindings
 
-myKeys :: [([Char], X ())]
-myKeys =
+myKeyBindings :: [(String, X ())]
+myKeyBindings =
     [ -- focus (BoringWindows)
       ("M-j",           focusDown)
     , ("M-k",           focusUp)
@@ -425,7 +425,7 @@ myConfig = ewmh def
     , handleEventHook = myEventHook
     , startupHook = myStartupHook
     }
-    `additionalKeysP` myKeys
+    `additionalKeysP` myKeyBindings
     `additionalMouseBindings` myMouseBindings
 
 main :: IO ()
