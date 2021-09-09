@@ -1,9 +1,13 @@
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
+{-# LANGUAGE TupleSections #-}
 
 import           Control.Exception                (catch)
 import           Data.Bifunctor                   (bimap)
+import           Data.Bool                        (bool)
+import           Data.List                        (intersect, sortOn)
 import qualified Data.Map                         as M
+import           Data.Maybe                       (fromMaybe, mapMaybe)
 import           Data.Monoid                      (All)
 import           Data.Tree                        (Tree (Node))
 import           GHC.IO.Exception                 (IOException)
@@ -11,6 +15,7 @@ import           Text.Printf                      (printf)
 import           Theme.Theme                      (base01, base04, base06,
                                                    base0C, basebg, basefg,
                                                    myFont)
+import           Utils.XdgDesktopEntry
 import           XMonad                           (Button, Event, Full (Full),
                                                    KeyMask, ManageHook, Window,
                                                    X, XConfig (..), button1,
@@ -78,7 +83,6 @@ import qualified XMonad.StackSet                  as W
 import           XMonad.Util.EZConfig             (additionalKeysP,
                                                    additionalMouseBindings)
 import           XMonad.Util.SpawnOnce            (spawnOnce)
--- import           XMonad.Util.Run             (runProcessWithInput)
 
 myModMask :: KeyMask
 myModMask = mod4Mask
@@ -152,61 +156,74 @@ myXPConfig = def
 
 -- tree select
 
-myTreeSelect :: [Tree (TSNode (X ()))]
-myTreeSelect =
-   [ Node (TSNode "Application Menu" "Open application menu" (return ()))
-       [
-         Node (TSNode "Browser" "" (return ()))
-           [ Node (TSNode "Firefox" "" (spawn "firefox")) []
-           , Node (TSNode "Firefox (Private)" "" (spawn "firefox -private-window")) []
-           , Node (TSNode "Chromium" "" (spawn "chromium")) []
-           ]
-       , Node (TSNode "WPS Office" "" (spawn "wps")) []
-       , Node (TSNode "Tools" "" (return ()))
-           [ Node (TSNode "Xfe" "File manager" (spawn "xfe"))  []
-           , Node (TSNode "qalculate" "Calculator" (spawn "qalculate"))  []
-           , Node (TSNode "Paint" "Paint tool" (spawn "pinta"))  []
-           , Node (TSNode "Peek" "Video capture" (spawn "peek"))  []
-           , Node (TSNode "Gmtp" "MTP file transfer tool" (spawn "gmtp"))  []
-           , Node (TSNode "pavucontrol" "Sound control" (spawn "pavucontrol"))  []
-           , Node (TSNode "ARandR" "Monitor configuration tool" (spawn "arandr"))  []
-           , Node (TSNode "Remmina" "Remote Desktop" (spawn "remmina"))  []
-           ]
-       ]
-   , Node (TSNode "System menu" "Open system menu" (return ()))
-       [ Node (TSNode "Monitor OFF" "" (spawn "xset dpms force standby")) []
-       , Node (TSNode "Standby" "" (spawn "systemctl suspend")) []
-       , Node (TSNode "Hibernate" "" (spawn "systemctl hibernate")) []
-       , Node (TSNode "Shutdown" "" (spawn "systemctl poweroff")) []
-       , Node (TSNode "Reboot"   ""   (spawn "systemctl reboot")) []
-       ]
-   ]
-
-myTreeSelectConfig :: TSConfig a
-myTreeSelectConfig = tsDefaultConfig
-    { ts_hidechildren = True
-    , ts_font         = myFont
-    , ts_background   = readColor basebg "C0"
-    , ts_node         = (0xff000000, readColor base0C "FF")
-    , ts_nodealt      = (0xff000000, readColor base04  "FF")
-    , ts_highlight    = (0xffffffff, readColor base01  "FF")
-    , ts_extra        = 0xffffffff
-    , ts_node_width   = 200
-    , ts_node_height  = 30
-    , ts_originX      = 0
-    , ts_originY      = 0
-    , ts_indent       = 80
-    , ts_navigate     = navigation
-    }
+applicationMenu :: IO (Tree (TSNode (X ())))
+applicationMenu = Node (TSNode "Application Menu" "Open application menu" (return ()))
+                . convert . construct template <$> readDescktopEntrys
   where
-    readColor color alpha =
-        read . (++) "0x" . (++) alpha . tail $ color
-    navigation = M.union
-        defaultNavigation $
-        M.fromList
-            [ ((noModMask, xK_q), cancel)
-            , ((controlMask, xK_bracketleft), cancel)
-            ]
+    categories = [ "WebBrowser", "AudioVideo", "Office", "Utility"
+                 , "System", "Settings", "Other"
+                 ]
+    template = M.fromList $ map (,[]) categories
+    construct m []     = m
+    construct m (e:es) =
+        let ks = maybe [] (`intersect` M.keys template) $ desktopEntryCategories e
+            k = if null ks then "Other" else head ks
+            m' = M.insertWith (\a b -> head a:b) k [e] m
+         in construct m' es
+    convert m = map mkCategoryNode categories
+      where
+        mkCategoryNode cate =
+            let es = sortOn desktopEntryName $ m M.! cate
+                childs = mapMaybe mkEntryNode es
+             in Node (TSNode cate "" (return ())) childs
+        mkEntryNode e = do
+            name <- desktopEntryName e
+            exec <- head . words <$> desktopEntryExec e
+            -- _ <- desktopEntryCategories e  -- ignore categories set
+            let comment = fromMaybe "" $ desktopEntryComment e
+                cmd = maybe exec
+                        (bool exec (printf "termite --exec \"%s\"" exec))
+                        (desktopEntryTerminal e)
+            Just $ Node (TSNode name comment (spawn cmd)) []
+
+myTreeSelectAction :: X ()
+myTreeSelectAction = do
+    appMenu <- io applicationMenu
+    treeselectAction myTsConfig $ myTsMenu <> [appMenu]
+  where
+    myTsConfig = tsDefaultConfig
+        { ts_hidechildren = True
+        , ts_font         = myFont
+        , ts_background   = readColor basebg "C0"
+        , ts_node         = (0xff000000, readColor base0C "FF")
+        , ts_nodealt      = (0xff000000, readColor base04 "FF")
+        , ts_highlight    = (0xffffffff, readColor base01 "FF")
+        , ts_extra        = 0xffffffff
+        , ts_node_width   = 280
+        , ts_node_height  = 30
+        , ts_originX      = 0
+        , ts_originY      = 0
+        , ts_indent       = 80
+        , ts_navigate     = navigation
+        }
+      where
+        readColor color alpha =
+            read . (++) "0x" . (++) alpha . tail $ color
+        navigation = M.union
+            defaultNavigation $
+            M.fromList
+                [ ((noModMask, xK_q), cancel)
+                , ((controlMask, xK_bracketleft), cancel)
+                ]
+    myTsMenu =
+       [ Node (TSNode "System menu" "Open system menu" (return ()))
+           [ Node (TSNode "Monitor OFF" "" (spawn "xset dpms force standby")) []
+           , Node (TSNode "Standby" "" (spawn "systemctl suspend")) []
+           , Node (TSNode "Hibernate" "" (spawn "systemctl hibernate")) []
+           , Node (TSNode "Shutdown" "" (spawn "systemctl poweroff")) []
+           , Node (TSNode "Reboot"   ""   (spawn "systemctl reboot")) []
+           ]
+       ]
 
 -- Keys
 
@@ -222,7 +239,7 @@ myKeys =
       -- shell prompt
     , ("M-p",           shellPrompt myXPConfig)
       -- tree select
-    , ("M-o",           treeselectAction myTreeSelectConfig myTreeSelect)
+    , ("M-o",           myTreeSelectAction)
       -- clipboard history
     , ("M-y",           spawnAndDo (doRectFloat (W.RationalRect 0 0 0.4 1.0))
                                    "termite --exec=\"clip.sh sel\" --title=clipboard")
