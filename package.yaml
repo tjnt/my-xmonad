@@ -32,9 +32,13 @@ library:
   exposed-modules:
     - Theme.Theme
     - Plugins.SimpleReader
+    - Utils.XdgDesktopEntry
   dependencies:
     - xmobar
     - xmonad-contrib
+    - text
+    - filepattern
+    - config-ini
 
 executables:
   xmonad:
