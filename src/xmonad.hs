@@ -27,7 +27,7 @@ import           XMonad                           (Button, Event, Full (Full),
                                                    mouseMoveWindow, noModMask,
                                                    refresh, sendMessage,
                                                    shiftMask, spawn, title,
-                                                   whenX, windows, windowset,
+                                                   windows, windowset,
                                                    withFocused, xK_b,
                                                    xK_bracketleft, xK_q, xmonad,
                                                    (-->), (.|.), (<+>), (=?),
@@ -92,12 +92,10 @@ myWorkspaces = map show [1..5]
 
 -- Functions
 
-moveToCenter :: X ()
-moveToCenter = withFocused $ \win -> do
-    floats <- gets $ W.floating . windowset
-    whenX (return (win `M.member` floats)) $ do
-        (_, W.RationalRect _ _ w h) <- floatLocation win
-        windows $ W.float win $ W.RationalRect ((1 - w) / 2) ((1 - h) / 2) w h
+centerFloat :: X ()
+centerFloat = withFocused $ \win -> do
+    (_, W.RationalRect _ _ w h) <- floatLocation win
+    windows $ W.float win $ W.RationalRect ((1 - w) / 2) ((1 - h) / 2) w h
 
 toggleFloat :: X ()
 toggleFloat = withFocused $ \win -> do
@@ -262,7 +260,7 @@ myKeys =
       -- sink all
     , ("M-S-t",         sinkAll)
       -- move to center
-    , ("M-g",           moveToCenter)
+    , ("M-g",           centerFloat)
       -- cycle workspaces
     , ("M-a",           toggleWS)
     , ("M-d",           nextWS)
