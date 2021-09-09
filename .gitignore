@@ -1,6 +1,6 @@
 .stack-work/
 my-xmonad.cabal
 xmonad-x86_64-linux
-xmonad.*
+xmonad.errors
 prompt-history
 *~
