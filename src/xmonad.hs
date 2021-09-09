@@ -297,7 +297,7 @@ myKeys =
     , ("<XF86MonBrightnessUp>",   brightnessCtrl 10)
     , ("<XF86MonBrightnessDown>", brightnessCtrl (-10))
       -- toggle monitor
-    , ("<XF86Display>",          cycleMonitor ("eDP-1", "HDMI-2"))
+    , ("<XF86Display>",          cycleMonitor ("eDP1", "HDMI2"))
       -- toggle wifi
     , ("<XF86WLAN>",             spawn "wifi toggle")
       -- toggle bluetooth
