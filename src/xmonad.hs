@@ -137,8 +137,8 @@ cycleMonitor (primary, secondary) = do
     handler _ = return 0
     file     = "/tmp/monitor-mode"
     single   = printf "--output %s --auto --output %s --off" primary secondary
-    rightof  = printf "--output %s --auto --output %s --auto --right-of eDP-1" primary secondary
-    leftof   = printf "--output %s --auto --output %s --auto --left-of eDP-1" primary secondary
+    rightof  = printf "--output %s --auto --output %s --auto --right-of %s" primary secondary primary
+    leftof   = printf "--output %s --auto --output %s --auto --left-of %s" primary secondary primary
     external = printf "--output %s --off --output %s --auto" primary secondary
 
 -- shell prompt
