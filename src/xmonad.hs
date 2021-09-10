@@ -377,6 +377,7 @@ myEventHook = handleEventHook def
 myStartupHook :: X ()
 myStartupHook = do
     spawnOnce "compton -b"
+    spawnOnce "dunst"
     spawnOnce $ printf
               "trayer --edge top --align right --widthtype request --height 31 \
                \--expand true --transparent true --alpha 0 --tint 0x%s \
