@@ -1,8 +1,11 @@
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
-{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE PostfixOperators #-}
+{-# LANGUAGE TupleSections    #-}
 
+import           Control.Concurrent               (threadDelay)
 import           Control.Exception                (catch)
+import           Control.Monad                    (when)
 import           Data.Bifunctor                   (bimap)
 import           Data.Bool                        (bool)
 import           Data.List                        (intersect, sortOn)
@@ -11,6 +14,7 @@ import           Data.Maybe                       (fromMaybe, mapMaybe)
 import           Data.Monoid                      (All)
 import           Data.Tree                        (Tree (Node))
 import           GHC.IO.Exception                 (IOException)
+import           Numeric                          (showFFloat)
 import           Text.Printf                      (printf)
 import           Theme.Theme                      (base01, base04, base06,
                                                    base0C, basebg, basefg,
@@ -82,6 +86,7 @@ import           XMonad.Prompt.Shell              (shellPrompt)
 import qualified XMonad.StackSet                  as W
 import           XMonad.Util.EZConfig             (additionalKeysP,
                                                    additionalMouseBindings)
+import           XMonad.Util.Run                  (runProcessWithInput, seconds)
 import           XMonad.Util.SpawnOnce            (spawnOnce)
 
 myModMask :: KeyMask
@@ -138,6 +143,35 @@ cycleMonitor (primary, secondary) = do
     rightof  = printf "--output %s --auto --output %s --auto --right-of %s" primary secondary primary
     leftof   = printf "--output %s --auto --output %s --auto --left-of %s" primary secondary primary
     external = printf "--output %s --off --output %s --auto" primary secondary
+
+notifyVolumeChange :: String -> X ()
+notifyVolumeChange name = do
+    io $ threadDelay (0.5 `seconds`)
+    w <- words . last . lines
+        <$> runProcessWithInput "amixer" ["get", name] ""
+    when (length w == 6) $
+        let (v, t) = (trimVol (w!!4), trimMut (w!!5))
+         in spawn $ "dunstify -a xmonad -u low -h int:transient:1 "
+                    <> printf "-h int:value:%s '%s volume%s'" v name
+                    (if t == "on" then "" else " [mute]")
+  where
+    trimVol = takeWhile (/='%') . tail
+    trimMut = takeWhile (/=']') . tail
+
+notifyBrightnessChange :: X ()
+notifyBrightnessChange = do
+    io $ threadDelay (0.5 `seconds`)
+    maxV <- io $ read <$> readFile fileMax
+    curV <- io $ read <$> readFile fileCur
+    let v = showDigits 0 ((curV / maxV) * 100)
+     in spawn $ "dunstify -a xmonad -u low -h int:transient:1 "
+                <> printf "-h int:value:%s brightness" v
+  where
+    prefix = "/sys/class/backlight/intel_backlight/"
+    fileMax = prefix ++ "max_brightness"
+    fileCur = prefix ++ "actual_brightness"
+    showDigits :: (RealFloat a) => Int -> a -> String
+    showDigits d n = showFFloat (Just d) n ""
 
 -- shell prompt
 
@@ -287,13 +321,13 @@ myKeyBindings =
       -- screenshot
     , ("<Print>", spawn "sleep 0.2; scrot -s $(xdg-user-dir PICTURES)/%Y-%m-%d-%T-shot.png")
       -- volume control
-    , ("<XF86AudioMute>",        spawn "amixer -q set Master toggle")
-    , ("<XF86AudioMicMute>",     spawn "amixer -q set Capture toggle")
-    , ("<XF86AudioRaiseVolume>", spawn "amixer -q set Master playback 10%+")
-    , ("<XF86AudioLowerVolume>", spawn "amixer -q set Master playback 10%-")
+    , ("<XF86AudioMute>",        spawn "amixer -q set Master toggle"  >> notifyVolumeChange "Master")
+    , ("<XF86AudioMicMute>",     spawn "amixer -q set Capture toggle" >> notifyVolumeChange "Capture")
+    , ("<XF86AudioRaiseVolume>", spawn "amixer -q set Master playback 10%+" >> notifyVolumeChange "Master")
+    , ("<XF86AudioLowerVolume>", spawn "amixer -q set Master playback 10%-" >> notifyVolumeChange "Master")
       -- brightness control
-    , ("<XF86MonBrightnessUp>",   brightnessCtrl 10)
-    , ("<XF86MonBrightnessDown>", brightnessCtrl (-10))
+    , ("<XF86MonBrightnessUp>",   brightnessCtrl 10    >> notifyBrightnessChange)
+    , ("<XF86MonBrightnessDown>", brightnessCtrl (-10) >> notifyBrightnessChange)
       -- toggle monitor
     , ("<XF86Display>",          cycleMonitor ("eDP1", "HDMI2"))
       -- toggle wifi
