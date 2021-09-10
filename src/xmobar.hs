@@ -7,7 +7,7 @@ import           Plugins.SimpleReader    (SimpleReader (..))
 import           System.Environment      (getEnv)
 import           System.IO.Unsafe        (unsafeDupablePerformIO)
 import           Text.Printf             (printf)
-import           Theme.Theme             (base01, base02, base07, base0B,
+import           Theme.Theme             (base01, base02, base03, base07,
                                           base0C, basebg, myFont)
 import           XMonad.Hooks.DynamicLog (trim, wrap, xmobarAction, xmobarColor)
 import           XMonad.Util.Run         (runProcessWithInput)
@@ -62,7 +62,7 @@ config =
                 [ "--template", "<ipat><total>%"
                 , "--Low",      "40"
                 , "--High",     "85"
-                , "--normal",   base0B
+                , "--normal",   base03
                 , "--high",     base01
                 , "--width",    "3"
                 , "--"
@@ -72,7 +72,7 @@ config =
                 [ "--template", "<usedipat><usedratio>%"
                 , "--Low",      "40"
                 , "--High",     "90"
-                , "--normal",   base0B
+                , "--normal",   base03
                 , "--high",     base01
                 , "--width",    "3"
                 , "--"
@@ -85,14 +85,14 @@ config =
                 , "--Low",      "40"
                 , "--High",     "60"
                 , "--width",    "3"
-                -- , "--normal",   base0B
+                -- , "--normal",   base03
                 -- , "--high",     base01
                 ] 50
             , Run $ DynNetwork
                 [ "--template", "<rxipat><rx>kb  <txipat><tx>kb"
                 , "--Low",      "102400"
                 , "--High",     "1024000"
-                , "--normal",   base0B
+                , "--normal",   base03
                 , "--high",     base01
                 , "--width",    "4"
                 , "--"
