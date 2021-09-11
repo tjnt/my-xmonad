@@ -17,6 +17,8 @@ import           Text.Printf                      (printf)
 import           Theme.Theme                      (base01, base04, base06,
                                                    base0C, basebg, basefg,
                                                    myFont)
+import           Utils.Dunst                      (dunstifyIndicator,
+                                                   dunstifyLow)
 import           Utils.Run                        (spawnAndWait, spawnTerminal,
                                                    spawnTerminalAndDo,
                                                    spawnWithOutput)
@@ -153,9 +155,8 @@ notifyVolumeChange target = do
         <$> spawnWithOutput (printf "amixer get %s" target)
     when (length w == 6) $
         let (v, t) = (trimVol (w!!4), trimMut (w!!5))
-         in spawn $ "dunstify -a xmonad -u low -h int:transient:1 "
-                    <> printf "-h int:value:%s '%s volume%s'" v target
-                    (if t == "on" then "" else " [mute]")
+            msg = printf "%s volume%s" target (bool " [mute]" "" (t=="on"))
+         in dunstifyIndicator v msg ""
   where
     trimVol = takeWhile (/='%') . tail
     trimMut = takeWhile (/=']') . tail
@@ -165,8 +166,7 @@ notifyBrightnessChange = do
     maxV <- io $ read <$> readFile fileMax
     curV <- io $ read <$> readFile fileCur
     let v = showDigits 0 ((curV / maxV) * 100)
-     in spawn $ "dunstify -a xmonad -u low -h int:transient:1 "
-                <> printf "-h int:value:%s brightness" v
+     in dunstifyIndicator v "brightness" ""
   where
     dir = "/sys/class/backlight/intel_backlight/"
     fileMax = dir <> "max_brightness"
@@ -189,15 +189,13 @@ wifiToggle :: X ()
 wifiToggle = do
     spawnAndWait "wifi toggle"
     w <- (!!2) . words <$> spawnWithOutput "wifi"
-    spawn $ "dunstify -a xmonad -u low -h int:transient:1 "
-          <> printf "'wifi turn %s'" w
+    dunstifyLow ("wifi turn " <> w) ""
 
 boluetoothToggle :: X ()
 boluetoothToggle = do
     spawnAndWait "bluetooth toggle"
     w <- (!!2) . words <$> spawnWithOutput "bluetooth"
-    spawn $ "dunstify -a xmonad -u low -h int:transient:1 "
-          <> printf "'bluetooth turn %s'" w
+    dunstifyLow ("bluetooth turn " <> w) ""
 
 -- shell prompt
 
