@@ -56,6 +56,7 @@ import           XMonad.Actions.TreeSelect        (TSConfig (..), TSNode (..),
                                                    cancel, defaultNavigation,
                                                    treeselectAction,
                                                    tsDefaultConfig)
+import           XMonad.Actions.Warp              (warpToWindow)
 import           XMonad.Hooks.DynamicLog          (PP (..), statusBar,
                                                    xmobarAction, xmobarColor,
                                                    xmobarPP)
@@ -287,8 +288,8 @@ myKeyBindings =
     , ("M-x",           withLastMinimized maximizeWindowAndFocus)
       -- close window
     , ("M-c",           kill1)
-      -- refresh window
-    , ("M-r",           refresh)
+      -- refresh window and warp pointer
+    , ("M-r",           refresh >> warpToWindow 0.5 0.5)
       -- toggle fullscreen
     , ("M-f",           sendMessage ToggleLayout)
       -- toggle float
