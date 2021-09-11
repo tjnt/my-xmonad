@@ -17,7 +17,8 @@ import           Text.Printf                      (printf)
 import           Theme.Theme                      (base01, base04, base06,
                                                    base0C, basebg, basefg,
                                                    myFont)
-import           Utils.Run                        (spawnAndWait,
+import           Utils.Run                        (spawnAndWait, spawnTerminal,
+                                                   spawnTerminalAndDo,
                                                    spawnWithOutput)
 import           Utils.XdgDesktopEntry
 import           XMonad                           (Button, Event, Full (Full),
@@ -50,7 +51,7 @@ import           XMonad.Actions.Minimize          (maximizeWindowAndFocus,
                                                    minimizeWindow,
                                                    withLastMinimized)
 import           XMonad.Actions.SinkAll           (sinkAll)
-import           XMonad.Actions.SpawnOn           (manageSpawn, spawnAndDo)
+import           XMonad.Actions.SpawnOn           (manageSpawn)
 import           XMonad.Actions.TreeSelect        (TSConfig (..), TSNode (..),
                                                    cancel, defaultNavigation,
                                                    treeselectAction,
@@ -269,17 +270,15 @@ myKeyBindings =
     , ("M-k",           focusUp)
     , ("M-m",           focusMaster)
       -- launch
-    , ("M-S-<Return>",  spawn "termite --exec=tmux --title=termite")
-    , ("M-C-<Return>",  spawnAndDo doCenterFloat "termite --exec=tmux --title=termite")
+    , ("M-S-<Return>",  spawnTerminal "--exec tmux")
+    , ("M-C-<Return>",  spawnTerminalAndDo doCenterFloat "--exec=tmux")
       -- shell prompt
     , ("M-p",           shellPrompt myXPConfig)
       -- tree select
     , ("M-o",           myTreeSelectAction)
       -- clipboard history
-    , ("M-y",           spawnAndDo (doRectFloat (W.RationalRect 0 0 0.4 1.0))
-                                   "termite --exec=\"clip.sh sel\" --title=clipboard")
-    , ("M-S-y",         spawnAndDo (doRectFloat (W.RationalRect 0 0 0.4 1.0))
-                                   "termite --exec=\"clip.sh del\" --title=clipboard")
+    , ("M-y",           spawnTerminal "--exec 'clip.sh sel' --title clipboard")
+    , ("M-S-y",         spawnTerminal "--exec 'clip.sh del' --title clipboard")
       -- resizing window ratio
     , ("M-u",           sendMessage ShrinkSlave)
     , ("M-n",           sendMessage ExpandSlave)
@@ -398,6 +397,7 @@ myManageHook = manageSpawn <+> manageDocks <+> composeAll
     , title =? "nmtui-edit"      --> doFloat
     , title =? "nmtui-connect"   --> doFloat
     , title =? "screen-capture"  --> doFloat
+    , title =? "clipboard"       --> doRectFloat (W.RationalRect 0 0 0.4 1.0)
     , isFullscreen               --> doFullFloat
     , isDialog                   --> doFloat
     ]
