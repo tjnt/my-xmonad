@@ -148,13 +148,13 @@ cycleMonitor (primary, secondary) = do
     external = printf "--output %s --off --output %s --auto" primary secondary
 
 notifyVolumeChange :: String -> X ()
-notifyVolumeChange name = do
+notifyVolumeChange target = do
     w <- words . last . lines
-        <$> spawnWithOutput (printf "amixer get %s" name)
+        <$> spawnWithOutput (printf "amixer get %s" target)
     when (length w == 6) $
         let (v, t) = (trimVol (w!!4), trimMut (w!!5))
          in spawn $ "dunstify -a xmonad -u low -h int:transient:1 "
-                    <> printf "-h int:value:%s '%s volume%s'" v name
+                    <> printf "-h int:value:%s '%s volume%s'" v target
                     (if t == "on" then "" else " [mute]")
   where
     trimVol = takeWhile (/='%') . tail
@@ -174,19 +174,16 @@ notifyBrightnessChange = do
     showDigits :: (RealFloat a) => Int -> a -> String
     showDigits d n = showFFloat (Just d) n ""
 
-volumeMasterToggle, volumeCaptureToggle, volumeMasterUp, volumeMasterDown :: X ()
-volumeMasterToggle =
-    spawnAndWait "amixer -q set Master toggle" >>
-    notifyVolumeChange "Master"
-volumeCaptureToggle =
-    spawnAndWait "amixer -q set Capture toggle" >>
-    notifyVolumeChange "Capture"
-volumeMasterUp =
-    spawnAndWait "amixer -q set Master playback 10%+" >>
-    notifyVolumeChange "Master"
-volumeMasterDown =
-    spawnAndWait "amixer -q set Master playback 10%-" >>
-    notifyVolumeChange "Master"
+volumeToggle, volumeUp, volumeDown :: String -> X ()
+volumeToggle target =
+    spawnAndWait (printf "amixer -q set %s toggle" target) >>
+    notifyVolumeChange target
+volumeUp target =
+    spawnAndWait (printf "amixer -q set %s 10%%+" target) >>
+    notifyVolumeChange target
+volumeDown target =
+    spawnAndWait (printf "amixer -q set %s 10%%-" target) >>
+    notifyVolumeChange target
 
 wifiToggle :: X ()
 wifiToggle = spawn "wifi toggle"
@@ -344,21 +341,23 @@ myKeyBindings =
     , ("M-C-S-<Left>" , withFocused $ snapShrink        R Nothing)
     , ("M-C-S-<Right>", withFocused $ snapGrow          R Nothing)
       -- screenshot
-    , ("<Print>",                 captureScreen)
+    , ("<Print>",                   captureScreen)
       -- volume control
-    , ("<XF86AudioMute>",         volumeMasterToggle)
-    , ("<XF86AudioMicMute>",      volumeCaptureToggle)
-    , ("<XF86AudioRaiseVolume>",  volumeMasterUp)
-    , ("<XF86AudioLowerVolume>",  volumeMasterDown)
+    , ("<XF86AudioMute>",           volumeToggle  "Master")
+    , ("<XF86AudioRaiseVolume>",    volumeUp      "Master")
+    , ("<XF86AudioLowerVolume>",    volumeDown    "Master")
+    , ("<XF86AudioMicMute>",        volumeToggle  "Capture")
+    , ("S-<XF86AudioRaiseVolume>",  volumeUp      "Capture")
+    , ("S-<XF86AudioLowerVolume>",  volumeDown    "Capture")
       -- brightness control
-    , ("<XF86MonBrightnessUp>",   brightnessCtrl 10    >> notifyBrightnessChange)
-    , ("<XF86MonBrightnessDown>", brightnessCtrl (-10) >> notifyBrightnessChange)
+    , ("<XF86MonBrightnessUp>",     brightnessCtrl 10    >> notifyBrightnessChange)
+    , ("<XF86MonBrightnessDown>",   brightnessCtrl (-10) >> notifyBrightnessChange)
       -- toggle monitor
-    , ("<XF86Display>",           cycleMonitor ("eDP1", "HDMI2"))
+    , ("<XF86Display>",             cycleMonitor ("eDP1", "HDMI2"))
       -- toggle wifi
-    , ("<XF86WLAN>",              wifiToggle)
+    , ("<XF86WLAN>",                wifiToggle)
       -- toggle bluetooth
-    , ("<XF86Bluetooth>",         boluetoothToggle)
+    , ("<XF86Bluetooth>",           boluetoothToggle)
     ]
   where
     convert :: (Integral a, Num b) => (a,a) -> (b,b)
@@ -430,10 +429,12 @@ myManageHook = manageSpawn <+> manageDocks <+> composeAll
 myServerModeHook :: X [(String, X ())]
 myServerModeHook = return
     [ ("open-terminal",         spawnTerminal "tmux")
-    , ("volume-master-toggle",  volumeMasterToggle)
-    , ("volume-capture-toggle", volumeCaptureToggle)
-    , ("volume-master-up",      volumeMasterUp)
-    , ("volume-master-down",    volumeMasterDown)
+    , ("volume-master-toggle",  volumeToggle  "Master")
+    , ("volume-master-up",      volumeUp      "Master")
+    , ("volume-master-down",    volumeDown    "Master")
+    , ("volume-capture-toggle", volumeToggle  "Capture")
+    , ("volume-capture-up",     volumeUp      "Capture")
+    , ("volume-capture-down",   volumeDown    "Capture")
     , ("wifi-toggle",           wifiToggle)
     , ("bluetooth-toggle",      boluetoothToggle)
     ]
