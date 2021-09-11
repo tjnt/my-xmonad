@@ -3,7 +3,6 @@
 {-# LANGUAGE PostfixOperators #-}
 {-# LANGUAGE TupleSections    #-}
 
-import           Control.Concurrent               (threadDelay)
 import           Control.Exception                (catch)
 import           Control.Monad                    (when)
 import           Data.Bifunctor                   (bimap)
@@ -20,6 +19,7 @@ import           Theme.Theme                      (base01, base04, base06,
                                                    base0C, basebg, basefg,
                                                    myFont)
 import           Utils.XdgDesktopEntry
+import           Utils.Run (spawnAndWait)
 import           XMonad                           (Button, Event, Full (Full),
                                                    KeyMask, ManageHook, Window,
                                                    X, XConfig (..), button1,
@@ -117,7 +117,7 @@ brightnessCtrl param = do
         minV = step * 10
         value = curV + step * param
         ajust = max minV $ min maxV value
-    spawn $ "echo " ++ show ajust ++ " | sudo tee " ++ fileCur ++ " > /dev/null"
+    spawnAndWait $ "echo " ++ show ajust ++ " | sudo tee " ++ fileCur ++ " > /dev/null"
   where
     prefix = "/sys/class/backlight/intel_backlight/"
     fileMax = prefix ++ "max_brightness"
@@ -146,7 +146,6 @@ cycleMonitor (primary, secondary) = do
 
 notifyVolumeChange :: String -> X ()
 notifyVolumeChange name = do
-    io $ threadDelay (0.5 `seconds`)
     w <- words . last . lines
         <$> runProcessWithInput "amixer" ["get", name] ""
     when (length w == 6) $
@@ -160,7 +159,6 @@ notifyVolumeChange name = do
 
 notifyBrightnessChange :: X ()
 notifyBrightnessChange = do
-    io $ threadDelay (0.5 `seconds`)
     maxV <- io $ read <$> readFile fileMax
     curV <- io $ read <$> readFile fileCur
     let v = showDigits 0 ((curV / maxV) * 100)
@@ -321,10 +319,10 @@ myKeyBindings =
       -- screenshot
     , ("<Print>", spawn "sleep 0.2; scrot -s $(xdg-user-dir PICTURES)/%Y-%m-%d-%T-shot.png")
       -- volume control
-    , ("<XF86AudioMute>",        spawn "amixer -q set Master toggle"  >> notifyVolumeChange "Master")
-    , ("<XF86AudioMicMute>",     spawn "amixer -q set Capture toggle" >> notifyVolumeChange "Capture")
-    , ("<XF86AudioRaiseVolume>", spawn "amixer -q set Master playback 10%+" >> notifyVolumeChange "Master")
-    , ("<XF86AudioLowerVolume>", spawn "amixer -q set Master playback 10%-" >> notifyVolumeChange "Master")
+    , ("<XF86AudioMute>",        spawnAndWait "amixer -q set Master toggle"  >> notifyVolumeChange "Master")
+    , ("<XF86AudioMicMute>",     spawnAndWait "amixer -q set Capture toggle" >> notifyVolumeChange "Capture")
+    , ("<XF86AudioRaiseVolume>", spawnAndWait "amixer -q set Master playback 10%+" >> notifyVolumeChange "Master")
+    , ("<XF86AudioLowerVolume>", spawnAndWait "amixer -q set Master playback 10%-" >> notifyVolumeChange "Master")
       -- brightness control
     , ("<XF86MonBrightnessUp>",   brightnessCtrl 10    >> notifyBrightnessChange)
     , ("<XF86MonBrightnessDown>", brightnessCtrl (-10) >> notifyBrightnessChange)
