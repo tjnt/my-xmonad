@@ -70,3 +70,13 @@ executables:
       - xmonad-contrib
       - containers
       - my-xmonad
+  xmonadctl:
+    source-dirs: src
+    main: xmonadctl.hs
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+      - -O2
+    dependencies:
+      - X11
