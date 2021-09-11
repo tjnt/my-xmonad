@@ -18,7 +18,8 @@ import           Text.Printf                      (printf)
 import           Theme.Theme                      (base01, base04, base06,
                                                    base0C, basebg, basefg,
                                                    myFont)
-import           Utils.Run                        (spawnAndWait)
+import           Utils.Run                        (spawnAndWait,
+                                                   spawnWithOutput)
 import           Utils.XdgDesktopEntry
 import           XMonad                           (Button, Event, Full (Full),
                                                    KeyMask, ManageHook, Window,
@@ -86,7 +87,6 @@ import           XMonad.Prompt.Shell              (shellPrompt)
 import qualified XMonad.StackSet                  as W
 import           XMonad.Util.EZConfig             (additionalKeysP,
                                                    additionalMouseBindings)
-import           XMonad.Util.Run                  (runProcessWithInput)
 import           XMonad.Util.SpawnOnce            (spawnOnce)
 
 myModMask :: KeyMask
@@ -147,7 +147,7 @@ cycleMonitor (primary, secondary) = do
 notifyVolumeChange :: String -> X ()
 notifyVolumeChange name = do
     w <- words . last . lines
-        <$> runProcessWithInput "amixer" ["get", name] ""
+        <$> spawnWithOutput (printf "amixer get %s" name)
     when (length w == 6) $
         let (v, t) = (trimVol (w!!4), trimMut (w!!5))
          in spawn $ "dunstify -a xmonad -u low -h int:transient:1 "
