@@ -34,6 +34,7 @@ library:
     - Plugins.SimpleReader
     - Utils.XdgDesktopEntry
     - Utils.Run
+    - Utils.Dunst
   dependencies:
     - xmonad
     - xmobar
