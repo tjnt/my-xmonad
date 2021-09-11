@@ -66,6 +66,8 @@ import           XMonad.Hooks.ManageHelpers       (doCenterFloat, doFullFloat,
                                                    doRectFloat, isDialog,
                                                    isFullscreen)
 import           XMonad.Hooks.Minimize            (minimizeEventHook)
+import           XMonad.Hooks.ServerMode          (serverModeEventHookCmd,
+                                                   serverModeEventHookCmd')
 import           XMonad.Layout.BoringWindows      (boringWindows, focusDown,
                                                    focusMaster, focusUp)
 import           XMonad.Layout.Circle             (Circle (..))
@@ -171,6 +173,26 @@ notifyBrightnessChange = do
     fileCur = dir <> "actual_brightness"
     showDigits :: (RealFloat a) => Int -> a -> String
     showDigits d n = showFFloat (Just d) n ""
+
+volumeMasterToggle, volumeCaptureToggle, volumeMasterUp, volumeMasterDown :: X ()
+volumeMasterToggle =
+    spawnAndWait "amixer -q set Master toggle" >>
+    notifyVolumeChange "Master"
+volumeCaptureToggle =
+    spawnAndWait "amixer -q set Capture toggle" >>
+    notifyVolumeChange "Capture"
+volumeMasterUp =
+    spawnAndWait "amixer -q set Master playback 10%+" >>
+    notifyVolumeChange "Master"
+volumeMasterDown =
+    spawnAndWait "amixer -q set Master playback 10%-" >>
+    notifyVolumeChange "Master"
+
+wifiToggle :: X ()
+wifiToggle = spawn "wifi toggle"
+
+boluetoothToggle :: X ()
+boluetoothToggle = spawn "bluetooth toggle"
 
 -- shell prompt
 
@@ -322,21 +344,21 @@ myKeyBindings =
     , ("M-C-S-<Left>" , withFocused $ snapShrink        R Nothing)
     , ("M-C-S-<Right>", withFocused $ snapGrow          R Nothing)
       -- screenshot
-    , ("<Print>",       captureScreen)
+    , ("<Print>",                 captureScreen)
       -- volume control
-    , ("<XF86AudioMute>",        spawnAndWait "amixer -q set Master toggle"  >> notifyVolumeChange "Master")
-    , ("<XF86AudioMicMute>",     spawnAndWait "amixer -q set Capture toggle" >> notifyVolumeChange "Capture")
-    , ("<XF86AudioRaiseVolume>", spawnAndWait "amixer -q set Master playback 10%+" >> notifyVolumeChange "Master")
-    , ("<XF86AudioLowerVolume>", spawnAndWait "amixer -q set Master playback 10%-" >> notifyVolumeChange "Master")
+    , ("<XF86AudioMute>",         volumeMasterToggle)
+    , ("<XF86AudioMicMute>",      volumeCaptureToggle)
+    , ("<XF86AudioRaiseVolume>",  volumeMasterUp)
+    , ("<XF86AudioLowerVolume>",  volumeMasterDown)
       -- brightness control
     , ("<XF86MonBrightnessUp>",   brightnessCtrl 10    >> notifyBrightnessChange)
     , ("<XF86MonBrightnessDown>", brightnessCtrl (-10) >> notifyBrightnessChange)
       -- toggle monitor
-    , ("<XF86Display>",          cycleMonitor ("eDP1", "HDMI2"))
+    , ("<XF86Display>",           cycleMonitor ("eDP1", "HDMI2"))
       -- toggle wifi
-    , ("<XF86WLAN>",             spawn "wifi toggle")
+    , ("<XF86WLAN>",              wifiToggle)
       -- toggle bluetooth
-    , ("<XF86Bluetooth>",        spawn "bluetooth toggle")
+    , ("<XF86Bluetooth>",         boluetoothToggle)
     ]
   where
     convert :: (Integral a, Num b) => (a,a) -> (b,b)
@@ -405,11 +427,24 @@ myManageHook = manageSpawn <+> manageDocks <+> composeAll
 
 -- Event Hook
 
+myServerModeHook :: X [(String, X ())]
+myServerModeHook = return
+    [ ("open-terminal",         spawnTerminal "tmux")
+    , ("volume-master-toggle",  volumeMasterToggle)
+    , ("volume-capture-toggle", volumeCaptureToggle)
+    , ("volume-master-up",      volumeMasterUp)
+    , ("volume-master-down",    volumeMasterDown)
+    , ("wifi-toggle",           wifiToggle)
+    , ("bluetooth-toggle",      boluetoothToggle)
+    ]
+
 myEventHook :: Event -> X All
 myEventHook = handleEventHook def
               <+> docksEventHook
               <+> fullscreenEventHook
               <+> minimizeEventHook
+              <+> serverModeEventHookCmd
+              <+> serverModeEventHookCmd' myServerModeHook
 
 -- Startup Hook
 
