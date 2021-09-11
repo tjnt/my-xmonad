@@ -254,6 +254,12 @@ myTreeSelectAction = do
            ]
        ]
 
+captureScreen :: X()
+captureScreen = spawn $
+    "scrot -s $(xdg-user-dir PICTURES)/%Y-%m-%d-%T-shot.png "
+    <> "-e 'dunstify -a xmonad -u low -h int:transient:1 \"saved capture\" \"$f\" ;"
+    <> "feh --title screen-capture \"$f\" &'"
+
 -- Key bindings
 
 myKeyBindings :: [(String, X ())]
@@ -316,7 +322,7 @@ myKeyBindings =
     , ("M-C-S-<Left>" , withFocused $ snapShrink        R Nothing)
     , ("M-C-S-<Right>", withFocused $ snapGrow          R Nothing)
       -- screenshot
-    , ("<Print>", spawn "sleep 0.2; scrot -s $(xdg-user-dir PICTURES)/%Y-%m-%d-%T-shot.png")
+    , ("<Print>",       captureScreen)
       -- volume control
     , ("<XF86AudioMute>",        spawnAndWait "amixer -q set Master toggle"  >> notifyVolumeChange "Master")
     , ("<XF86AudioMicMute>",     spawnAndWait "amixer -q set Capture toggle" >> notifyVolumeChange "Capture")
@@ -391,6 +397,7 @@ myManageHook = manageSpawn <+> manageDocks <+> composeAll
     , title =? "nmtui"           --> doFloat
     , title =? "nmtui-edit"      --> doFloat
     , title =? "nmtui-connect"   --> doFloat
+    , title =? "screen-capture"  --> doFloat
     , isFullscreen               --> doFullFloat
     , isDialog                   --> doFloat
     ]
