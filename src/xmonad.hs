@@ -23,9 +23,10 @@ import           Utils.Run                        (spawnAndWait, spawnTerminal,
 import           Utils.XdgDesktopEntry
 import           XMonad                           (Button, Event, Full (Full),
                                                    KeyMask, ManageHook, Window,
-                                                   X, XConfig (..), button1,
-                                                   button3, button4, button5,
-                                                   className, composeAll,
+                                                   X, XConfig (..), asks,
+                                                   button1, button3, button4,
+                                                   button5, className,
+                                                   composeAll, config,
                                                    controlMask, def, doFloat,
                                                    floatLocation, focus, gets,
                                                    io, mod4Mask,
@@ -66,8 +67,7 @@ import           XMonad.Hooks.ManageHelpers       (doCenterFloat, doFullFloat,
                                                    doRectFloat, isDialog,
                                                    isFullscreen)
 import           XMonad.Hooks.Minimize            (minimizeEventHook)
-import           XMonad.Hooks.ServerMode          (serverModeEventHookCmd,
-                                                   serverModeEventHookCmd')
+import           XMonad.Hooks.ServerMode          (serverModeEventHookCmd')
 import           XMonad.Layout.BoringWindows      (boringWindows, focusDown,
                                                    focusMaster, focusUp)
 import           XMonad.Layout.Circle             (Circle (..))
@@ -437,13 +437,20 @@ myServerModeHook = return
     , ("wifi-toggle",           wifiToggle)
     , ("bluetooth-toggle",      boluetoothToggle)
     ]
+    <> workspaceCommands
+  where
+    workspaceCommands :: X [(String, X ())]
+    workspaceCommands = asks (workspaces . config) >>= \wss -> return
+                            [ (m <> i, windows $ f i) | i <- wss
+                            , (f, m) <- [ (W.greedyView, "view-workspace-")
+                                        , (W.shift, "shift-workspace-") ]
+                            ]
 
 myEventHook :: Event -> X All
 myEventHook = handleEventHook def
               <+> docksEventHook
               <+> fullscreenEventHook
               <+> minimizeEventHook
-              <+> serverModeEventHookCmd
               <+> serverModeEventHookCmd' myServerModeHook
 
 -- Startup Hook
@@ -482,7 +489,7 @@ myXMobar = statusBar "xmobar"
         }
     toggleStrutsKey
   where
-    clickable s n = xmobarAction ("xdotool key super+" <> n) "1" s
+    clickable s n = xmobarAction ("xmonadctl view-workspace-" <> n) "1" s
     toggleStrutsKey XConfig { XMonad.modMask = m } = (m, xK_b)
 
 -- main
