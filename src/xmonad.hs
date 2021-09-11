@@ -18,8 +18,8 @@ import           Text.Printf                      (printf)
 import           Theme.Theme                      (base01, base04, base06,
                                                    base0C, basebg, basefg,
                                                    myFont)
+import           Utils.Run                        (spawnAndWait)
 import           Utils.XdgDesktopEntry
-import           Utils.Run (spawnAndWait)
 import           XMonad                           (Button, Event, Full (Full),
                                                    KeyMask, ManageHook, Window,
                                                    X, XConfig (..), button1,
@@ -117,11 +117,11 @@ brightnessCtrl param = do
         minV = step * 10
         value = curV + step * param
         ajust = max minV $ min maxV value
-    spawnAndWait $ "echo " ++ show ajust ++ " | sudo tee " ++ fileCur ++ " > /dev/null"
+    spawnAndWait $ printf "echo %d | sudo tee %s > /dev/null" ajust fileCur
   where
-    prefix = "/sys/class/backlight/intel_backlight/"
-    fileMax = prefix ++ "max_brightness"
-    fileCur = prefix ++ "brightness"
+    dir = "/sys/class/backlight/intel_backlight/"
+    fileMax = dir <> "max_brightness"
+    fileCur = dir <> "brightness"
 
 cycleMonitor :: (String, String) -> X ()
 cycleMonitor (primary, secondary) = do
@@ -165,9 +165,9 @@ notifyBrightnessChange = do
      in spawn $ "dunstify -a xmonad -u low -h int:transient:1 "
                 <> printf "-h int:value:%s brightness" v
   where
-    prefix = "/sys/class/backlight/intel_backlight/"
-    fileMax = prefix ++ "max_brightness"
-    fileCur = prefix ++ "actual_brightness"
+    dir = "/sys/class/backlight/intel_backlight/"
+    fileMax = dir <> "max_brightness"
+    fileCur = dir <> "actual_brightness"
     showDigits :: (RealFloat a) => Int -> a -> String
     showDigits d n = showFFloat (Just d) n ""
 
