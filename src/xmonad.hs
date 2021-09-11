@@ -186,10 +186,18 @@ volumeDown target =
     notifyVolumeChange target
 
 wifiToggle :: X ()
-wifiToggle = spawn "wifi toggle"
+wifiToggle = do
+    spawnAndWait "wifi toggle"
+    w <- (!!2) . words <$> spawnWithOutput "wifi"
+    spawn $ "dunstify -a xmonad -u low -h int:transient:1 "
+          <> printf "'wifi turn %s'" w
 
 boluetoothToggle :: X ()
-boluetoothToggle = spawn "bluetooth toggle"
+boluetoothToggle = do
+    spawnAndWait "bluetooth toggle"
+    w <- (!!2) . words <$> spawnWithOutput "bluetooth"
+    spawn $ "dunstify -a xmonad -u low -h int:transient:1 "
+          <> printf "'bluetooth turn %s'" w
 
 -- shell prompt
 
