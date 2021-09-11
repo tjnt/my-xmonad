@@ -86,7 +86,7 @@ import           XMonad.Prompt.Shell              (shellPrompt)
 import qualified XMonad.StackSet                  as W
 import           XMonad.Util.EZConfig             (additionalKeysP,
                                                    additionalMouseBindings)
-import           XMonad.Util.Run                  (runProcessWithInput, seconds)
+import           XMonad.Util.Run                  (runProcessWithInput)
 import           XMonad.Util.SpawnOnce            (spawnOnce)
 
 myModMask :: KeyMask
