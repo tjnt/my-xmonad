@@ -33,12 +33,15 @@ library:
     - Theme.Theme
     - Plugins.SimpleReader
     - Utils.XdgDesktopEntry
+    - Utils.Run
   dependencies:
+    - xmonad
     - xmobar
     - xmonad-contrib
     - text
     - filepattern
     - config-ini
+    - process
 
 executables:
   xmonad:
