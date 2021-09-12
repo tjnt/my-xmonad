@@ -488,10 +488,10 @@ myXMobar = statusBar "xmobar"
         , ppHidden          = xmobarColor base06 basebg . clickable "●"
         , ppHiddenNoWindows = xmobarColor base06 basebg . clickable "○"
         , ppTitle           = xmobarColor base04 basebg
+        , ppLayout          = fromMaybe "" . (iconMap M.!?)
         , ppOutput          = putStrLn
         , ppWsSep           = " "
         , ppSep             = "  "
-        , ppLayout          = fromMaybe "" .(iconMap M.!?)
         }
     toggleStrutsKey
   where
