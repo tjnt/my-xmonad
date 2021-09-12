@@ -90,15 +90,8 @@ import           XMonad.Prompt                    (XPConfig, XPPosition (..),
                                                    position, promptBorderWidth)
 import           XMonad.Prompt.Shell              (shellPrompt)
 import qualified XMonad.StackSet                  as W
-import           XMonad.Util.EZConfig             (additionalKeysP,
-                                                   additionalMouseBindings)
+import           XMonad.Util.EZConfig             (additionalKeysP)
 import           XMonad.Util.SpawnOnce            (spawnOnce)
-
-myModMask :: KeyMask
-myModMask = mod4Mask
-
-myWorkspaces :: [String]
-myWorkspaces = map show [1..5]
 
 -- Functions
 
@@ -289,8 +282,8 @@ captureScreen = spawn $
 
 -- Key bindings
 
-myKeyBindings :: [(String, X ())]
-myKeyBindings =
+myKeys :: [(String, X ())]
+myKeys =
     [ -- focus (BoringWindows)
       ("M-j",           focusDown)
     , ("M-k",           focusUp)
@@ -373,19 +366,19 @@ myKeyBindings =
 
 -- Mouse bindings
 
-myMouseBindings :: [((KeyMask, Button), Window -> X ())]
-myMouseBindings =
-    [ ((myModMask, button1), \w ->
+myMouseBindings :: XConfig l ->M.Map (KeyMask, Button) (Window -> X ())
+myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
+    [ ((modm, button1), \w ->
             focus w >> mouseMoveWindow w >>
             afterDrag (snapMagicMove (Just 50) (Just 50) w))
-    , ((myModMask .|. shiftMask, button1), \w ->
+    , ((modm .|. shiftMask, button1), \w ->
             focus w >> mouseMoveWindow w >>
             afterDrag (snapMagicResize [L,R,U,D] (Just 50) (Just 50) w))
-    , ((myModMask, button3), \w ->
+    , ((modm, button3), \w ->
             focus w >> mouseResizeWindow w >>
             afterDrag (snapMagicResize [R,D] (Just 50) (Just 50) w))
-    , ((myModMask, button4), \_ -> windows W.swapUp)
-    , ((myModMask, button5), \_ -> windows W.swapDown)
+    , ((modm, button4), \_ -> windows W.swapUp)
+    , ((modm, button5), \_ -> windows W.swapDown)
     ]
 
 -- Layout Hook
@@ -502,20 +495,20 @@ myXMobar = statusBar "xmobar"
 -- main
 
 myConfig = ewmh def
-    { modMask = myModMask
+    { modMask = mod4Mask
     , terminal = "termite"
-    , workspaces = myWorkspaces
-    , focusFollowsMouse = True
+    , workspaces = map show [1..5]
+    , borderWidth = 4
     , normalBorderColor = base06
     , focusedBorderColor = base01
-    , borderWidth = 4
+    , focusFollowsMouse = True
     , layoutHook = myLayoutHook
     , manageHook = myManageHook
     , handleEventHook = myEventHook
     , startupHook = myStartupHook
+    , mouseBindings = myMouseBindings
     }
-    `additionalKeysP` myKeyBindings
-    `additionalMouseBindings` myMouseBindings
+    `additionalKeysP` myKeys
 
 main :: IO ()
 main = xmonad =<< myXMobar myConfig
