@@ -404,6 +404,8 @@ myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
 myLayoutHook = toggleLayouts expand normal
   where
     spacing = spacingRaw True (Border 2 2 4 4) True (Border 0 0 0 0) False
+    rename s = renamed [ Replace s ]
+
     tall   = boringWindows . minimize . smartBorders . spacing
            $ mouseResizableTile
     mirror = boringWindows . minimize . smartBorders . spacing
@@ -416,12 +418,13 @@ myLayoutHook = toggleLayouts expand normal
            $ Circle
     full   = boringWindows . minimize . noBorders
            $ Full
-    normal =     renamed [ Replace "Tall"   ] tall
-             ||| renamed [ Replace "Mirror" ] mirror
-             ||| renamed [ Replace "Float"  ] float
-             ||| renamed [ Replace "Three"  ] three
-             ||| renamed [ Replace "Circle" ] circle
-    expand =     renamed [ Replace "Full"   ] full
+
+    normal =     rename "Tall"   tall
+             ||| rename "Mirror" mirror
+             ||| rename "Float"  float
+             ||| rename "Three"  three
+             ||| rename "Circle" circle
+    expand =     rename "Full"   full
 
 -- Manage Hook
 
