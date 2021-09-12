@@ -11,10 +11,14 @@ import           Data.Ini.Config              (IniParser, fieldMbOf, flag,
 import           Data.Maybe                   (catMaybes)
 import qualified Data.Text                    as T
 import qualified Data.Text.IO                 as TIO
+import           System.Environment           (getEnv)
 import           System.FilePattern.Directory (getDirectoryFiles)
 
-xdgApplicationsPath :: FilePath
-xdgApplicationsPath = "/usr/share/applications/"
+xdgApplicationsPaths :: FilePath -> [FilePath]
+xdgApplicationsPaths home =
+    [ "/usr/share/applications/"
+    , home <> "/.local/share/applications/"
+    ]
 
 data DesktopEntry = DesktopEntry
     { desktopEntryName        :: Maybe String
@@ -27,8 +31,10 @@ data DesktopEntry = DesktopEntry
 
 readDescktopEntrys :: IO [DesktopEntry]
 readDescktopEntrys = do
-    files <- getDirectoryFiles xdgApplicationsPath ["*.desktop"]
-    catMaybes <$> mapM (go . (xdgApplicationsPath <>)) (filter (`notElem` [".", ".."]) files)
+    home <- getEnv "HOME"
+    paths <- concat <$> mapM (\dir ->
+        map (dir <>) <$> getDirectoryFiles dir ["*.desktop"]) (xdgApplicationsPaths home)
+    catMaybes <$> mapM go paths
   where
     go :: FilePath -> IO (Maybe DesktopEntry)
     go path = do
