@@ -90,6 +90,7 @@ import           XMonad.Layout.NoBorders             (noBorders, smartBorders)
 import           XMonad.Layout.Renamed               (Rename (..), renamed)
 import           XMonad.Layout.SimplestFloat         (simplestFloat)
 import           XMonad.Layout.Spacing               (Border (..), spacingRaw)
+import           XMonad.Layout.ThreeColumns          (ThreeCol (ThreeColMid))
 import           XMonad.Layout.ToggleLayouts         (ToggleLayout (..),
                                                       toggleLayouts)
 import           XMonad.Prompt                       (XPConfig, XPPosition (..),
@@ -337,7 +338,8 @@ myKeys =
     , ("M-6",           sendMessage $ JumpToLayout "Tall")
     , ("M-7",           sendMessage $ JumpToLayout "Mirror")
     , ("M-8",           sendMessage $ JumpToLayout "Float")
-    , ("M-9",           sendMessage $ JumpToLayout "Circle")
+    , ("M-9",           sendMessage $ JumpToLayout "Three")
+    , ("M-0",           sendMessage $ JumpToLayout "Circle")
       -- float keys
     , ("M-<Up>",        withFocused $ keysMoveWindow'   (0,-10))
     , ("M-<Down>",      withFocused $ keysMoveWindow'   (0,10))
@@ -406,15 +408,18 @@ myLayoutHook = toggleLayouts expand normal
            $ mouseResizableTile
     mirror = boringWindows . minimize . smartBorders . spacing
            $ mouseResizableTileMirrored
-    circle = boringWindows . minimize . smartBorders
-           $ Circle
     float  = boringWindows . minimize . smartBorders
            $ simplestFloat
+    three  = boringWindows . minimize . smartBorders
+           $ ThreeColMid 1 (3/100) (1/2)
+    circle = boringWindows . minimize . smartBorders
+           $ Circle
     full   = boringWindows . minimize . noBorders
            $ Full
     normal =     renamed [ Replace "Tall"   ] tall
              ||| renamed [ Replace "Mirror" ] mirror
              ||| renamed [ Replace "Float"  ] float
+             ||| renamed [ Replace "Three"  ] three
              ||| renamed [ Replace "Circle" ] circle
     expand =     renamed [ Replace "Full"   ] full
 
@@ -512,6 +517,7 @@ myXMobar = statusBar "xmobar"
         [ ("Tall",   icon "layout-tall.xpm")
         , ("Mirror", icon "layout-mirror.xpm")
         , ("Float",  icon "layout-float.xpm")
+        , ("Three",  icon "layout-three.xpm")
         , ("Circle", icon "layout-circle.xpm")
         , ("Full",   icon "layout-full.xpm")
         ]
