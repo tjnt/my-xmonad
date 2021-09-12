@@ -243,8 +243,8 @@ applicationMenu = Node (TSNode "Application Menu" "Open application menu" (retur
             -- _ <- desktopEntryCategories e  -- ignore categories not set
             let comment = fromMaybe "" $ desktopEntryComment e
                 cmd = if fromMaybe False (desktopEntryTerminal e)
-                         then spawn exec
-                         else spawnTerminal $ printf "--exec '%s'" exec
+                         then spawnTerminal $ printf "--exec '%s'" exec
+                         else spawn exec
             Just $ Node (TSNode name comment cmd) []
 
 myTreeSelectAction :: X ()
