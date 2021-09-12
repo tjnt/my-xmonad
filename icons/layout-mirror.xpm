@@ -1,5 +1,5 @@
 /* XPM */
-static char * tall_xpm[] = {
+static char * mirror_xpm[] = {
 "20 20 2 1           ",
 " 	        c #151515",
 ".	        c #a8a897",
