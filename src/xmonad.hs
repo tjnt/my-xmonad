@@ -396,12 +396,11 @@ myLayoutHook = toggleLayouts expand normal
            $ simplestFloat
     full   = boringWindows . minimize . noBorders
            $ Full
-    icon = printf "<icon=%s/>"
-    normal =     renamed [ Replace (icon "layout-tall.xpm")  ] tall
-             ||| renamed [ Replace (icon "layout-mirror.xpm")] mirror
-             ||| renamed [ Replace (icon "layout-circle.xpm")] circle
-             ||| renamed [ Replace (icon "layout-float.xpm") ] float
-    expand =     renamed [ Replace (icon "layout-full.xpm")  ] full
+    normal =     renamed [ Replace "Tall"   ] tall
+             ||| renamed [ Replace "Mirror" ] mirror
+             ||| renamed [ Replace "Circle" ] circle
+             ||| renamed [ Replace "Float"  ] float
+    expand =     renamed [ Replace "Full"   ] full
 
 -- Manage Hook
 
@@ -486,11 +485,20 @@ myXMobar = statusBar "xmobar"
         , ppOutput          = putStrLn
         , ppWsSep           = " "
         , ppSep             = "  "
+        , ppLayout          = fromMaybe "" .(iconMap M.!?)
         }
     toggleStrutsKey
   where
     clickable s n = xmobarAction ("xmonadctl view-workspace-" <> n) "1" s
     toggleStrutsKey XConfig { XMonad.modMask = m } = (m, xK_b)
+    icon = printf "<icon=%s/>"
+    iconMap = M.fromList
+        [ ("Tall",   icon "layout-tall.xpm")
+        , ("Mirror", icon "layout-mirror.xpm")
+        , ("Circle", icon "layout-circle.xpm")
+        , ("Float",  icon "layout-float.xpm")
+        , ("Full",   icon "layout-full.xpm")
+        ]
 
 -- main
 
