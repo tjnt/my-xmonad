@@ -429,7 +429,7 @@ myLayoutHook = toggleLayouts expand normal
 -- Manage Hook
 
 myManageHook :: ManageHook
-myManageHook = manageSpawn <+> manageDocks <+> composeAll
+myManageHook = manageDocks <+> manageSpawn <+> composeAll
     [ className =? "Xmessage"    --> doFloat
     , className =? "MPlayer"     --> doFloat
     , className =? "mplayer2"    --> doFloat
