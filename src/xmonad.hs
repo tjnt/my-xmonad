@@ -36,12 +36,13 @@ import           XMonad                              (Button, Event,
                                                       gets, io, mod4Mask,
                                                       mouseMoveWindow,
                                                       noModMask, refresh,
-                                                      sendMessage, shiftMask,
-                                                      spawn, title, windows,
-                                                      windowset, withFocused,
-                                                      xK_b, xK_bracketleft,
-                                                      xK_q, xmonad, (-->),
-                                                      (.|.), (<+>), (=?))
+                                                      resource, sendMessage,
+                                                      shiftMask, spawn, title,
+                                                      windows, windowset,
+                                                      withFocused, xK_b,
+                                                      xK_bracketleft, xK_q,
+                                                      xmonad, (-->), (.|.),
+                                                      (<&&>), (<+>), (=?))
 import           XMonad.Actions.CopyWindow           (kill1)
 import           XMonad.Actions.CycleSelectedLayouts (cycleThroughLayouts)
 import           XMonad.Actions.CycleWS              (nextWS, prevWS,
@@ -435,6 +436,7 @@ myManageHook = manageDocks <+> manageSpawn <+> composeAll
     , className =? "mplayer2"    --> doFloat
     , className =? "Pavucontrol" --> doFloat
     , className =? "Peek"        --> doFloat
+    , className =? "Firefox" <&&> resource =? "Toolkit" --> doFloat
     , title =? "htop"            --> doFloat
     , title =? "pulsemixer"      --> doRectFloat (W.RationalRect 0 0 0.5 0.4)
     , title =? "nmtui"           --> doFloat
