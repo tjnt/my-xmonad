@@ -2,97 +2,105 @@
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 {-# LANGUAGE TupleSections #-}
 
-import           Control.Exception                (catch)
-import           Control.Monad                    (when)
-import           Data.Bifunctor                   (bimap)
-import           Data.Bool                        (bool)
-import           Data.List                        (intersect, sortOn)
-import qualified Data.Map                         as M
-import           Data.Maybe                       (fromMaybe, mapMaybe)
-import           Data.Monoid                      (All)
-import           Data.Tree                        (Tree (Node))
-import           GHC.IO.Exception                 (IOException)
-import           Numeric                          (showFFloat)
-import           Text.Printf                      (printf)
-import           Theme.Theme                      (base01, base04, base06,
-                                                   base0C, basebg, basefg,
-                                                   myFont)
-import           Utils.Dunst                      (dunstifyIndicator,
-                                                   dunstifyLow)
-import           Utils.Run                        (spawnAndWait, spawnTerminal,
-                                                   spawnTerminalAndDo,
-                                                   spawnWithOutput)
+import           Control.Exception                   (catch)
+import           Control.Monad                       (when)
+import           Data.Bifunctor                      (bimap)
+import           Data.Bool                           (bool)
+import           Data.List                           (intersect, sortOn)
+import qualified Data.Map                            as M
+import           Data.Maybe                          (fromMaybe, mapMaybe)
+import           Data.Monoid                         (All)
+import           Data.Tree                           (Tree (Node))
+import           GHC.IO.Exception                    (IOException)
+import           Numeric                             (showFFloat)
+import           Text.Printf                         (printf)
+import           Theme.Theme                         (base01, base04, base06,
+                                                      base0C, basebg, basefg,
+                                                      myFont)
+import           Utils.Dunst                         (dunstifyIndicator,
+                                                      dunstifyLow)
+import           Utils.Run                           (spawnAndWait,
+                                                      spawnTerminal,
+                                                      spawnTerminalAndDo,
+                                                      spawnWithOutput)
 import           Utils.XdgDesktopEntry
-import           XMonad                           (Button, Event, Full (Full),
-                                                   KeyMask, ManageHook, Window,
-                                                   X, XConfig (..), asks,
-                                                   button1, button3, button4,
-                                                   button5, className,
-                                                   composeAll, config,
-                                                   controlMask, def, doFloat,
-                                                   floatLocation, focus, gets,
-                                                   io, mod4Mask,
-                                                   mouseMoveWindow, noModMask,
-                                                   refresh, sendMessage,
-                                                   shiftMask, spawn, title,
-                                                   windows, windowset,
-                                                   withFocused, xK_b,
-                                                   xK_bracketleft, xK_q, xmonad,
-                                                   (-->), (.|.), (<+>), (=?))
-import           XMonad.Actions.CopyWindow        (kill1)
-import           XMonad.Actions.CycleWS           (nextWS, prevWS, shiftToNext,
-                                                   shiftToPrev, toggleWS)
-import           XMonad.Actions.FlexibleResize    (mouseResizeWindow)
-import           XMonad.Actions.FloatKeys         (keysMoveWindow,
-                                                   keysResizeWindow)
-import           XMonad.Actions.FloatSnap         (afterDrag, snapGrow,
-                                                   snapMagicMove,
-                                                   snapMagicResize, snapMove,
-                                                   snapShrink)
-import           XMonad.Actions.Minimize          (maximizeWindowAndFocus,
-                                                   minimizeWindow,
-                                                   withLastMinimized)
-import           XMonad.Actions.SinkAll           (sinkAll)
-import           XMonad.Actions.SpawnOn           (manageSpawn)
-import           XMonad.Actions.TreeSelect        (TSConfig (..), TSNode (..),
-                                                   cancel, defaultNavigation,
-                                                   treeselectAction,
-                                                   tsDefaultConfig)
-import           XMonad.Actions.Warp              (warpToWindow)
-import           XMonad.Hooks.DynamicLog          (PP (..), statusBar,
-                                                   xmobarAction, xmobarColor,
-                                                   xmobarPP)
-import           XMonad.Hooks.EwmhDesktops        (ewmh, fullscreenEventHook)
-import           XMonad.Hooks.ManageDocks         (docksEventHook, manageDocks)
-import           XMonad.Hooks.ManageHelpers       (doCenterFloat, doFullFloat,
-                                                   doRectFloat, isDialog,
-                                                   isFullscreen)
-import           XMonad.Hooks.Minimize            (minimizeEventHook)
-import           XMonad.Hooks.ServerMode          (serverModeEventHookCmd')
-import           XMonad.Layout.BoringWindows      (boringWindows, focusDown,
-                                                   focusMaster, focusUp)
-import           XMonad.Layout.Circle             (Circle (..))
-import           XMonad.Layout.Gaps               (Direction2D (..))
-import           XMonad.Layout.LayoutCombinators  (JumpToLayout (JumpToLayout),
-                                                   (|||))
-import           XMonad.Layout.Minimize           (minimize)
-import           XMonad.Layout.MouseResizableTile (MRTMessage (..),
-                                                   mouseResizableTile,
-                                                   mouseResizableTileMirrored)
-import           XMonad.Layout.NoBorders          (noBorders, smartBorders)
-import           XMonad.Layout.Renamed            (Rename (..), renamed)
-import           XMonad.Layout.SimplestFloat      (simplestFloat)
-import           XMonad.Layout.Spacing            (Border (..), spacingRaw)
-import           XMonad.Layout.ToggleLayouts      (ToggleLayout (..),
-                                                   toggleLayouts)
-import           XMonad.Prompt                    (XPConfig, XPPosition (..),
-                                                   alwaysHighlight, bgColor,
-                                                   fgColor, font, height,
-                                                   position, promptBorderWidth)
-import           XMonad.Prompt.Shell              (shellPrompt)
-import qualified XMonad.StackSet                  as W
-import           XMonad.Util.EZConfig             (additionalKeysP)
-import           XMonad.Util.SpawnOnce            (spawnOnce)
+import           XMonad                              (Button, Event,
+                                                      Full (Full), KeyMask,
+                                                      ManageHook, Window, X,
+                                                      XConfig (..), asks,
+                                                      button1, button3, button4,
+                                                      button5, className,
+                                                      composeAll, config,
+                                                      controlMask, def, doFloat,
+                                                      floatLocation, focus,
+                                                      gets, io, mod4Mask,
+                                                      mouseMoveWindow,
+                                                      noModMask, refresh,
+                                                      sendMessage, shiftMask,
+                                                      spawn, title, windows,
+                                                      windowset, withFocused,
+                                                      xK_b, xK_bracketleft,
+                                                      xK_q, xmonad, (-->),
+                                                      (.|.), (<+>), (=?))
+import           XMonad.Actions.CopyWindow           (kill1)
+import           XMonad.Actions.CycleSelectedLayouts (cycleThroughLayouts)
+import           XMonad.Actions.CycleWS              (nextWS, prevWS,
+                                                      shiftToNext, shiftToPrev,
+                                                      toggleWS)
+import           XMonad.Actions.FlexibleResize       (mouseResizeWindow)
+import           XMonad.Actions.FloatKeys            (keysMoveWindow,
+                                                      keysResizeWindow)
+import           XMonad.Actions.FloatSnap            (afterDrag, snapGrow,
+                                                      snapMagicMove,
+                                                      snapMagicResize, snapMove,
+                                                      snapShrink)
+import           XMonad.Actions.Minimize             (maximizeWindowAndFocus,
+                                                      minimizeWindow,
+                                                      withLastMinimized)
+import           XMonad.Actions.SinkAll              (sinkAll)
+import           XMonad.Actions.SpawnOn              (manageSpawn)
+import           XMonad.Actions.TreeSelect           (TSConfig (..),
+                                                      TSNode (..), cancel,
+                                                      defaultNavigation,
+                                                      treeselectAction,
+                                                      tsDefaultConfig)
+import           XMonad.Actions.Warp                 (warpToWindow)
+import           XMonad.Hooks.DynamicLog             (PP (..), statusBar,
+                                                      xmobarAction, xmobarColor,
+                                                      xmobarPP)
+import           XMonad.Hooks.EwmhDesktops           (ewmh, fullscreenEventHook)
+import           XMonad.Hooks.ManageDocks            (docksEventHook,
+                                                      manageDocks)
+import           XMonad.Hooks.ManageHelpers          (doCenterFloat,
+                                                      doFullFloat, doRectFloat,
+                                                      isDialog, isFullscreen)
+import           XMonad.Hooks.Minimize               (minimizeEventHook)
+import           XMonad.Hooks.ServerMode             (serverModeEventHookCmd')
+import           XMonad.Layout.BoringWindows         (boringWindows, focusDown,
+                                                      focusMaster, focusUp)
+import           XMonad.Layout.Circle                (Circle (..))
+import           XMonad.Layout.Gaps                  (Direction2D (..))
+import           XMonad.Layout.LayoutCombinators     (JumpToLayout (JumpToLayout),
+                                                      (|||))
+import           XMonad.Layout.Minimize              (minimize)
+import           XMonad.Layout.MouseResizableTile    (MRTMessage (..),
+                                                      mouseResizableTile,
+                                                      mouseResizableTileMirrored)
+import           XMonad.Layout.NoBorders             (noBorders, smartBorders)
+import           XMonad.Layout.Renamed               (Rename (..), renamed)
+import           XMonad.Layout.SimplestFloat         (simplestFloat)
+import           XMonad.Layout.Spacing               (Border (..), spacingRaw)
+import           XMonad.Layout.ToggleLayouts         (ToggleLayout (..),
+                                                      toggleLayouts)
+import           XMonad.Prompt                       (XPConfig, XPPosition (..),
+                                                      alwaysHighlight, bgColor,
+                                                      fgColor, font, height,
+                                                      position,
+                                                      promptBorderWidth)
+import           XMonad.Prompt.Shell                 (shellPrompt)
+import qualified XMonad.StackSet                     as W
+import           XMonad.Util.EZConfig                (additionalKeysP)
+import           XMonad.Util.SpawnOnce               (spawnOnce)
 
 -- Functions
 
@@ -323,11 +331,13 @@ myKeys =
     , ("M-s",           prevWS)
     , ("M-S-d",         shiftToNext)
     , ("M-S-s",         shiftToPrev)
+      -- cycle specific layout
+    , ("M-<Space>",     cycleThroughLayouts ["Tall", "Mirror", "Float"])
       -- direct layout switch
     , ("M-6",           sendMessage $ JumpToLayout "Tall")
     , ("M-7",           sendMessage $ JumpToLayout "Mirror")
-    , ("M-8",           sendMessage $ JumpToLayout "Circle")
-    , ("M-9",           sendMessage $ JumpToLayout "Float")
+    , ("M-8",           sendMessage $ JumpToLayout "Float")
+    , ("M-9",           sendMessage $ JumpToLayout "Circle")
       -- float keys
     , ("M-<Up>",        withFocused $ keysMoveWindow'   (0,-10))
     , ("M-<Down>",      withFocused $ keysMoveWindow'   (0,10))
@@ -404,8 +414,8 @@ myLayoutHook = toggleLayouts expand normal
            $ Full
     normal =     renamed [ Replace "Tall"   ] tall
              ||| renamed [ Replace "Mirror" ] mirror
-             ||| renamed [ Replace "Circle" ] circle
              ||| renamed [ Replace "Float"  ] float
+             ||| renamed [ Replace "Circle" ] circle
     expand =     renamed [ Replace "Full"   ] full
 
 -- Manage Hook
@@ -501,8 +511,8 @@ myXMobar = statusBar "xmobar"
     iconMap = M.fromList
         [ ("Tall",   icon "layout-tall.xpm")
         , ("Mirror", icon "layout-mirror.xpm")
-        , ("Circle", icon "layout-circle.xpm")
         , ("Float",  icon "layout-float.xpm")
+        , ("Circle", icon "layout-circle.xpm")
         , ("Full",   icon "layout-full.xpm")
         ]
 
