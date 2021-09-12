@@ -38,8 +38,7 @@ import           XMonad                           (Button, Event, Full (Full),
                                                    windows, windowset,
                                                    withFocused, xK_b,
                                                    xK_bracketleft, xK_q, xmonad,
-                                                   (-->), (.|.), (<+>), (=?),
-                                                   (|||))
+                                                   (-->), (.|.), (<+>), (=?))
 import           XMonad.Actions.CopyWindow        (kill1)
 import           XMonad.Actions.CycleWS           (nextWS, prevWS, shiftToNext,
                                                    shiftToPrev, toggleWS)
@@ -74,6 +73,8 @@ import           XMonad.Layout.BoringWindows      (boringWindows, focusDown,
                                                    focusMaster, focusUp)
 import           XMonad.Layout.Circle             (Circle (..))
 import           XMonad.Layout.Gaps               (Direction2D (..))
+import           XMonad.Layout.LayoutCombinators  (JumpToLayout (JumpToLayout),
+                                                   (|||))
 import           XMonad.Layout.Minimize           (minimize)
 import           XMonad.Layout.MouseResizableTile (MRTMessage (..),
                                                    mouseResizableTile,
@@ -322,6 +323,11 @@ myKeys =
     , ("M-s",           prevWS)
     , ("M-S-d",         shiftToNext)
     , ("M-S-s",         shiftToPrev)
+      -- direct layout switch
+    , ("M-6",           sendMessage $ JumpToLayout "Tall")
+    , ("M-7",           sendMessage $ JumpToLayout "Mirror")
+    , ("M-8",           sendMessage $ JumpToLayout "Circle")
+    , ("M-9",           sendMessage $ JumpToLayout "Float")
       -- float keys
     , ("M-<Up>",        withFocused $ keysMoveWindow'   (0,-10))
     , ("M-<Down>",      withFocused $ keysMoveWindow'   (0,10))
