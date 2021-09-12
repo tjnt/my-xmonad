@@ -238,13 +238,14 @@ applicationMenu = Node (TSNode "Application Menu" "Open application menu" (retur
              in Node (TSNode cate "" (return ())) childs
         mkEntryNode e = do
             name <- desktopEntryName e
-            exec <- head . words <$> desktopEntryExec e
-            -- _ <- desktopEntryCategories e  -- ignore categories set
+            exec <- unwords . filter (('%' /=) . head) . words
+                <$> desktopEntryExec e
+            -- _ <- desktopEntryCategories e  -- ignore categories not set
             let comment = fromMaybe "" $ desktopEntryComment e
-                cmd = maybe exec
-                        (bool exec (printf "--exec '%s'" exec))
-                        (desktopEntryTerminal e)
-            Just $ Node (TSNode name comment (spawnTerminal cmd)) []
+                cmd = if fromMaybe False (desktopEntryTerminal e)
+                         then spawn exec
+                         else spawnTerminal $ printf "--exec '%s'" exec
+            Just $ Node (TSNode name comment cmd) []
 
 myTreeSelectAction :: X ()
 myTreeSelectAction = do
