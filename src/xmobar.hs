@@ -136,7 +136,7 @@ config =
                 -- , "--low",      base01
                 -- , "--high",     base02
                 , "--"
-                , "-a",         "dunstify -a xmonad -u normal -h int:transient:1 'Battery running out !!'"
+                , "-a",         "dunstify -a xmonad -u critical -h int:transient:1 'Battery running out !!'"
                 , "-A",         "10"
                 , "-o",         xmobarFont 1 "<leftbar> " <> "<left>% " <> "(<timeleft>) " <> "<watts>w"
                 , "-O",         xmobarFont 1 "<leftbar> " <> "<left>% " <> xmobarFont 1 "\xf0e7 " <> "<watts>w"
