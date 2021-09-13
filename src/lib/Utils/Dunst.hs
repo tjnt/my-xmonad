@@ -7,6 +7,10 @@ module Utils.Dunst
     , dunstifyCritical
     , dunstifyIndicator
     , dunstify
+    , dunstClose
+    , dunstCloseAll
+    , dunstHistoryPop
+    , dunstRestart
     ) where
 
 import           Text.Printf (printf)
@@ -71,3 +75,9 @@ dunstify opt summary body = spawn $
         UrgencyCritical -> "normal"
     transient = if dunstTransient opt then "-h int:transient:1" else ""
     options = dunstOtherOptions opt
+
+dunstClose, dunstCloseAll, dunstHistoryPop, dunstRestart :: X ()
+dunstClose      = spawn "dunstctl close"
+dunstCloseAll   = spawn "dunstctl close-all"
+dunstHistoryPop = spawn "dunstctl history-pop"
+dunstRestart    = spawn "killall dunst ; dunst"

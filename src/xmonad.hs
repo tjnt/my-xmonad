@@ -17,7 +17,10 @@ import           Text.Printf                         (printf)
 import           Theme.Theme                         (base01, base04, base06,
                                                       base0C, basebg, basefg,
                                                       myFont)
-import           Utils.Dunst                         (dunstifyIndicator,
+import           Utils.Dunst                         (dunstCloseAll,
+                                                      dunstHistoryPop,
+                                                      dunstRestart,
+                                                      dunstifyIndicator,
                                                       dunstifyLow)
 import           Utils.Run                           (spawnAndWait,
                                                       spawnTerminal,
@@ -359,6 +362,10 @@ myKeys =
     , ("M-C-S-<Down>" , withFocused $ snapGrow          D Nothing)
     , ("M-C-S-<Left>" , withFocused $ snapShrink        R Nothing)
     , ("M-C-S-<Right>", withFocused $ snapGrow          R Nothing)
+      -- dunst operation
+    , ("M-[",           dunstCloseAll)
+    , ("M-S-[",         dunstRestart)
+    , ("M-]",           dunstHistoryPop)
       -- screenshot
     , ("<Print>",                   captureScreen)
       -- volume control
