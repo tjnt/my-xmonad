@@ -52,6 +52,8 @@ config =
                 , "%bluetooth%" & (<> "%deviceicons%")
                                 . xmobarAction "xmonadctl bluetooth-toggle" "1"
                                 . xmobarAction "blueman-manager" "3"
+                , "%dunst%" & xmobarAction "dunstctl history-pop" "1"
+                            . xmobarAction "killall dunst ; dunst" "3"
                 , "%battery%"
                 , "%date%"
                 ]
@@ -140,6 +142,7 @@ config =
                 , "-O",         xmobarFont 1 "<leftbar> " <> "<left>% " <> xmobarFont 1 "\xf0e7 " <> "<watts>w"
                 , "-i",         xmobarFont 1 "\xf1e6 " <> "<left>%"
                 ] 100
+            , Run $ SimpleReader dunstNotifyCount "dunst" 50
             , Run $ Date "%m/%d %a %H:%M" "date" 100
             , Run $ Com "trayer-padding-icon.sh" [] "trayerpad" 100
             ]
@@ -216,6 +219,15 @@ deviceIcons = do
             , ("input-gaming", "\xf11b")
             ]
 
+dunstNotifyCount :: IO String
+dunstNotifyCount = do
+    stdout <- trim <$> runProcessWithInput "dunstctl" ["count", "history"] ""
+    let icon = xmobarFont 1
+                $ case stdout of
+                    ""  -> xmobarColor base01 "" "\xf861"
+                    "0" -> "\xf860"
+                    _   -> xmobarColor base02 "" "\xf868"
+    return $ printf "%s %s" icon stdout
 
 runTUI :: String -> String -> String -> String -> String
 runTUI cmd title = xmobarAction
