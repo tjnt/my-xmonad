@@ -31,12 +31,12 @@ import           XMonad                              (Button, Event,
                                                       Full (Full), KeyMask,
                                                       ManageHook, Window, X,
                                                       XConfig (..), asks,
-                                                      button1, button3, button4,
-                                                      button5, className,
-                                                      composeAll, config,
-                                                      controlMask, def, doFloat,
-                                                      floatLocation, focus,
-                                                      gets, io, mod4Mask,
+                                                      button1, button2, button3,
+                                                      button4, button5,
+                                                      className, composeAll,
+                                                      config, controlMask, def,
+                                                      doFloat, floatLocation,
+                                                      focus, gets, io, mod4Mask,
                                                       mouseMoveWindow,
                                                       noModMask, refresh,
                                                       resource, sendMessage,
@@ -397,13 +397,17 @@ myMouseBindings :: XConfig l ->M.Map (KeyMask, Button) (Window -> X ())
 myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
     [ ((modm, button1), \w ->
             focus w >> mouseMoveWindow w >>
-            afterDrag (snapMagicMove (Just 50) (Just 50) w))
+            afterDrag (snapMagicMove (Just 50) (Just 50) w) >>
+            windows W.shiftMaster)
     , ((modm .|. shiftMask, button1), \w ->
             focus w >> mouseMoveWindow w >>
-            afterDrag (snapMagicResize [L,R,U,D] (Just 50) (Just 50) w))
+            afterDrag (snapMagicResize [L,R,U,D] (Just 50) (Just 50) w) >>
+            windows W.shiftMaster)
+    , ((modm, button2), windows . (W.shiftMaster .) . W.focusWindow)
     , ((modm, button3), \w ->
             focus w >> mouseResizeWindow w >>
-            afterDrag (snapMagicResize [R,D] (Just 50) (Just 50) w))
+            afterDrag (snapMagicResize [R,D] (Just 50) (Just 50) w) >>
+            windows W.shiftMaster)
     , ((modm, button4), \_ -> windows W.swapUp)
     , ((modm, button5), \_ -> windows W.swapDown)
     ]
