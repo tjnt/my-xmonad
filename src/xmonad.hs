@@ -29,8 +29,9 @@ import           Utils.Run                           (spawnAndWait,
 import           Utils.XdgDesktopEntry
 import           XMonad                              (Button, Event,
                                                       Full (Full), KeyMask,
-                                                      ManageHook, Window, X,
-                                                      XConfig (..), asks,
+                                                      ManageHook,
+                                                      Mirror (Mirror), Window,
+                                                      X, XConfig (..), asks,
                                                       button1, button2, button3,
                                                       button4, button5,
                                                       className, composeAll,
@@ -87,11 +88,10 @@ import           XMonad.Layout.Gaps                  (Direction2D (..))
 import           XMonad.Layout.LayoutCombinators     (JumpToLayout (JumpToLayout),
                                                       (|||))
 import           XMonad.Layout.Minimize              (minimize)
-import           XMonad.Layout.MouseResizableTile    (MRTMessage (..),
-                                                      mouseResizableTile,
-                                                      mouseResizableTileMirrored)
 import           XMonad.Layout.NoBorders             (noBorders, smartBorders)
 import           XMonad.Layout.Renamed               (Rename (..), renamed)
+import           XMonad.Layout.ResizableTile         (MirrorResize (MirrorExpand, MirrorShrink),
+                                                      ResizableTall (ResizableTall))
 import           XMonad.Layout.SimplestFloat         (simplestFloat)
 import           XMonad.Layout.Spacing               (Border (..), spacingRaw)
 import           XMonad.Layout.ThreeColumns          (ThreeCol (ThreeColMid))
@@ -314,8 +314,8 @@ myKeys =
     , ("M-y",           spawnTerminal "--exec 'clip.sh sel' --title clipboard")
     , ("M-S-y",         spawnTerminal "--exec 'clip.sh del' --title clipboard")
       -- resizing window ratio
-    , ("M-u",           sendMessage ShrinkSlave)
-    , ("M-n",           sendMessage ExpandSlave)
+    , ("M-u",           sendMessage MirrorExpand)
+    , ("M-n",           sendMessage MirrorShrink)
       -- minimize window
     , ("M-z",           withFocused minimizeWindow)
     , ("M-x",           withLastMinimized maximizeWindowAndFocus)
@@ -420,9 +420,9 @@ myLayoutHook = toggleLayouts expand normal
     rename s = renamed [ Replace s ]
 
     tall   = boringWindows . minimize . smartBorders . spacing
-           $ mouseResizableTile
+           $ ResizableTall 1 (3/100) (1/2) []
     mirror = boringWindows . minimize . smartBorders . spacing
-           $ mouseResizableTileMirrored
+           $ Mirror (ResizableTall 1 (3/100) (1/2) [])
     float  = boringWindows . minimize . smartBorders
            $ simplestFloat
     three  = boringWindows . minimize . smartBorders . spacing
