@@ -416,7 +416,7 @@ myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
 
 myLayoutHook = toggleLayouts expand normal
   where
-    spacing = spacingRaw True (Border 4 4 8 8) True (Border 2 2 2 2) True
+    spacing = spacingRaw True (Border 4 4 8 8) True (Border 4 4 4 4) True
     rename s = renamed [ Replace s ]
 
     tall   = boringWindows . minimize . smartBorders . spacing
