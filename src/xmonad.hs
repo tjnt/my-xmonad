@@ -366,6 +366,14 @@ myKeys =
     , ("M-[",           dunstCloseAll)
     , ("M-S-[",         dunstRestart)
     , ("M-]",           dunstHistoryPop)
+      -- application launcher
+    , ("M-<F2>",        spawn "chromium")
+    , ("M-<F3>",        spawn "firefox")
+    , ("M-<F4>",        spawn "firefox -private-window")
+    , ("M-<F8>",        spawnTerminal "--exec ranger")
+    , ("M-<F9>",        spawnTerminal "--exec ytop")
+    , ("M-<F10>",       spawnTerminal "--exec pulsemixer")
+    , ("M-<F11>",       spawnTerminal "--exec nmtui")
       -- screenshot
     , ("<Print>",                   captureScreen)
       -- volume control
@@ -450,6 +458,7 @@ myManageHook = manageDocks <+> manageSpawn <+> composeAll
     , className =? "Peek"        --> doFloat
     , className =? "Firefox" <&&> resource =? "Toolkit" --> doFloat
     , title =? "htop"            --> doFloat
+    , title =? "ytop"            --> doFloat
     , title =? "pulsemixer"      --> doRectFloat (W.RationalRect 0 0 0.5 0.4)
     , title =? "nmtui"           --> doFloat
     , title =? "nmtui-edit"      --> doFloat
