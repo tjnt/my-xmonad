@@ -370,6 +370,7 @@ myKeys =
     , ("M-<F2>",        spawn "chromium")
     , ("M-<F3>",        spawn "firefox")
     , ("M-<F4>",        spawn "firefox -private-window")
+    , ("M-<F5>",        spawn "thunderbird")
     , ("M-<F8>",        spawnTerminal "--exec ranger")
     , ("M-<F9>",        spawnTerminal "--exec ytop")
     , ("M-<F10>",       spawnTerminal "--exec pulsemixer")
