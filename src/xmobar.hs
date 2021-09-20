@@ -6,11 +6,11 @@ import           Data.Maybe              (fromMaybe)
 import           Plugins.SimpleReader    (SimpleReader (..))
 import           System.Environment      (getEnv)
 import           System.IO.Unsafe        (unsafeDupablePerformIO)
+import           System.Process          (readProcess)
 import           Text.Printf             (printf)
 import           Theme.Theme             (base01, base02, base03, base07,
                                           base0C, basebg, myFont)
 import           XMonad.Hooks.DynamicLog (trim, wrap, xmobarAction, xmobarColor)
-import           XMonad.Util.Run         (runProcessWithInput)
 import           Xmobar                  (Align (L), Command (Com), Config (..),
                                           Date (Date),
                                           Monitors (Battery, Brightness, Cpu, DynNetwork, Memory, MultiCoreTemp, Volume, Wireless),
@@ -150,7 +150,7 @@ config =
 
 wifiIcon :: IO String
 wifiIcon = do
-    stdout <- trim <$> runProcessWithInput "wifi" [] ""
+    stdout <- trim <$> readProcess "wifi" [] ""
     return . xmobarFont 1
            $ if isSubsequenceOf "on" stdout
                 then xmobarColor base02 "" "\xfaa8"
@@ -158,7 +158,7 @@ wifiIcon = do
 
 bluetoothIcon :: IO String
 bluetoothIcon = do
-    stdout <- trim <$> runProcessWithInput "bluetooth" [] ""
+    stdout <- trim <$> readProcess "bluetooth" [] ""
     return . xmobarFont 1
            $ if isSubsequenceOf "on" stdout
                 then xmobarColor base0C "" "\xf5ae"
@@ -174,7 +174,7 @@ data DeviceInfo = DeviceInfo
 deviceIcons :: IO String
 deviceIcons = do
     devices <- map (replace ':' '_' . (!! 1) . words) . lines
-        <$> runProcessWithInput "bluetoothctl" ["paired-devices"] ""
+        <$> readProcess "bluetoothctl" ["paired-devices"] ""
     res <- filter devConnected <$> mapM getDeviceInfo devices
     return . concatMap ((' ' :) . convertIcon) $ res
   where
@@ -182,10 +182,10 @@ deviceIcons = do
 
     getDeviceInfo :: String -> IO DeviceInfo
     getDeviceInfo addr = do
-        conn <- isSubsequenceOf "true" <$> runProcessWithInput "dbus-send" (dbusArgs addr "Connected") ""
+        conn <- isSubsequenceOf "true" <$> readProcess "dbus-send" (dbusArgs addr "Connected") ""
         (name,icon) <-
-            if conn then (,) <$> (dbusTrimValue <$> runProcessWithInput "dbus-send" (dbusArgs addr "Name") "")
-                             <*> (dbusTrimValue <$> runProcessWithInput "dbus-send" (dbusArgs addr "Icon") "")
+            if conn then (,) <$> (dbusTrimValue <$> readProcess "dbus-send" (dbusArgs addr "Name") "")
+                             <*> (dbusTrimValue <$> readProcess "dbus-send" (dbusArgs addr "Icon") "")
                     else return ("","")
         return $ DeviceInfo { devConnected=conn, devName=name, devIcon=icon }
       where
@@ -221,7 +221,7 @@ deviceIcons = do
 
 dunstNotifyCount :: IO String
 dunstNotifyCount = do
-    stdout <- trim <$> runProcessWithInput "dunstctl" ["count", "history"] ""
+    stdout <- trim <$> readProcess "dunstctl" ["count", "history"] ""
     let icon = xmobarFont 1
                 $ case stdout of
                     ""  -> xmobarColor base01 "" "\xf861"

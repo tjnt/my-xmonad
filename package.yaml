@@ -70,6 +70,7 @@ executables:
       - xmobar
       - xmonad-contrib
       - containers
+      - process
       - my-xmonad
   xmonadctl:
     source-dirs: src
