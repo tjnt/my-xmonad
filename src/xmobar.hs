@@ -40,15 +40,15 @@ config =
             xmobarFont 2 "\xe777"
             <> " %UnsafeStdinReader% }{"
             <> concatMap (wrap " " " ")
-                [ "%cpu%" & runTUI "htop -s PERCENT_CPU" "htop" "3"
-                , "%memory%" & runTUI "htop -s PERCENT_MEM" "htop" "3"
+                [ "%cpu%" & runTerminal "htop -s PERCENT_CPU" "htop" "3"
+                , "%memory%" & runTerminal "htop -s PERCENT_MEM" "htop" "3"
                 , "%multicoretemp%"
-                , "%dynnetwork%" & runTUI "nmtui-edit" "" "3"
+                , "%dynnetwork%" & runTerminal "nmtui-edit" "" "3"
                 , "%bright%"
                 , "%default:Master%" & xmobarAction "xmonadctl volume-master-toggle" "1"
-                                     . runTUI "pulsemixer" "" "3"
+                                     . runTerminal "pulsemixer" "" "3"
                 , "%wifi%%wlp3s0wi%" & xmobarAction "xmonadctl wifi-toggle" "1"
-                                     . runTUI "nmtui-connect" "" "3"
+                                     . runTerminal "nmtui-connect" "" "3"
                 , "%bluetooth%" & (<> "%deviceicons%")
                                 . xmobarAction "xmonadctl bluetooth-toggle" "1"
                                 . xmobarAction "blueman-manager" "3"
@@ -229,8 +229,8 @@ dunstNotifyCount = do
                     _   -> xmobarColor base02 "" "\xf868"
     return $ printf "%s %s" icon stdout
 
-runTUI :: String -> String -> String -> String -> String
-runTUI cmd title = xmobarAction
+runTerminal :: String -> String -> String -> String -> String
+runTerminal cmd title = xmobarAction
                  $ "termite --exec " <> wrap "\"" "\"" cmd
                  <> if null title then "" else " --title " <> title
 
