@@ -109,7 +109,6 @@ import qualified XMonad.StackSet                     as W
 import           XMonad.Util.EZConfig                (additionalKeysP)
 import           XMonad.Util.NamedScratchpad         (NamedScratchpad (NS),
                                                       NamedScratchpads,
-                                                      customFloating,
                                                       defaultFloating,
                                                       namedScratchpadAction,
                                                       namedScratchpadFilterOutWorkspacePP,
@@ -304,8 +303,7 @@ myScratchpads :: NamedScratchpads
 myScratchpads =
     [ NS "ytop" (termcmd "ytop" "ytop") (title =? "ytop") defaultFloating
     , NS "pulsemixer" (termcmd "pulsemixer" "pulsemixer") (title =? "pulsemixer") defaultFloating
-    , NS "terminal" "termite --title scratch-terminal" (title =? "scratch-terminal")
-        (customFloating (W.RationalRect 0 0.03 1.0 0.4))
+    , NS "terminal" "termite --title scratch-terminal" (title =? "scratch-terminal") defaultFloating
     ]
   where
     termcmd c t = printf "termite --exec %s --title %s" c t
@@ -488,6 +486,7 @@ myManageHook = manageDocks <+> manageSpawn <+> composeAll
     , title =? "nmtui-connect"   --> doFloat
     , title =? "screen-capture"  --> doFloat
     , title =? "clipboard"       --> doRectFloat (W.RationalRect 0 0 0.4 1.0)
+    , title =? "scratch-terminal"--> doRectFloat (W.RationalRect 0 0.03 1.0 0.4)
     , isFullscreen               --> doFullFloat
     , isDialog                   --> doFloat
     ]
