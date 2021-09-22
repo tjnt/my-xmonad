@@ -109,6 +109,7 @@ import qualified XMonad.StackSet                     as W
 import           XMonad.Util.EZConfig                (additionalKeysP)
 import           XMonad.Util.NamedScratchpad         (NamedScratchpad (NS),
                                                       NamedScratchpads,
+                                                      customFloating,
                                                       defaultFloating,
                                                       namedScratchpadAction,
                                                       namedScratchpadFilterOutWorkspacePP,
@@ -301,11 +302,13 @@ myTreeSelectAction = do
 
 myScratchpads :: NamedScratchpads
 myScratchpads =
-    [ NS "ytop" (termcmd "ytop") (title =? "ytop") defaultFloating
-    , NS "pulsemixer" (termcmd "pulsemixer") (title =? "pulsemixer") defaultFloating
+    [ NS "ytop" (termcmd "ytop" "ytop") (title =? "ytop") defaultFloating
+    , NS "pulsemixer" (termcmd "pulsemixer" "pulsemixer") (title =? "pulsemixer") defaultFloating
+    , NS "terminal" "termite --title scratch-terminal" (title =? "scratch-terminal")
+        (customFloating (W.RationalRect 0 0.03 1.0 0.4))
     ]
   where
-    termcmd app = printf "termite --exec %s --title %s" app app
+    termcmd c t = printf "termite --exec %s --title %s" c t
 
 captureScreen :: X()
 captureScreen = spawn $
@@ -392,7 +395,7 @@ myKeys =
     , ("M-<F8>",        spawnTerminal "--exec ranger")
     , ("M-<F9>",        namedScratchpadAction myScratchpads "ytop")
     , ("M-<F10>",       namedScratchpadAction myScratchpads "pulsemixer")
-    , ("M-<F11>",       spawnTerminal "--exec nmtui")
+    , ("M-<F11>",       namedScratchpadAction myScratchpads "terminal")
       -- screenshot
     , ("<Print>",                   captureScreen)
       -- volume control
