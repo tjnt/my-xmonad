@@ -1,27 +1,24 @@
-{- |
-   Module : Theme.Xresources
-   Copyright : (c) 2021 Joan Milev <joantmilev@gmail.com>
-   License : MIT
-
-   Maintainer : Joan Milev <joantmilev@gmail.com>
-   Stability : Stable
-   Portability : Unknown
--}
-
 module Theme.Xresources (xprop) where
 
+import           Control.Monad    (when)
 import           Data.Bifunctor   (bimap)
 import           Data.Char        (isSpace)
 import           Data.List        (dropWhileEnd, elemIndex, find)
 import           Data.Maybe       (catMaybes, fromMaybe)
-import           Prelude          (IO, Int, Maybe, ShowS, String, dropWhile,
-                                   fst, lines, snd, splitAt, tail, ($), (.),
-                                   (<$>), (==))
+import           System.IO        (hClose, hGetContents)
 import           System.IO.Unsafe (unsafeDupablePerformIO)
-import           XMonad.Util.Run  (runProcessWithInput)
+import           System.Process   (runInteractiveProcess)
 
-xProperty :: String -> IO String
-xProperty key = fromMaybe "" . findValue key <$> runProcessWithInput "xrdb" ["-query"] ""
+unsafeRunProcessWithInput :: FilePath -> [String] -> String
+unsafeRunProcessWithInput cmd args = unsafeDupablePerformIO $ do
+    (hin, hout, herr, _) <- runInteractiveProcess cmd args Nothing Nothing
+    out <- hGetContents hout
+    when (out == out) $ return () -- wait for exit
+    hClose hin >> hClose hout >> hClose herr
+    return out
+
+xProperty :: String -> String
+xProperty key = fromMaybe "" . findValue key $ unsafeRunProcessWithInput "xrdb" ["-query"]
 
 findValue :: String -> String -> Maybe String
 findValue xresKey xres = snd <$> find ((== xresKey) . fst) (catMaybes $ splitAtColon <$> lines xres)
@@ -34,4 +31,4 @@ splitAtTrimming str idx = bimap trim (trim . tail) $ splitAt idx str
 
 trim, xprop :: ShowS
 trim = dropWhileEnd isSpace . dropWhile isSpace
-xprop = unsafeDupablePerformIO . xProperty
+xprop = xProperty
