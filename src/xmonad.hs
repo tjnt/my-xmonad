@@ -76,6 +76,7 @@ import           XMonad.Hooks.DynamicLog             (PP (..), statusBar,
                                                       xmobarPP)
 import           XMonad.Hooks.EwmhDesktops           (ewmh, fullscreenEventHook)
 import           XMonad.Hooks.ManageDocks            (docksEventHook,
+                                                      docksStartupHook,
                                                       manageDocks)
 import           XMonad.Hooks.ManageHelpers          (doCenterFloat,
                                                       doFullFloat, doRectFloat,
@@ -522,7 +523,7 @@ myEventHook = handleEventHook def
 -- Startup Hook
 
 myStartupHook :: X ()
-myStartupHook = do
+myStartupHook = docksStartupHook <+> do
     spawnOnce "compton -b"
     spawnOnce "dunst"
     spawnOnce $ printf
