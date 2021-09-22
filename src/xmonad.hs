@@ -41,17 +41,18 @@ import           XMonad                              (Button, Event,
                                                       mouseMoveWindow,
                                                       noModMask, refresh,
                                                       resource, sendMessage,
-                                                      shiftMask, spawn, title,
-                                                      windows, windowset,
-                                                      withFocused, xK_b,
-                                                      xK_bracketleft, xK_q,
-                                                      xmonad, (-->), (.|.),
-                                                      (<&&>), (<+>), (=?))
+                                                      shiftMask, spawn,
+                                                      terminal, title, windows,
+                                                      windowset, withFocused,
+                                                      xK_b, xK_bracketleft,
+                                                      xK_q, xmonad, (-->),
+                                                      (.|.), (<&&>), (<+>),
+                                                      (=?))
 import           XMonad.Actions.CopyWindow           (kill1)
 import           XMonad.Actions.CycleSelectedLayouts (cycleThroughLayouts)
-import           XMonad.Actions.CycleWS              (nextWS, prevWS,
-                                                      shiftToNext, shiftToPrev,
-                                                      toggleWS)
+import           XMonad.Actions.CycleWS              (Direction1D (Next, Prev),
+                                                      WSType (WSIs), moveTo,
+                                                      shiftTo, toggleWS)
 import           XMonad.Actions.FlexibleResize       (mouseResizeWindow)
 import           XMonad.Actions.FloatKeys            (keysMoveWindow,
                                                       keysResizeWindow)
@@ -105,6 +106,12 @@ import           XMonad.Prompt                       (XPConfig, XPPosition (..),
 import           XMonad.Prompt.Shell                 (shellPrompt)
 import qualified XMonad.StackSet                     as W
 import           XMonad.Util.EZConfig                (additionalKeysP)
+import           XMonad.Util.NamedScratchpad         (NamedScratchpad (NS),
+                                                      NamedScratchpads,
+                                                      defaultFloating,
+                                                      namedScratchpadAction,
+                                                      namedScratchpadFilterOutWorkspacePP,
+                                                      namedScratchpadManageHook)
 import           XMonad.Util.SpawnOnce               (spawnOnce)
 
 -- Functions
@@ -289,6 +296,16 @@ myTreeSelectAction = do
            ]
        ]
 
+-- scratch pad
+
+myScratchpads :: NamedScratchpads
+myScratchpads =
+    [ NS "ytop" (termcmd "ytop") (title =? "ytop") defaultFloating
+    , NS "pulsemixer" (termcmd "pulsemixer") (title =? "pulsemixer") defaultFloating
+    ]
+  where
+    termcmd app = printf "termite --exec %s --title %s" app app
+
 captureScreen :: X()
 captureScreen = spawn $
     "scrot -s $(xdg-user-dir PICTURES)/%Y-%m-%d-%T-shot.png "
@@ -333,10 +350,10 @@ myKeys =
     , ("M-g",           centerFloat)
       -- cycle workspaces
     , ("M-a",           toggleWS)
-    , ("M-d",           nextWS)
-    , ("M-s",           prevWS)
-    , ("M-S-d",         shiftToNext)
-    , ("M-S-s",         shiftToPrev)
+    , ("M-d",           moveTo  Next nonNSP)
+    , ("M-s",           moveTo  Prev nonNSP)
+    , ("M-S-d",         shiftTo Next nonNSP)
+    , ("M-S-s",         shiftTo Prev nonNSP)
       -- cycle specific layout
     , ("M-<Space>",     cycleThroughLayouts ["Tall", "Mirror", "Float"])
       -- direct layout switch
@@ -372,8 +389,8 @@ myKeys =
     , ("M-<F4>",        spawn "firefox -private-window")
     , ("M-<F5>",        spawn "thunderbird")
     , ("M-<F8>",        spawnTerminal "--exec ranger")
-    , ("M-<F9>",        spawnTerminal "--exec ytop")
-    , ("M-<F10>",       spawnTerminal "--exec pulsemixer")
+    , ("M-<F9>",        namedScratchpadAction myScratchpads "ytop")
+    , ("M-<F10>",       namedScratchpadAction myScratchpads "pulsemixer")
     , ("M-<F11>",       spawnTerminal "--exec nmtui")
       -- screenshot
     , ("<Print>",                   captureScreen)
@@ -399,10 +416,11 @@ myKeys =
     convert = bimap fromIntegral fromIntegral
     keysMoveWindow' = keysMoveWindow . convert
     keysResizeWindow' d g = keysResizeWindow (convert d) (convert g)
+    nonNSP = WSIs . return $ (/= "NSP") . W.tag
 
 -- Mouse bindings
 
-myMouseBindings :: XConfig l ->M.Map (KeyMask, Button) (Window -> X ())
+myMouseBindings :: XConfig l -> M.Map (KeyMask, Button) (Window -> X ())
 myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
     [ ((modm, button1), \w ->
             focus w >> mouseMoveWindow w >>
@@ -459,8 +477,8 @@ myManageHook = manageDocks <+> manageSpawn <+> composeAll
     , className =? "Peek"        --> doFloat
     , className =? "Firefox" <&&> resource =? "Toolkit" --> doFloat
     , title =? "htop"            --> doFloat
-    , title =? "ytop"            --> doFloat
-    , title =? "pulsemixer"      --> doRectFloat (W.RationalRect 0 0 0.5 0.4)
+    , title =? "ytop"            --> doRectFloat (W.RationalRect 0 0.03 0.5 0.6)
+    , title =? "pulsemixer"      --> doRectFloat (W.RationalRect 0 0.03 0.5 0.4)
     , title =? "nmtui"           --> doFloat
     , title =? "nmtui-edit"      --> doFloat
     , title =? "nmtui-connect"   --> doFloat
@@ -469,6 +487,7 @@ myManageHook = manageDocks <+> manageSpawn <+> composeAll
     , isFullscreen               --> doFullFloat
     , isDialog                   --> doFloat
     ]
+    <+> namedScratchpadManageHook myScratchpads
 
 -- Event Hook
 
@@ -522,7 +541,11 @@ myStartupHook = do
 -- xmobar
 
 myXMobar = statusBar "xmobar"
-    xmobarPP
+    (namedScratchpadFilterOutWorkspacePP myPP)
+    toggleStrutsKey
+  where
+    clickable s n = xmobarAction ("xmonadctl view-workspace-" <> n) "1" s
+    myPP = xmobarPP
         { ppOrder           = id
         , ppCurrent         = xmobarColor base01 basebg . clickable "●"
         , ppUrgent          = xmobarColor base06 basebg . clickable "●"
@@ -535,10 +558,6 @@ myXMobar = statusBar "xmobar"
         , ppWsSep           = " "
         , ppSep             = "  "
         }
-    toggleStrutsKey
-  where
-    clickable s n = xmobarAction ("xmonadctl view-workspace-" <> n) "1" s
-    toggleStrutsKey XConfig { XMonad.modMask = m } = (m, xK_b)
     icon = printf "<icon=%s/>"
     iconMap = M.fromList
         [ ("Tall",   icon "layout-tall.xpm")
@@ -548,6 +567,7 @@ myXMobar = statusBar "xmobar"
         , ("Circle", icon "layout-circle.xpm")
         , ("Full",   icon "layout-full.xpm")
         ]
+    toggleStrutsKey XConfig { XMonad.modMask = m } = (m, xK_b)
 
 -- main
 
