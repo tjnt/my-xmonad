@@ -25,6 +25,7 @@ import           Utils.Dunst                         (dunstCloseAll,
 import           Utils.Run                           (spawnAndWait,
                                                       spawnTerminal,
                                                       spawnTerminalAndDo,
+                                                      spawnTerminalOrClose,
                                                       spawnWithOutput)
 import           Utils.XdgDesktopEntry
 import           XMonad                              (Button, Event,
@@ -391,9 +392,10 @@ myKeys =
     , ("M-<F4>",        spawn "firefox -private-window")
     , ("M-<F5>",        spawn "thunderbird")
     , ("M-<F8>",        spawnTerminal "--exec ranger")
-    , ("M-<F9>",        namedScratchpadAction myScratchpads "ytop")
-    , ("M-<F10>",       namedScratchpadAction myScratchpads "pulsemixer")
-    , ("M-<F11>",       namedScratchpadAction myScratchpads "terminal")
+    , ("M-<F9>",        spawnTerminalOrClose "--exec htop --title htop" (title =? "htop"))
+    , ("M-<F10>",       spawnTerminalOrClose "--exec ytop --title ytop" (title =? "ytop"))
+    , ("M-<F11>",       namedScratchpadAction myScratchpads "pulsemixer")
+    , ("M-<F12>",       namedScratchpadAction myScratchpads "terminal")
       -- screenshot
     , ("<Print>",                   captureScreen)
       -- volume control
@@ -478,7 +480,7 @@ myManageHook = manageDocks <+> manageSpawn <+> composeAll
     , className =? "Pavucontrol" --> doFloat
     , className =? "Peek"        --> doFloat
     , className =? "Firefox" <&&> resource =? "Toolkit" --> doFloat
-    , title =? "htop"            --> doFloat
+    , title =? "htop"            --> doFullFloat
     , title =? "ytop"            --> doRectFloat (W.RationalRect 0 0.03 0.5 0.6)
     , title =? "pulsemixer"      --> doRectFloat (W.RationalRect 0 0.03 0.5 0.4)
     , title =? "nmtui"           --> doFloat
