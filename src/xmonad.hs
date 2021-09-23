@@ -213,6 +213,12 @@ boluetoothToggle = do
     w <- (!!2) . words <$> spawnWithOutput "bluetooth"
     dunstifyLow ("bluetooth turn " <> w) ""
 
+captureScreen :: X()
+captureScreen = spawn $
+    "scrot -s $(xdg-user-dir PICTURES)/%Y-%m-%d-%T-shot.png "
+    <> "-e 'dunstify -a xmonad -u low -h int:transient:1 \"saved capture\" \"$f\" ;"
+    <> "feh --title screen-capture \"$f\" &'"
+
 -- shell prompt
 
 myXPConfig :: XPConfig
@@ -308,12 +314,6 @@ myScratchpads =
     ]
   where
     termcmd c t = printf "termite --exec %s --title %s" c t
-
-captureScreen :: X()
-captureScreen = spawn $
-    "scrot -s $(xdg-user-dir PICTURES)/%Y-%m-%d-%T-shot.png "
-    <> "-e 'dunstify -a xmonad -u low -h int:transient:1 \"saved capture\" \"$f\" ;"
-    <> "feh --title screen-capture \"$f\" &'"
 
 -- Key bindings
 
