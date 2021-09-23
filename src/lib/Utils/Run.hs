@@ -3,14 +3,20 @@ module Utils.Run
     , spawnAndWait
     , spawnTerminal
     , spawnTerminalAndDo
+    , spawnOrClose
+    , spawnTerminalOrClose
     ) where
 
-import           Control.Monad          (void, when)
-import           System.IO              (hClose, hGetContents)
-import           System.Process         (runInteractiveCommand)
-import           XMonad                 (ManageHook, X, asks, config, io, spawn,
-                                         terminal)
-import           XMonad.Actions.SpawnOn (spawnAndDo)
+import           Control.Monad           (void, when)
+import qualified Data.List               as L
+import           System.IO               (hClose, hGetContents)
+import           System.Process          (runInteractiveCommand)
+import           XMonad                  (ManageHook, Query, X, ask, asks,
+                                          config, gets, io, killWindow, liftX,
+                                          spawn, terminal, windowset, (<&&>))
+import           XMonad.Actions.SpawnOn  (spawnAndDo)
+import           XMonad.Actions.WindowGo (ifWindow)
+import qualified XMonad.StackSet         as W
 
 spawnWithOutput :: String -> X String
 spawnWithOutput cmd = io $ do
@@ -36,3 +42,19 @@ spawnTerminalAndDo :: ManageHook -> String -> X ()
 spawnTerminalAndDo mh args = do
     t <- asks (terminal . config)
     spawnAndDo mh . concat $ [t, " ", args]
+
+closeHook :: ManageHook
+closeHook = ask >>= liftX . killWindow >> mempty
+
+isInCurrentWs :: Query Bool
+isInCurrentWs = ask >>= \w -> liftX $ do
+    L.elem w <$> gets (W.index . windowset)
+
+closeMaybe :: X () -> Query Bool -> X ()
+closeMaybe f qry = ifWindow (qry <&&> isInCurrentWs) closeHook f
+
+spawnOrClose :: String -> Query Bool -> X ()
+spawnOrClose = closeMaybe . spawn
+
+spawnTerminalOrClose :: String -> Query Bool -> X ()
+spawnTerminalOrClose = closeMaybe . spawnTerminal
