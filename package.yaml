@@ -35,10 +35,12 @@ library:
     - Utils.XdgDesktopEntry
     - Utils.Run
     - Utils.Dunst
+    - Hooks.AvoidDocksFloat
   dependencies:
     - xmonad
     - xmobar
     - xmonad-contrib
+    - containers
     - text
     - filepattern
     - config-ini
