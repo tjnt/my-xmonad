@@ -12,6 +12,9 @@ import           Data.Maybe                          (fromMaybe, mapMaybe)
 import           Data.Monoid                         (All)
 import           Data.Tree                           (Tree (Node))
 import           GHC.IO.Exception                    (IOException)
+import           Hooks.AvoidDocksFloat               (doAvoidDocksFloat,
+                                                      doAvoidDocksFullFloat,
+                                                      doAvoidDocksRectFloat)
 import           Numeric                             (showFFloat)
 import           Text.Printf                         (printf)
 import           Theme.Theme                         (base01, base04, base06,
@@ -37,8 +40,8 @@ import           XMonad                              (Button, Event,
                                                       button4, button5,
                                                       className, composeAll,
                                                       config, controlMask, def,
-                                                      doFloat, floatLocation,
-                                                      focus, gets, io, mod4Mask,
+                                                      floatLocation, focus,
+                                                      gets, io, mod4Mask,
                                                       mouseMoveWindow,
                                                       noModMask, refresh,
                                                       resource, sendMessage,
@@ -76,9 +79,8 @@ import           XMonad.Hooks.DynamicLog             (PP (..), statusBar,
                                                       xmobarAction, xmobarColor,
                                                       xmobarPP)
 import           XMonad.Hooks.EwmhDesktops           (ewmh, fullscreenEventHook)
-import           XMonad.Hooks.ManageHelpers          (doCenterFloat,
-                                                      doFullFloat, doRectFloat,
-                                                      isDialog, isFullscreen)
+import           XMonad.Hooks.ManageHelpers          (doCenterFloat, isDialog,
+                                                      isFullscreen)
 import           XMonad.Hooks.Minimize               (minimizeEventHook)
 import           XMonad.Hooks.ServerMode             (serverModeEventHookCmd')
 import           XMonad.Layout.BoringWindows         (boringWindows, focusDown,
@@ -478,18 +480,22 @@ myManageHook = manageSpawn <+> composeAll
     , className =? "Peek"        --> doFloat
     , className =? "Firefox" <&&> resource =? "Toolkit" --> doFloat
     , title =? "htop"            --> doFullFloat
-    , title =? "ytop"            --> doRectFloat (W.RationalRect 0 0.03 0.5 0.6)
-    , title =? "pulsemixer"      --> doRectFloat (W.RationalRect 0 0.03 0.5 0.4)
+    , title =? "ytop"            --> doRectFloat (W.RationalRect 0 0 0.5 0.6)
+    , title =? "pulsemixer"      --> doRectFloat (W.RationalRect 0 0 0.5 0.4)
     , title =? "nmtui"           --> doFloat
     , title =? "nmtui-edit"      --> doFloat
     , title =? "nmtui-connect"   --> doFloat
     , title =? "screen-capture"  --> doFloat
     , title =? "clipboard"       --> doRectFloat (W.RationalRect 0 0 0.4 1.0)
-    , title =? "scratch-terminal"--> doRectFloat (W.RationalRect 0 0.03 1.0 0.4)
+    , title =? "scratch-terminal"--> doRectFloat (W.RationalRect 0 0 1.0 0.4)
     , isFullscreen               --> doFullFloat
     , isDialog                   --> doFloat
     ]
     <+> namedScratchpadManageHook myScratchpads
+  where
+    doFloat = doAvoidDocksFloat
+    doRectFloat = doAvoidDocksRectFloat
+    doFullFloat = doAvoidDocksFullFloat
 
 -- Event Hook
 
