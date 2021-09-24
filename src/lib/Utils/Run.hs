@@ -5,12 +5,16 @@ module Utils.Run
     , spawnTerminalAndDo
     , spawnOrClose
     , spawnTerminalOrClose
+    , readProcess
+    , readProcess'
     ) where
 
+import           Control.Exception       (catch)
 import           Control.Monad           (void, when)
 import qualified Data.List               as L
+import           GHC.IO.Exception        (IOException)
 import           System.IO               (hClose, hGetContents)
-import           System.Process          (runInteractiveCommand)
+import           System.Process          (readProcess, runInteractiveCommand)
 import           XMonad                  (ManageHook, Query, X, ask, asks,
                                           config, gets, io, killWindow, liftX,
                                           spawn, terminal, windowset, (<&&>))
@@ -58,3 +62,9 @@ spawnOrClose = closeMaybe . spawn
 
 spawnTerminalOrClose :: String -> Query Bool -> X ()
 spawnTerminalOrClose = closeMaybe . spawnTerminal
+
+readProcess' :: FilePath -> [String] -> String -> IO (Maybe String)
+readProcess' path args input = (Just <$> readProcess path args input) `catch` handler
+  where
+    handler :: IOException -> IO (Maybe String)
+    handler _ = return Nothing

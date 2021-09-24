@@ -72,7 +72,7 @@ executables:
       - xmobar
       - xmonad-contrib
       - containers
-      - process
+      - transformers
       - my-xmonad
   xmonadctl:
     source-dirs: src

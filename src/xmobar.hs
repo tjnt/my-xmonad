@@ -1,23 +1,25 @@
-import           Control.Monad           (msum)
-import           Data.Function           ((&))
-import           Data.List               (isSubsequenceOf)
-import qualified Data.Map.Strict         as M
-import           Data.Maybe              (fromMaybe)
-import           Plugins.SimpleReader    (SimpleReader (..))
-import           System.Environment      (getEnv)
-import           System.IO.Unsafe        (unsafeDupablePerformIO)
-import           System.Process          (readProcess)
-import           Text.Printf             (printf)
-import           Theme.Theme             (base01, base02, base03, base07,
-                                          base0C, basebg, myFont)
-import           XMonad.Hooks.DynamicLog (trim, wrap, xmobarAction, xmobarColor)
-import           Xmobar                  (Align (L), Command (Com), Config (..),
-                                          Date (Date),
-                                          Monitors (Battery, Brightness, Cpu, DynNetwork, Memory, MultiCoreTemp, Volume, Wireless),
-                                          Runnable (Run),
-                                          StdinReader (UnsafeStdinReader),
-                                          XPosition (TopSize), defaultConfig,
-                                          xmobar)
+import           Control.Monad             (msum, unless)
+import           Control.Monad.Trans.Maybe (MaybeT (..), runMaybeT)
+import           Data.Function             ((&))
+import           Data.List                 (isSubsequenceOf)
+import qualified Data.Map.Strict           as M
+import           Data.Maybe                (catMaybes, fromMaybe)
+import           Plugins.SimpleReader      (SimpleReader (..))
+import           System.Environment        (getEnv)
+import           System.IO.Unsafe          (unsafeDupablePerformIO)
+import           Text.Printf               (printf)
+import           Theme.Theme               (base01, base02, base03, base07,
+                                            base0C, basebg, myFont)
+import           Utils.Run                 (readProcess, readProcess')
+import           XMonad.Hooks.DynamicLog   (trim, wrap, xmobarAction,
+                                            xmobarColor)
+import           Xmobar                    (Align (L), Command (Com),
+                                            Config (..), Date (Date),
+                                            Monitors (Battery, Brightness, Cpu, DynNetwork, Memory, MultiCoreTemp, Volume, Wireless),
+                                            Runnable (Run),
+                                            StdinReader (UnsafeStdinReader),
+                                            XPosition (TopSize), defaultConfig,
+                                            xmobar)
 
 config :: Config
 config =
@@ -175,18 +177,18 @@ deviceIcons :: IO String
 deviceIcons = do
     devices <- map (replace ':' '_' . (!! 1) . words) . lines
         <$> readProcess "bluetoothctl" ["paired-devices"] ""
-    res <- filter devConnected <$> mapM getDeviceInfo devices
+    res <- catMaybes <$> mapM getDeviceInfo devices
     return . concatMap ((' ' :) . convertIcon) $ res
   where
     replace a b = map (\x -> if x == a then b else x)
 
-    getDeviceInfo :: String -> IO DeviceInfo
-    getDeviceInfo addr = do
-        conn <- isSubsequenceOf "true" <$> readProcess "dbus-send" (dbusArgs addr "Connected") ""
-        (name,icon) <-
-            if conn then (,) <$> (dbusTrimValue <$> readProcess "dbus-send" (dbusArgs addr "Name") "")
-                             <*> (dbusTrimValue <$> readProcess "dbus-send" (dbusArgs addr "Icon") "")
-                    else return ("","")
+    getDeviceInfo :: String -> IO (Maybe DeviceInfo)
+    getDeviceInfo addr = runMaybeT $ do
+        conn <- ("true" `isSubsequenceOf`) <$>
+            MaybeT (readProcess' "dbus-send" (dbusArgs addr "Connected") "")
+        unless conn $ (MaybeT . return) Nothing
+        name <- dbusTrimValue <$> MaybeT (readProcess' "dbus-send" (dbusArgs addr "Name") "")
+        icon <- dbusTrimValue <$> MaybeT (readProcess' "dbus-send" (dbusArgs addr "Icon") "")
         return $ DeviceInfo { devConnected=conn, devName=name, devIcon=icon }
       where
         dbusArgs s p =
