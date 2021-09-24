@@ -12,9 +12,8 @@ import           Data.Maybe                          (fromMaybe, mapMaybe)
 import           Data.Monoid                         (All)
 import           Data.Tree                           (Tree (Node))
 import           GHC.IO.Exception                    (IOException)
-import           Hooks.AvoidDocksFloat               (doAvoidDocksFloat,
-                                                      doAvoidDocksFullFloat,
-                                                      doAvoidDocksRectFloat)
+import           Hooks.AvoidDocksFloat               (doFloat, doFullFloat,
+                                                      doRectFloat)
 import           Numeric                             (showFFloat)
 import           Text.Printf                         (printf)
 import           Theme.Theme                         (base01, base04, base06,
@@ -492,10 +491,6 @@ myManageHook = manageSpawn <+> composeAll
     , isDialog                   --> doFloat
     ]
     <+> namedScratchpadManageHook myScratchpads
-  where
-    doFloat = doAvoidDocksFloat
-    doRectFloat = doAvoidDocksRectFloat
-    doFullFloat = doAvoidDocksFullFloat
 
 -- Event Hook
 
