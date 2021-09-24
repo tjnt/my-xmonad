@@ -76,9 +76,6 @@ import           XMonad.Hooks.DynamicLog             (PP (..), statusBar,
                                                       xmobarAction, xmobarColor,
                                                       xmobarPP)
 import           XMonad.Hooks.EwmhDesktops           (ewmh, fullscreenEventHook)
-import           XMonad.Hooks.ManageDocks            (docksEventHook,
-                                                      docksStartupHook,
-                                                      manageDocks)
 import           XMonad.Hooks.ManageHelpers          (doCenterFloat,
                                                       doFullFloat, doRectFloat,
                                                       isDialog, isFullscreen)
@@ -473,7 +470,7 @@ myLayoutHook = toggleLayouts expand normal
 -- Manage Hook
 
 myManageHook :: ManageHook
-myManageHook = manageDocks <+> manageSpawn <+> composeAll
+myManageHook = manageSpawn <+> composeAll
     [ className =? "Xmessage"    --> doFloat
     , className =? "MPlayer"     --> doFloat
     , className =? "mplayer2"    --> doFloat
@@ -519,7 +516,6 @@ myServerModeHook = return
 
 myEventHook :: Event -> X All
 myEventHook = handleEventHook def
-              <+> docksEventHook
               <+> fullscreenEventHook
               <+> minimizeEventHook
               <+> serverModeEventHookCmd' myServerModeHook
@@ -527,7 +523,7 @@ myEventHook = handleEventHook def
 -- Startup Hook
 
 myStartupHook :: X ()
-myStartupHook = docksStartupHook <+> do
+myStartupHook = do
     spawnOnce "compton -b"
     spawnOnce "dunst"
     spawnOnce $ printf
