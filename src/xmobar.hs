@@ -33,7 +33,7 @@ config =
         , lowerOnStart = True
         , overrideRedirect = True
         , persistent = True
-        , iconRoot = homeDir <> "/.xmonad/icons"
+        , iconRoot = xmonadDir <> "/icons"
         , sepChar = "%"
         , alignSep = "}{"
         , template =
@@ -144,7 +144,7 @@ config =
                 ] 100
             , Run $ SimpleReader dunstNotifyCount "dunst" 50
             , Run $ Date "%m/%d %a %H:%M" "date" 100
-            , Run $ Com "trayer-padding-icon.sh" [] "trayerpad" 100
+            , Run $ Com (xmonadDir <> "/scripts/trayer-padding-icon.sh") [] "trayerpad" 100
             ]
       }
 
@@ -236,6 +236,9 @@ runTerminal cmd title = xmobarAction
 
 homeDir :: String
 homeDir = unsafeDupablePerformIO (getEnv "HOME")
+
+xmonadDir :: String
+xmonadDir = homeDir <> "/.xmonad"
 
 xmobarFont :: Int -> String -> String
 xmobarFont n = wrap (printf "<fn=%d>" n) "</fn>"

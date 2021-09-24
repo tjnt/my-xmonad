@@ -40,8 +40,8 @@ import           XMonad                              (Button, Event,
                                                       className, composeAll,
                                                       config, controlMask, def,
                                                       floatLocation, focus,
-                                                      gets, io, mod4Mask,
-                                                      mouseMoveWindow,
+                                                      getXMonadDir, gets, io,
+                                                      mod4Mask, mouseMoveWindow,
                                                       noModMask, refresh,
                                                       resource, sendMessage,
                                                       shiftMask, spawn,
@@ -211,6 +211,11 @@ boluetoothToggle = do
     w <- (!!2) . words <$> spawnWithOutput "bluetooth"
     dunstifyLow ("bluetooth turn " <> w) ""
 
+clipboardHistory :: String -> X()
+clipboardHistory opt = do
+    clipsh <- (<> "/scripts/clip.sh") <$> getXMonadDir
+    spawnTerminal $ printf "--exec '%s %s' --title clipboard" clipsh opt
+
 captureScreen :: X()
 captureScreen = spawn $
     "scrot -s $(xdg-user-dir PICTURES)/%Y-%m-%d-%T-shot.png "
@@ -329,8 +334,8 @@ myKeys =
       -- tree select
     , ("M-o",           myTreeSelectAction)
       -- clipboard history
-    , ("M-y",           spawnTerminal "--exec 'clip.sh sel' --title clipboard")
-    , ("M-S-y",         spawnTerminal "--exec 'clip.sh del' --title clipboard")
+    , ("M-y",           clipboardHistory "sel")
+    , ("M-S-y",         clipboardHistory "del")
       -- resizing window ratio
     , ("M-u",           sendMessage MirrorExpand)
     , ("M-n",           sendMessage MirrorShrink)
