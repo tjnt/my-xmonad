@@ -482,12 +482,12 @@ myManageHook = manageSpawn <+> composeAll
     , title =? "htop"            --> doFullFloat
     , title =? "ytop"            --> doRectFloat (W.RationalRect 0 0 0.5 0.6)
     , title =? "pulsemixer"      --> doRectFloat (W.RationalRect 0 0 0.5 0.4)
+    , title =? "scratch-terminal"--> doRectFloat (W.RationalRect 0 0 1.0 0.4)
+    , title =? "clipboard"       --> doRectFloat (W.RationalRect 0 0 0.4 1.0)
     , title =? "nmtui"           --> doFloat
     , title =? "nmtui-edit"      --> doFloat
     , title =? "nmtui-connect"   --> doFloat
     , title =? "screen-capture"  --> doFloat
-    , title =? "clipboard"       --> doRectFloat (W.RationalRect 0 0 0.4 1.0)
-    , title =? "scratch-terminal"--> doRectFloat (W.RationalRect 0 0 1.0 0.4)
     , isFullscreen               --> doFullFloat
     , isDialog                   --> doFloat
     ]
