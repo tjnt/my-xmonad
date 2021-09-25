@@ -1,10 +1,10 @@
 import           Control.Monad             (msum, unless)
-import           Control.Monad.Trans.Maybe (MaybeT (..), runMaybeT)
+import           Control.Monad.Trans.Maybe (MaybeT (MaybeT), runMaybeT)
 import           Data.Function             ((&))
 import           Data.List                 (isSubsequenceOf)
 import qualified Data.Map.Strict           as M
 import           Data.Maybe                (catMaybes, fromMaybe)
-import           Plugins.SimpleReader      (SimpleReader (..))
+import           Plugins.SimpleReader      (SimpleReader (SimpleReader))
 import           System.Environment        (getEnv)
 import           System.IO.Unsafe          (unsafeDupablePerformIO)
 import           Text.Printf               (printf)
@@ -189,7 +189,7 @@ deviceIcons = do
         unless conn $ (MaybeT . return) Nothing
         name <- dbusTrimValue <$> MaybeT (readProcess' "dbus-send" (dbusArgs addr "Name") "")
         icon <- dbusTrimValue <$> MaybeT (readProcess' "dbus-send" (dbusArgs addr "Icon") "")
-        return $ DeviceInfo { devConnected=conn, devName=name, devIcon=icon }
+        return $ DeviceInfo { devConnected = conn, devName = name, devIcon = icon }
       where
         dbusArgs s p =
             [ "--print-reply=literal"
