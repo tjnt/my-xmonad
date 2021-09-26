@@ -116,6 +116,9 @@ import           XMonad.Util.SpawnOnce               (spawnOnce)
 
 -- Functions
 
+showDigits :: (RealFloat a) => Int -> a -> String
+showDigits d n = showFFloat (Just d) n ""
+
 centerFloat :: X ()
 centerFloat = withFocused $ \win -> do
     (_, W.RationalRect _ _ w h) <- floatLocation win
@@ -130,13 +133,13 @@ toggleFloat = withFocused $ \win -> do
 
 brightnessCtrl :: Int -> X ()
 brightnessCtrl param = do
-    maxV <- io $ read <$> readFile fileMax :: X Int
-    curV <- io $ read <$> readFile fileCur :: X Int
-    let step = maxV `div` 100
+    maxV <- io $ read <$> readFile fileMax :: X Float
+    curV <- io $ read <$> readFile fileCur :: X Float
+    let step = maxV / 100
         minV = step * 10
-        value = curV + step * param
-        ajust = max minV $ min maxV value
-    spawnAndWait $ printf "echo %d | sudo tee %s > /dev/null" ajust fileCur
+        value = curV + step * fromIntegral param
+        ajust = showDigits 0 (max minV $ min maxV value)
+    spawnAndWait $ printf "echo %s | sudo tee %s > /dev/null" ajust fileCur
   where
     dir = "/sys/class/backlight/intel_backlight/"
     fileMax = dir <> "max_brightness"
@@ -185,8 +188,6 @@ notifyBrightnessChange = do
     dir = "/sys/class/backlight/intel_backlight/"
     fileMax = dir <> "max_brightness"
     fileCur = dir <> "actual_brightness"
-    showDigits :: (RealFloat a) => Int -> a -> String
-    showDigits d n = showFFloat (Just d) n ""
 
 volumeToggle, volumeUp, volumeDown :: String -> X ()
 volumeToggle target =
