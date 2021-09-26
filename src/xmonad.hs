@@ -330,7 +330,7 @@ myKeys =
     , ("M-S-<Return>",  spawnTerminal "--exec tmux")
     , ("M-C-<Return>",  spawnTerminalAndDo doCenterFloat "--exec=tmux")
       -- shell prompt
-    , ("M-p",           shellPrompt myXPConfig)
+    , ("M-S-p",         shellPrompt myXPConfig)
       -- tree select
     , ("M-o",           myTreeSelectAction)
       -- clipboard history
