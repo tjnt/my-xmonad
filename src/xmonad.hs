@@ -78,10 +78,16 @@ import           XMonad.Hooks.DynamicLog             (PP (..), statusBar,
                                                       xmobarAction, xmobarColor,
                                                       xmobarPP)
 import           XMonad.Hooks.EwmhDesktops           (ewmh, fullscreenEventHook)
+import           XMonad.Hooks.InsertPosition         (Focus (Newer),
+                                                      Position (Below),
+                                                      insertPosition)
 import           XMonad.Hooks.ManageHelpers          (doCenterFloat, isDialog,
                                                       isFullscreen)
 import           XMonad.Hooks.Minimize               (minimizeEventHook)
 import           XMonad.Hooks.ServerMode             (serverModeEventHookCmd')
+import           XMonad.Hooks.ToggleHook             (runLogHook, toggleHook,
+                                                      toggleHookAllNew,
+                                                      willHookAllNewPP)
 import           XMonad.Layout.BoringWindows         (boringWindows, focusDown,
                                                       focusMaster, focusUp)
 import           XMonad.Layout.Circle                (Circle (..))
@@ -364,6 +370,8 @@ myKeys =
     , ("M-S-t",         sinkAll)
       -- move to center
     , ("M-g",           centerFloat)
+      -- toggle manage hook
+    , ("M-v",           toggleHookAllNew "insertBelow" >> runLogHook)
       -- cycle workspaces
     , ("M-a",           toggleWS)
     , ("M-d",           moveTo  Next nonNSP)
@@ -489,7 +497,8 @@ myLayoutHook = toggleLayouts expand normal
 -- Manage Hook
 
 myManageHook :: ManageHook
-myManageHook = manageSpawn <+> composeAll
+myManageHook = toggleHook "insertBelow" (insertPosition Below Newer)
+           <+> manageSpawn <+> composeAll
     [ className =? "Xmessage"    --> doFloat
     , className =? "MPlayer"     --> doFloat
     , className =? "mplayer2"    --> doFloat
@@ -564,9 +573,8 @@ myXMobar = statusBar "xmobar"
     (namedScratchpadFilterOutWorkspacePP myPP)
     toggleStrutsKey
   where
-    clickable s n = xmobarAction ("xmonadctl view-workspace-" <> n) "1" s
     myPP = xmobarPP
-        { ppOrder           = id
+        { ppOrder           = order
         , ppCurrent         = xmobarColor base01 basebg . clickable "●"
         , ppUrgent          = xmobarColor base06 basebg . clickable "●"
         , ppVisible         = xmobarColor base01 basebg . clickable "⦿"
@@ -577,7 +585,11 @@ myXMobar = statusBar "xmobar"
         , ppOutput          = putStrLn
         , ppWsSep           = " "
         , ppSep             = "  "
+        , ppExtras          = [extToggleHookPP]
         }
+    order (w:l:t:e:xs) = w:l:e:t:xs
+    order xs           = xs
+    clickable s n = xmobarAction ("xmonadctl view-workspace-" <> n) "1" s
     icon = printf "<icon=%s/>"
     iconMap = M.fromList
         [ ("Tall",   icon "layout-tall.xpm")
@@ -588,6 +600,8 @@ myXMobar = statusBar "xmobar"
         , ("Circle", icon "layout-circle.xpm")
         , ("Full",   icon "layout-full.xpm")
         ]
+    extToggleHookPP = maybe (Just "A") return
+                  <$> willHookAllNewPP "insertBelow" (const "B")
     toggleStrutsKey XConfig { XMonad.modMask = m } = (m, xK_b)
 
 -- main
