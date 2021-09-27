@@ -310,12 +310,12 @@ myTreeSelectAction = do
         ]
     layoutMenu =
         [ Node (TSNode "Layout menu" "Open layout menu" (return ()))
-            [ layoutNode "Tall" , layoutNode "Mirror", layoutNode "Float"
-            , layoutNode "Three", layoutNode "Grid",   layoutNode "Circle"
+          (map (\s -> Node (TSNode s "" (sendMessage $ JumpToLayout s)) [])
+            [ "Tall" , "Mirror", "Float"
+            , "Three", "Grid",   "Circle"
             ]
+          )
         ]
-      where
-        layoutNode s = Node (TSNode s "" (sendMessage $ JumpToLayout s)) []
 
 -- scratch pad
 
