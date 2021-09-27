@@ -86,6 +86,7 @@ import           XMonad.Layout.BoringWindows         (boringWindows, focusDown,
                                                       focusMaster, focusUp)
 import           XMonad.Layout.Circle                (Circle (..))
 import           XMonad.Layout.Gaps                  (Direction2D (..))
+import           XMonad.Layout.Grid                  (Grid (Grid))
 import           XMonad.Layout.LayoutCombinators     (JumpToLayout (JumpToLayout),
                                                       (|||))
 import           XMonad.Layout.Minimize              (minimize)
@@ -310,7 +311,7 @@ myTreeSelectAction = do
     layoutMenu =
         [ Node (TSNode "Layout menu" "Open layout menu" (return ()))
             [ layoutNode "Tall" , layoutNode "Mirror", layoutNode "Float"
-            , layoutNode "Three",  layoutNode "Circle"
+            , layoutNode "Three", layoutNode "Grid",   layoutNode "Circle"
             ]
         ]
       where
@@ -376,7 +377,7 @@ myKeys =
     , ("M-7",           sendMessage $ JumpToLayout "Mirror")
     , ("M-8",           sendMessage $ JumpToLayout "Float")
     , ("M-9",           sendMessage $ JumpToLayout "Three")
-    , ("M-0",           sendMessage $ JumpToLayout "Circle")
+    , ("M-0",           sendMessage $ JumpToLayout "Grid")
       -- float keys
     , ("M-<Up>",        withFocused $ keysMoveWindow'   (0,-10))
     , ("M-<Down>",      withFocused $ keysMoveWindow'   (0,10))
@@ -470,17 +471,20 @@ myLayoutHook = toggleLayouts expand normal
            $ simplestFloat
     three  = boringWindows . minimize . smartBorders . spacing
            $ ThreeColMid 1 (3/100) (1/2)
+    grid   = boringWindows . minimize . smartBorders . spacing
+           $ Grid
     circle = boringWindows . minimize . smartBorders
            $ Circle
     full   = boringWindows . minimize . noBorders
            $ Full
 
-    normal =     rename "Tall"   tall
-             ||| rename "Mirror" mirror
-             ||| rename "Float"  float
-             ||| rename "Three"  three
-             ||| rename "Circle" circle
-    expand =     rename "Full"   full
+    normal = rename "Tall"   tall
+         ||| rename "Mirror" mirror
+         ||| rename "Float"  float
+         ||| rename "Three"  three
+         ||| rename "Grid"   grid
+         ||| rename "Circle" circle
+    expand = rename "Full"   full
 
 -- Manage Hook
 
@@ -580,6 +584,7 @@ myXMobar = statusBar "xmobar"
         , ("Mirror", icon "layout-mirror.xpm")
         , ("Float",  icon "layout-float.xpm")
         , ("Three",  icon "layout-three.xpm")
+        , ("Grid",   icon "layout-grid.xpm")
         , ("Circle", icon "layout-circle.xpm")
         , ("Full",   icon "layout-full.xpm")
         ]
