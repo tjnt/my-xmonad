@@ -272,7 +272,7 @@ applicationMenu = Node (TSNode "Application Menu" "Open application menu" (retur
 myTreeSelectAction :: X ()
 myTreeSelectAction = do
     appMenu <- io applicationMenu
-    treeselectAction myTsConfig $ myTsMenu <> [appMenu]
+    treeselectAction myTsConfig $ myTsMenu <> layoutMenu <> [appMenu]
   where
     myTsConfig = tsDefaultConfig
         { ts_hidechildren = True
@@ -299,14 +299,22 @@ myTreeSelectAction = do
                 , ((controlMask, xK_bracketleft), cancel)
                 ]
     myTsMenu =
-       [ Node (TSNode "System menu" "Open system menu" (return ()))
-           [ Node (TSNode "Monitor OFF" "" (spawn "xset dpms force standby")) []
-           , Node (TSNode "Standby" "" (spawn "systemctl suspend")) []
-           , Node (TSNode "Hibernate" "" (spawn "systemctl hibernate")) []
-           , Node (TSNode "Shutdown" "" (spawn "systemctl poweroff")) []
-           , Node (TSNode "Reboot"   ""   (spawn "systemctl reboot")) []
-           ]
-       ]
+        [ Node (TSNode "System menu" "Open system menu" (return ()))
+            [ Node (TSNode "Monitor OFF" "" (spawn "xset dpms force standby")) []
+            , Node (TSNode "Standby" "" (spawn "systemctl suspend")) []
+            , Node (TSNode "Hibernate" "" (spawn "systemctl hibernate")) []
+            , Node (TSNode "Shutdown" "" (spawn "systemctl poweroff")) []
+            , Node (TSNode "Reboot"   ""   (spawn "systemctl reboot")) []
+            ]
+        ]
+    layoutMenu =
+        [ Node (TSNode "Layout menu" "Open layout menu" (return ()))
+            [ layoutNode "Tall" , layoutNode "Mirror", layoutNode "Float"
+            , layoutNode "Three",  layoutNode "Circle"
+            ]
+        ]
+      where
+        layoutNode s = Node (TSNode s "" (sendMessage $ JumpToLayout s)) []
 
 -- scratch pad
 
