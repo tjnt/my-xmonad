@@ -342,9 +342,13 @@ myKeys =
       ("M-j",           focusDown)
     , ("M-k",           focusUp)
     , ("M-m",           focusMaster)
+      -- swap master
+    , ("M-i",           windows W.swapMaster)
       -- launch
-    , ("M-S-<Return>",  spawnTerminal "--exec tmux")
-    , ("M-C-<Return>",  spawnTerminalAndDo doCenterFloat "--exec=tmux")
+    , ("M-<Return>",    spawnTerminal "--exec tmux")
+    , ("M-S-<Return>",  spawnTerminal "")  -- without tmux
+    , ("M-C-<Return>",    spawnTerminalAndDo doCenterFloat "--exec=tmux")
+    , ("M-C-S-<Return>",  spawnTerminalAndDo doCenterFloat "")
       -- shell prompt
     , ("M-S-p",         shellPrompt myXPConfig)
       -- tree select
