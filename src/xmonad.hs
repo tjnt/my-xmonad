@@ -47,10 +47,10 @@ import           XMonad                              (Button, Event,
                                                       shiftMask, spawn,
                                                       terminal, title, windows,
                                                       windowset, withFocused,
-                                                      xK_b, xK_bracketleft,
-                                                      xK_q, xmonad, (-->),
-                                                      (.|.), (<&&>), (<+>),
-                                                      (=?))
+                                                      xC_left_ptr, xK_b,
+                                                      xK_bracketleft, xK_q,
+                                                      xmonad, (-->), (.|.),
+                                                      (<&&>), (<+>), (=?))
 import           XMonad.Actions.CopyWindow           (kill1)
 import           XMonad.Actions.CycleSelectedLayouts (cycleThroughLayouts)
 import           XMonad.Actions.CycleWS              (Direction1D (Next, Prev),
@@ -113,6 +113,7 @@ import           XMonad.Prompt                       (XPConfig, XPPosition (..),
                                                       promptBorderWidth)
 import           XMonad.Prompt.Shell                 (shellPrompt)
 import qualified XMonad.StackSet                     as W
+import           XMonad.Util.Cursor                  (setDefaultCursor)
 import           XMonad.Util.EZConfig                (additionalKeysP)
 import           XMonad.Util.NamedScratchpad         (NamedScratchpad (NS),
                                                       NamedScratchpads,
@@ -559,6 +560,7 @@ myEventHook = handleEventHook def
 
 myStartupHook :: X ()
 myStartupHook = do
+    setDefaultCursor xC_left_ptr
     spawnOnce "compton -b"
     spawnOnce "dunst"
     spawnOnce $ printf
