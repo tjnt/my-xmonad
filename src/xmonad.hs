@@ -74,7 +74,7 @@ import           XMonad.Actions.TreeSelect           (TSConfig (..),
                                                       treeselectAction,
                                                       tsDefaultConfig)
 import           XMonad.Actions.Warp                 (warpToWindow)
-import           XMonad.Hooks.DynamicLog             (PP (..), statusBar,
+import           XMonad.Hooks.DynamicLog             (PP (..), statusBar, wrap,
                                                       xmobarAction, xmobarColor,
                                                       xmobarPP)
 import           XMonad.Hooks.EwmhDesktops           (ewmh, fullscreenEventHook)
@@ -569,28 +569,26 @@ myStartupHook = do
 
 -- xmobar
 
-myXMobar = statusBar "xmobar"
-    (namedScratchpadFilterOutWorkspacePP myPP)
-    toggleStrutsKey
+myPP = xmobarPP
+    { ppOrder           = order
+    , ppCurrent         = xmobarColor base01 basebg . clickable "●"
+    , ppUrgent          = xmobarColor base06 basebg . clickable "●"
+    , ppVisible         = xmobarColor base01 basebg . clickable "⦿"
+    , ppHidden          = xmobarColor base06 basebg . clickable "●"
+    , ppHiddenNoWindows = xmobarColor base06 basebg . clickable "○"
+    , ppTitle           = xmobarColor base04 basebg
+    , ppLayout          = fromMaybe "" . (iconMap M.!?)
+    , ppOutput          = putStrLn
+    , ppWsSep           = " "
+    , ppSep             = "  "
+    , ppExtras          = [extToggleHookPP]
+    }
   where
-    myPP = xmobarPP
-        { ppOrder           = order
-        , ppCurrent         = xmobarColor base01 basebg . clickable "●"
-        , ppUrgent          = xmobarColor base06 basebg . clickable "●"
-        , ppVisible         = xmobarColor base01 basebg . clickable "⦿"
-        , ppHidden          = xmobarColor base06 basebg . clickable "●"
-        , ppHiddenNoWindows = xmobarColor base06 basebg . clickable "○"
-        , ppTitle           = xmobarColor base04 basebg
-        , ppLayout          = fromMaybe "" . (iconMap M.!?)
-        , ppOutput          = putStrLn
-        , ppWsSep           = " "
-        , ppSep             = "  "
-        , ppExtras          = [extToggleHookPP]
-        }
     order (w:l:t:e:xs) = w:l:e:t:xs
     order xs           = xs
+
     clickable s n = xmobarAction ("xmonadctl view-workspace-" <> n) "1" s
-    icon = printf "<icon=%s/>"
+
     iconMap = M.fromList
         [ ("Tall",   icon "layout-tall.xpm")
         , ("Mirror", icon "layout-mirror.xpm")
@@ -600,8 +598,21 @@ myXMobar = statusBar "xmobar"
         , ("Circle", icon "layout-circle.xpm")
         , ("Full",   icon "layout-full.xpm")
         ]
-    extToggleHookPP = maybe (Just "A") return
-                  <$> willHookAllNewPP "insertBelow" (const "B")
+      where
+        icon = printf "<icon=%s/>"
+
+    extToggleHookPP = maybe (Just iconAbove) return
+                  <$> willHookAllNewPP "insertBelow" (const iconBelow)
+      where
+        xmobarFont :: Int -> String -> String
+        xmobarFont n = wrap (printf "<fn=%d>" n) "</fn>"
+        iconAbove = xmobarFont 1 "\xfa53"
+        iconBelow = xmobarFont 1 "\xfa54"
+
+myXMobar = statusBar "xmobar"
+    (namedScratchpadFilterOutWorkspacePP myPP)
+    toggleStrutsKey
+  where
     toggleStrutsKey XConfig { XMonad.modMask = m } = (m, xK_b)
 
 -- main
