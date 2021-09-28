@@ -66,6 +66,7 @@ import           XMonad.Actions.FloatSnap            (afterDrag, snapGrow,
 import           XMonad.Actions.Minimize             (maximizeWindowAndFocus,
                                                       minimizeWindow,
                                                       withLastMinimized)
+import           XMonad.Actions.Promote              (promote)
 import           XMonad.Actions.SinkAll              (sinkAll)
 import           XMonad.Actions.SpawnOn              (manageSpawn)
 import           XMonad.Actions.TreeSelect           (TSConfig (..),
@@ -343,7 +344,7 @@ myKeys =
     , ("M-k",             focusUp)
     , ("M-m",             focusMaster)
       -- swap master
-    , ("M-S-m",           windows W.swapMaster)
+    , ("M-S-m",           promote)
       -- launch
     , ("M-<Return>",      spawnTerminal "--exec tmux")
     , ("M-S-<Return>",    spawnTerminal "")  -- without tmux
