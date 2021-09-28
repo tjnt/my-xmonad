@@ -343,7 +343,7 @@ myKeys =
     , ("M-k",             focusUp)
     , ("M-m",             focusMaster)
       -- swap master
-    , ("M-i",             windows W.swapMaster)
+    , ("M-S-m",           windows W.swapMaster)
       -- launch
     , ("M-<Return>",      spawnTerminal "--exec tmux")
     , ("M-S-<Return>",    spawnTerminal "")  -- without tmux
