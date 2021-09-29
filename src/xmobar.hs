@@ -13,6 +13,7 @@ import           Theme.Theme               (base01, base02, base03, base07,
 import           Utils.Run                 (readProcess, readProcess')
 import           XMonad.Hooks.DynamicLog   (trim, wrap, xmobarAction,
                                             xmobarColor)
+import           XMonad.Hooks.StatusBar.PP (xmobarFont)
 import           Xmobar                    (Align (L), Command (Com),
                                             Config (..), Date (Date),
                                             Monitors (Battery, Brightness, Cpu, DynNetwork, Memory, MultiCoreTemp, Volume, Wireless),
@@ -241,9 +242,6 @@ homeDir = unsafeDupablePerformIO (getEnv "HOME")
 
 xmonadDir :: String
 xmonadDir = homeDir <> "/.xmonad"
-
-xmobarFont :: Int -> String -> String
-xmobarFont n = wrap (printf "<fn=%d>" n) "</fn>"
 
 main :: IO ()
 main = xmobar config

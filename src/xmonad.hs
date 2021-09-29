@@ -76,9 +76,8 @@ import           XMonad.Actions.TreeSelect           (TSConfig (..),
                                                       treeselectAction)
 import           XMonad.Actions.Warp                 (warpToWindow)
 import           XMonad.Hooks.DynamicLog             (PP (..), filterOutWsPP,
-                                                      statusBar, wrap,
-                                                      xmobarAction, xmobarColor,
-                                                      xmobarPP)
+                                                      statusBar, xmobarAction,
+                                                      xmobarColor, xmobarPP)
 import           XMonad.Hooks.EwmhDesktops           (ewmh, fullscreenEventHook)
 import           XMonad.Hooks.InsertPosition         (Focus (Newer),
                                                       Position (Below),
@@ -87,6 +86,7 @@ import           XMonad.Hooks.ManageHelpers          (doCenterFloat, isDialog,
                                                       isFullscreen)
 import           XMonad.Hooks.Minimize               (minimizeEventHook)
 import           XMonad.Hooks.ServerMode             (serverModeEventHookCmd')
+import           XMonad.Hooks.StatusBar.PP           (xmobarFont)
 import           XMonad.Hooks.ToggleHook             (runLogHook, toggleHook,
                                                       toggleHookAllNew,
                                                       willHookAllNewPP)
@@ -448,7 +448,7 @@ myKeys =
     convert = bimap fromIntegral fromIntegral
     keysMoveWindow' = keysMoveWindow . convert
     keysResizeWindow' d g = keysResizeWindow (convert d) (convert g)
-    nonNSP = WSIs . return $ (/= "NSP") . W.tag
+    nonNSP = WSIs . return $ (/= scratchpadWorkspaceTag) . W.tag
 
 -- Mouse bindings
 
@@ -614,13 +614,11 @@ myPP = xmobarPP
     extToggleHookPP = maybe (Just iconAbove) return
                   <$> willHookAllNewPP "insertBelow" (const iconBelow)
       where
-        xmobarFont :: Int -> String -> String
-        xmobarFont n = wrap (printf "<fn=%d>" n) "</fn>"
         iconAbove = xmobarFont 1 "\xfa53"
         iconBelow = xmobarFont 1 "\xfa54"
 
 myXMobar = statusBar "xmobar"
-    ((filterOutWsPP [scratchpadWorkspaceTag]) myPP)
+    (filterOutWsPP [scratchpadWorkspaceTag] myPP)
     toggleStrutsKey
   where
     toggleStrutsKey XConfig { XMonad.modMask = m } = (m, xK_b)
