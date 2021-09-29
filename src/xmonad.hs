@@ -91,11 +91,15 @@ import           XMonad.Hooks.ManageHelpers          (composeOne, doCenterFloat,
                                                       isDialog, isFullscreen,
                                                       (-?>))
 import           XMonad.Hooks.Minimize               (minimizeEventHook)
+import           XMonad.Hooks.RefocusLast            (isFloat,
+                                                      refocusLastLayoutHook,
+                                                      refocusLastWhen)
 import           XMonad.Hooks.ServerMode             (serverModeEventHookCmd')
 import           XMonad.Hooks.StatusBar              (StatusBarConfig,
                                                       statusBarProp, withSB)
-import           XMonad.Hooks.StatusBar.PP           (xmobarAction, xmobarColor,
-                                                      xmobarFont, xmobarBorder)
+import           XMonad.Hooks.StatusBar.PP           (xmobarAction,
+                                                      xmobarBorder, xmobarColor,
+                                                      xmobarFont)
 import           XMonad.Hooks.ToggleHook             (runLogHook, toggleHook,
                                                       toggleHookAllNew,
                                                       willHookAllNewPP)
@@ -116,6 +120,7 @@ import           XMonad.Layout.Spacing               (Border (..), spacingRaw)
 import           XMonad.Layout.ThreeColumns          (ThreeCol (ThreeColMid))
 import           XMonad.Layout.ToggleLayouts         (ToggleLayout (..),
                                                       toggleLayouts)
+import           XMonad.Layout.TrackFloating         (trackFloating)
 import           XMonad.Prompt                       (XPConfig, XPPosition (..),
                                                       alwaysHighlight, bgColor,
                                                       fgColor, font, height,
@@ -484,7 +489,8 @@ myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
 
 -- Layout Hook
 
-myLayoutHook = avoidStruts $ toggleLayouts expand normal
+myLayoutHook = refocusLastLayoutHook . trackFloating . avoidStruts
+             $ toggleLayouts expand normal
   where
     spacing = spacingRaw True (Border 4 4 8 8) True (Border 4 4 4 4) True
     rename s = renamed [ Replace s ]
@@ -564,6 +570,7 @@ myServerModeHook = return
 
 myEventHook :: Event -> X All
 myEventHook = handleEventHook def
+              <+> refocusLastWhen isFloat
               <+> fullscreenEventHook
               <+> minimizeEventHook
               <+> serverModeEventHookCmd' myServerModeHook
@@ -593,7 +600,7 @@ myStartupHook = do
 myPP :: PP
 myPP = xmobarPP
     { ppOrder           = order
-    , ppCurrent         = xmobarColor base01 basebg . xmobarBorder "Bottom" base01 2 
+    , ppCurrent         = xmobarColor base01 basebg . xmobarBorder "Bottom" base01 2
     , ppUrgent          = xmobarColor base06 basebg
     , ppVisible         = xmobarColor base04 basebg
     , ppHidden          = xmobarColor base06 basebg
