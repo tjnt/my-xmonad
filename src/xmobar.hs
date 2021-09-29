@@ -18,7 +18,7 @@ import           Xmobar                    (Align (L), Command (Com),
                                             Config (..), Date (Date),
                                             Monitors (Battery, Brightness, Cpu, DynNetwork, Memory, MultiCoreTemp, Volume, Wireless),
                                             Runnable (Run),
-                                            StdinReader (UnsafeStdinReader),
+                                            XMonadLog (UnsafeXMonadLog),
                                             XPosition (TopSize), defaultConfig,
                                             xmobar)
 
@@ -28,6 +28,7 @@ config =
         { font = myFont
         , additionalFonts =
             [ "xft:RictyDiminished Nerd Font:style=Regular:size=10"
+            , "xft:RictyDiminished Nerd Font:style=Regular:size=12"
             , "xft:RictyDiminished Nerd Font:style=Regular:size=20"
             ]
         , bgColor = basebg
@@ -40,8 +41,8 @@ config =
         , sepChar = "%"
         , alignSep = "}{"
         , template =
-            xmobarFont 2 "\xe777"
-            <> " %UnsafeStdinReader% }{"
+            xmobarFont 3 "\xe777"
+            <> " %UnsafeXMonadLog% }{"
             <> concatMap (wrap " " " ")
                 [ "%cpu%" & runTerminal "htop -s PERCENT_CPU" "htop" "3"
                 , "%memory%" & runTerminal "htop -s PERCENT_MEM" "htop" "3"
@@ -62,7 +63,7 @@ config =
                 ]
             <> "%trayerpad%"
         , commands =
-            [ Run UnsafeStdinReader
+            [ Run UnsafeXMonadLog
             , Run $ Cpu
                 [ "--template", "<ipat><total>%"
                 , "--Low",      "40"

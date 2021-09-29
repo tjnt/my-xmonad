@@ -33,8 +33,9 @@ import           Utils.XdgDesktopEntry
 import           XMonad                              (Button, Event,
                                                       Full (Full), KeyMask,
                                                       ManageHook,
-                                                      Mirror (Mirror), Window,
-                                                      X, XConfig (..), asks,
+                                                      Mirror (Mirror), Query,
+                                                      Window, WorkspaceId, X,
+                                                      XConfig (..), asks,
                                                       button1, button2, button3,
                                                       button4, button5, cfgDir,
                                                       className, composeAll,
@@ -48,7 +49,7 @@ import           XMonad                              (Button, Event,
                                                       shiftMask, spawn,
                                                       terminal, title, windows,
                                                       windowset, withFocused,
-                                                      xC_left_ptr, xK_b,
+                                                      xC_left_ptr,
                                                       xK_bracketleft, xK_q,
                                                       xmonad, (-->), (.|.),
                                                       (<&&>), (<+>), (=?))
@@ -75,18 +76,26 @@ import           XMonad.Actions.TreeSelect           (TSConfig (..),
                                                       defaultNavigation,
                                                       treeselectAction)
 import           XMonad.Actions.Warp                 (warpToWindow)
+import           XMonad.Hooks.DynamicIcons           (IconConfig (..), appIcon,
+                                                      dynamicIconsPP,
+                                                      iconsGetFocus)
 import           XMonad.Hooks.DynamicLog             (PP (..), filterOutWsPP,
-                                                      statusBar, xmobarAction,
-                                                      xmobarColor, xmobarPP)
+                                                      xmobarPP)
 import           XMonad.Hooks.EwmhDesktops           (ewmh, fullscreenEventHook)
 import           XMonad.Hooks.InsertPosition         (Focus (Newer),
                                                       Position (Below),
                                                       insertPosition)
-import           XMonad.Hooks.ManageHelpers          (doCenterFloat, isDialog,
-                                                      isFullscreen)
+import           XMonad.Hooks.ManageDocks            (ToggleStruts (ToggleStruts),
+                                                      avoidStruts, docks)
+import           XMonad.Hooks.ManageHelpers          (composeOne, doCenterFloat,
+                                                      isDialog, isFullscreen,
+                                                      (-?>))
 import           XMonad.Hooks.Minimize               (minimizeEventHook)
 import           XMonad.Hooks.ServerMode             (serverModeEventHookCmd')
-import           XMonad.Hooks.StatusBar.PP           (xmobarFont)
+import           XMonad.Hooks.StatusBar              (StatusBarConfig,
+                                                      statusBarProp, withSB)
+import           XMonad.Hooks.StatusBar.PP           (xmobarAction, xmobarColor,
+                                                      xmobarFont, xmobarBorder)
 import           XMonad.Hooks.ToggleHook             (runLogHook, toggleHook,
                                                       toggleHookAllNew,
                                                       willHookAllNewPP)
@@ -378,6 +387,8 @@ myKeys =
       -- move to center
     , ("M-g",             centerFloat)
       -- toggle manage hook
+    , ("M-b",             sendMessage ToggleStruts)
+      -- toggle manage hook
     , ("M-v",             toggleHookAllNew "insertBelow" >> runLogHook)
       -- cycle workspaces
     , ("M-a",             toggleWS)
@@ -473,7 +484,7 @@ myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
 
 -- Layout Hook
 
-myLayoutHook = toggleLayouts expand normal
+myLayoutHook = avoidStruts $ toggleLayouts expand normal
   where
     spacing = spacingRaw True (Border 4 4 8 8) True (Border 4 4 4 4) True
     rename s = renamed [ Replace s ]
@@ -579,15 +590,16 @@ myStartupHook = do
 
 -- xmobar
 
+myPP :: PP
 myPP = xmobarPP
     { ppOrder           = order
-    , ppCurrent         = xmobarColor base01 basebg . clickable "●"
-    , ppUrgent          = xmobarColor base06 basebg . clickable "●"
-    , ppVisible         = xmobarColor base01 basebg . clickable "⦿"
-    , ppHidden          = xmobarColor base06 basebg . clickable "●"
-    , ppHiddenNoWindows = xmobarColor base06 basebg . clickable "○"
+    , ppCurrent         = xmobarColor base01 basebg . xmobarBorder "Bottom" base01 2 
+    , ppUrgent          = xmobarColor base06 basebg
+    , ppVisible         = xmobarColor base04 basebg
+    , ppHidden          = xmobarColor base06 basebg
+    , ppHiddenNoWindows = xmobarColor base06 basebg
     , ppTitle           = xmobarColor base04 basebg
-    , ppLayout          = fromMaybe "" . (iconMap M.!?)
+    , ppLayout          = fromMaybe "" . (layoutIcons M.!?)
     , ppOutput          = putStrLn
     , ppWsSep           = " "
     , ppSep             = "  "
@@ -597,9 +609,7 @@ myPP = xmobarPP
     order (w:l:t:e:xs) = w:l:e:t:xs
     order xs           = xs
 
-    clickable s n = xmobarAction ("xmonadctl view-workspace-" <> n) "1" s
-
-    iconMap = M.fromList
+    layoutIcons = M.fromList
         [ ("Tall",   icon "layout-tall.xpm")
         , ("Mirror", icon "layout-mirror.xpm")
         , ("Float",  icon "layout-float.xpm")
@@ -617,15 +627,42 @@ myPP = xmobarPP
         iconAbove = xmobarFont 1 "\xfa53"
         iconBelow = xmobarFont 1 "\xfa54"
 
-myXMobar = statusBar "xmobar"
-    (filterOutWsPP [scratchpadWorkspaceTag] myPP)
-    toggleStrutsKey
+myXMobar :: StatusBarConfig
+myXMobar = statusBarProp "xmobar"
+         . dynamicIconsPP iconConfig
+         . filterOutWsPP [scratchpadWorkspaceTag] $ myPP
   where
-    toggleStrutsKey XConfig { XMonad.modMask = m } = (m, xK_b)
+    iconConfig :: IconConfig
+    iconConfig = def
+        { iconConfigIcons  = appIcons
+        , iconConfigFmt    = iconsFmtReplace' (xmobarFont 1 "\xf988") concat
+        , iconConfigFilter = iconsGetFocus
+        }
+
+    iconsFmtReplace' :: String -> ([String] -> String)
+                     -> WorkspaceId -> [String] -> String
+    iconsFmtReplace' s cat ws is =
+        clickable ws $ case is of [] -> s
+                                  _  -> cat is
+      where
+        clickable n = xmobarAction ("xmonadctl view-workspace-" <> n) "1"
+
+    appIcons :: Query [String]
+    appIcons = composeOne
+        [ className =? "Termite"     -?> appIconFont 2 "\xe795"
+        , className =? "Firefox"     -?> appIconFont 2 "\xe745"
+        , className =? "Chromium"    -?> appIconFont 2 "\xe743"
+        , className =? "thunderbird" -?> appIconFont 1 "\xf6ed"
+        , className =? "Vieb"        -?> appIconFont 1 "\xe7c5"
+        , className =? "Gvim"        -?> appIconFont 1 "\xe7c5"
+        , pure True                  -?> appIconFont 1 "\xfc63"
+        ]
+      where
+        appIconFont n = appIcon . xmobarFont n
 
 -- main
 
-myConfig = ewmh def
+myConfig = ewmh . docks $ def
     { modMask = mod4Mask
     , terminal = "termite"
     , workspaces = map show [1..5]
@@ -642,4 +679,4 @@ myConfig = ewmh def
     `additionalKeysP` myKeys
 
 main :: IO ()
-main = xmonad =<< myXMobar myConfig
+main = xmonad . withSB myXMobar $ myConfig
