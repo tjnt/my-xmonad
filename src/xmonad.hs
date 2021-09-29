@@ -36,12 +36,13 @@ import           XMonad                              (Button, Event,
                                                       Mirror (Mirror), Window,
                                                       X, XConfig (..), asks,
                                                       button1, button2, button3,
-                                                      button4, button5,
+                                                      button4, button5, cfgDir,
                                                       className, composeAll,
                                                       config, controlMask, def,
+                                                      directories,
                                                       floatLocation, focus,
-                                                      getXMonadDir, gets, io,
-                                                      mod4Mask, mouseMoveWindow,
+                                                      gets, io, mod4Mask,
+                                                      mouseMoveWindow,
                                                       noModMask, refresh,
                                                       resource, sendMessage,
                                                       shiftMask, spawn,
@@ -72,10 +73,10 @@ import           XMonad.Actions.SpawnOn              (manageSpawn)
 import           XMonad.Actions.TreeSelect           (TSConfig (..),
                                                       TSNode (..), cancel,
                                                       defaultNavigation,
-                                                      treeselectAction,
-                                                      tsDefaultConfig)
+                                                      treeselectAction)
 import           XMonad.Actions.Warp                 (warpToWindow)
-import           XMonad.Hooks.DynamicLog             (PP (..), statusBar, wrap,
+import           XMonad.Hooks.DynamicLog             (PP (..), filterOutWsPP,
+                                                      statusBar, wrap,
                                                       xmobarAction, xmobarColor,
                                                       xmobarPP)
 import           XMonad.Hooks.EwmhDesktops           (ewmh, fullscreenEventHook)
@@ -119,8 +120,8 @@ import           XMonad.Util.NamedScratchpad         (NamedScratchpad (NS),
                                                       NamedScratchpads,
                                                       defaultFloating,
                                                       namedScratchpadAction,
-                                                      namedScratchpadFilterOutWorkspacePP,
-                                                      namedScratchpadManageHook)
+                                                      namedScratchpadManageHook,
+                                                      scratchpadWorkspaceTag)
 import           XMonad.Util.SpawnOnce               (spawnOnce)
 
 -- Functions
@@ -223,7 +224,7 @@ boluetoothToggle = do
 
 clipboardHistory :: String -> X()
 clipboardHistory opt = do
-    clipsh <- (<> "/scripts/clip.sh") <$> getXMonadDir
+    clipsh <- (<> "/scripts/clip.sh") <$> asks (cfgDir . directories)
     spawnTerminal $ printf "--exec '%s %s' --title clipboard" clipsh opt
 
 captureScreen :: X()
@@ -283,7 +284,7 @@ myTreeSelectAction = do
     appMenu <- io applicationMenu
     treeselectAction myTsConfig $ myTsMenu <> layoutMenu <> [appMenu]
   where
-    myTsConfig = tsDefaultConfig
+    myTsConfig = def
         { ts_hidechildren = True
         , ts_font         = myFont
         , ts_background   = readColor basebg "C0"
@@ -619,7 +620,7 @@ myPP = xmobarPP
         iconBelow = xmobarFont 1 "\xfa54"
 
 myXMobar = statusBar "xmobar"
-    (namedScratchpadFilterOutWorkspacePP myPP)
+    ((filterOutWsPP [scratchpadWorkspaceTag]) myPP)
     toggleStrutsKey
   where
     toggleStrutsKey XConfig { XMonad.modMask = m } = (m, xK_b)
