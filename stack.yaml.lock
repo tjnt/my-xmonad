@@ -5,12 +5,49 @@
 
 packages:
 - completed:
-    hackage: xmobar-0.39@sha256:59d15adf16a0ca95b65ddbd62f330d628ccf07282f8928e3f7b4ce00250a468f,12547
+    name: X11
+    version: 1.10.1
+    git: https://github.com/xmonad/X11.git
     pantry-tree:
-      size: 6747
-      sha256: 7da55b2b265bef7c53bb4b5bf1ebc5fcae1e6e9cee54e1b30482ceab05ffdc6e
+      size: 3432
+      sha256: 2d900133b47323ba014d9a8872d4f7de0bfbfd64b0ac99a3cb6825533bbefbb7
+    commit: 8df5483b0801860ee267441f31e35647d0389c37
   original:
-    hackage: xmobar-0.39
+    git: https://github.com/xmonad/X11.git
+    commit: 8df5483b0801860ee267441f31e35647d0389c37
+- completed:
+    name: xmonad
+    version: 0.16.99999
+    git: https://github.com/xmonad/xmonad.git
+    pantry-tree:
+      size: 3621
+      sha256: 770666a45b8d6a1fee9f591b021c19e72b8a552e31ff7055e0f05a3cf7f1a886
+    commit: 33a86c0cdb9aa481e23cc5527a997adef5e32d42
+  original:
+    git: https://github.com/xmonad/xmonad.git
+    commit: 33a86c0cdb9aa481e23cc5527a997adef5e32d42
+- completed:
+    name: xmonad-contrib
+    version: 0.16.999
+    git: https://github.com/xmonad/xmonad-contrib.git
+    pantry-tree:
+      size: 23008
+      sha256: 97153a604c1aa99b1b59a78ee4afab94ad3bb0262a3f7c1042efeedb9d61d372
+    commit: 20fdcbad0181d9e8fc7571799b1bb02952489df6
+  original:
+    git: https://github.com/xmonad/xmonad-contrib.git
+    commit: 20fdcbad0181d9e8fc7571799b1bb02952489df6
+- completed:
+    name: xmobar
+    version: '0.40'
+    git: https://github.com/jaor/xmobar.git
+    pantry-tree:
+      size: 7776
+      sha256: 2ca50fa8885dcc9efcc7a826d5b201095a7a5728d5dccd4cf473d38a26537313
+    commit: 6525d5102ef3e1649bc71d29734bbae93cc8c1b7
+  original:
+    git: https://github.com/jaor/xmobar.git
+    commit: 6525d5102ef3e1649bc71d29734bbae93cc8c1b7
 - completed:
     hackage: netlink-1.1.1.0@sha256:d83424b5ba9921191449e4b1f53c7cba7f4375f2c55a9b737c77e982e1f40d00,3689
     pantry-tree:
