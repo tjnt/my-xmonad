@@ -71,6 +71,7 @@ import           XMonad.Actions.Minimize             (maximizeWindowAndFocus,
 import           XMonad.Actions.Promote              (promote)
 import           XMonad.Actions.SinkAll              (sinkAll)
 import           XMonad.Actions.SpawnOn              (manageSpawn)
+import           XMonad.Actions.TiledWindowDragging  (dragWindow)
 import           XMonad.Actions.TreeSelect           (TSConfig (..),
                                                       TSNode (..), cancel,
                                                       defaultNavigation,
@@ -474,10 +475,7 @@ myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
             focus w >> mouseMoveWindow w >>
             afterDrag (snapMagicMove (Just 50) (Just 50) w) >>
             windows W.shiftMaster)
-    , ((modm .|. shiftMask, button1), \w ->
-            focus w >> mouseMoveWindow w >>
-            afterDrag (snapMagicResize [L,R,U,D] (Just 50) (Just 50) w) >>
-            windows W.shiftMaster)
+    , ((modm .|. shiftMask, button1), dragWindow)
     , ((modm, button2), windows . (W.shiftMaster .) . W.focusWindow)
     , ((modm, button3), \w ->
             focus w >> mouseResizeWindow w >>
