@@ -70,7 +70,7 @@ import           XMonad.Actions.Minimize             (maximizeWindowAndFocus,
                                                       withLastMinimized)
 import           XMonad.Actions.Promote              (promote)
 import           XMonad.Actions.SinkAll              (sinkAll)
-import           XMonad.Actions.SpawnOn              (manageSpawn)
+import           XMonad.Actions.SpawnOn              (manageSpawn, spawnHere)
 import           XMonad.Actions.TiledWindowDragging  (dragWindow)
 import           XMonad.Actions.TreeSelect           (TSConfig (..),
                                                       TSNode (..), cancel,
@@ -429,10 +429,10 @@ myKeys =
     , ("M-S-[",           dunstRestart)
     , ("M-]",             dunstHistoryPop)
       -- application launcher
-    , ("M-<F2>",          spawn "chromium")
-    , ("M-<F3>",          spawn "firefox")
-    , ("M-<F4>",          spawn "firefox -private-window")
-    , ("M-<F5>",          spawn "thunderbird")
+    , ("M-<F2>",          spawnHere "chromium")
+    , ("M-<F3>",          spawnHere "firefox")
+    , ("M-<F4>",          spawnHere "firefox -private-window")
+    , ("M-<F5>",          spawnHere "thunderbird")
     , ("M-<F8>",          spawnTerminal "--exec ranger")
     , ("M-<F9>",          spawnTerminalOrClose "--exec htop --title htop" (title =? "htop"))
     , ("M-<F10>",         spawnTerminalOrClose "--exec ytop --title ytop" (title =? "ytop"))
