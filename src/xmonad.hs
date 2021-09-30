@@ -80,8 +80,6 @@ import           XMonad.Actions.Warp                 (warpToWindow)
 import           XMonad.Hooks.DynamicIcons           (IconConfig (..), appIcon,
                                                       dynamicIconsPP,
                                                       iconsGetFocus)
-import           XMonad.Hooks.DynamicLog             (PP (..), filterOutWsPP,
-                                                      xmobarPP)
 import           XMonad.Hooks.EwmhDesktops           (ewmh, ewmhFullscreen)
 import           XMonad.Hooks.InsertPosition         (Focus (Newer),
                                                       Position (Below),
@@ -98,9 +96,10 @@ import           XMonad.Hooks.RefocusLast            (isFloat,
 import           XMonad.Hooks.ServerMode             (serverModeEventHookCmd')
 import           XMonad.Hooks.StatusBar              (StatusBarConfig,
                                                       statusBarProp, withSB)
-import           XMonad.Hooks.StatusBar.PP           (xmobarAction,
+import           XMonad.Hooks.StatusBar.PP           (PP (..), filterOutWsPP,
+                                                      xmobarAction,
                                                       xmobarBorder, xmobarColor,
-                                                      xmobarFont)
+                                                      xmobarFont, xmobarPP)
 import           XMonad.Hooks.ToggleHook             (runLogHook, toggleHook,
                                                       toggleHookAllNew,
                                                       willHookAllNewPP)

@@ -11,9 +11,8 @@ import           Text.Printf               (printf)
 import           Theme.Theme               (base01, base02, base03, base07,
                                             base0C, basebg, myFont)
 import           Utils.Run                 (readProcess, readProcess')
-import           XMonad.Hooks.DynamicLog   (trim, wrap, xmobarAction,
-                                            xmobarColor)
-import           XMonad.Hooks.StatusBar.PP (xmobarFont)
+import           XMonad.Hooks.StatusBar.PP (trim, wrap, xmobarAction,
+                                            xmobarColor, xmobarFont)
 import           Xmobar                    (Align (L), Command (Com),
                                             Config (..), Date (Date),
                                             Monitors (Battery, Brightness, Cpu, DynNetwork, Memory, MultiCoreTemp, Volume, Wireless),
