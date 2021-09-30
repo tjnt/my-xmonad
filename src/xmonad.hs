@@ -487,26 +487,17 @@ myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
 
 -- Layout Hook
 
-myLayoutHook = refocusLastLayoutHook . trackFloating . avoidStruts
+myLayoutHook = refocusLastLayoutHook . trackFloating
+             . avoidStruts . boringWindows . minimize
              $ toggleLayouts expand normal
   where
-    spacing = spacingRaw True (Border 4 4 8 8) True (Border 4 4 4 4) True
-    rename s = renamed [ Replace s ]
-
-    tall   = boringWindows . minimize . smartBorders . spacing
-           $ ResizableTall 1 (3/100) (1/2) []
-    mirror = boringWindows . minimize . smartBorders . spacing
-           $ Mirror (ResizableTall 1 (3/100) (1/2) [])
-    float  = boringWindows . minimize . smartBorders
-           $ simplestFloat
-    three  = boringWindows . minimize . smartBorders . spacing
-           $ ThreeColMid 1 (3/100) (1/2)
-    grid   = boringWindows . minimize . smartBorders . spacing
-           $ Grid
-    circle = boringWindows . minimize . smartBorders
-           $ Circle
-    full   = boringWindows . minimize . noBorders
-           $ Full
+    tall   = smartBorders . spacing $ ResizableTall 1 (3/100) (1/2) []
+    mirror = smartBorders . spacing $ Mirror (ResizableTall 1 (3/100) (1/2) [])
+    float  = smartBorders simplestFloat
+    three  = smartBorders . spacing $ ThreeColMid 1 (3/100) (1/2)
+    grid   = smartBorders . spacing $ Grid
+    circle = smartBorders Circle
+    full   = noBorders Full
 
     normal = rename "Tall"   tall
          ||| rename "Mirror" mirror
@@ -515,6 +506,9 @@ myLayoutHook = refocusLastLayoutHook . trackFloating . avoidStruts
          ||| rename "Grid"   grid
          ||| rename "Circle" circle
     expand = rename "Full"   full
+
+    spacing = spacingRaw True (Border 4 4 8 8) True (Border 4 4 4 4) True
+    rename s = renamed [ Replace s ]
 
 -- Manage Hook
 
