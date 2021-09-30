@@ -82,7 +82,7 @@ import           XMonad.Hooks.DynamicIcons           (IconConfig (..), appIcon,
                                                       iconsGetFocus)
 import           XMonad.Hooks.DynamicLog             (PP (..), filterOutWsPP,
                                                       xmobarPP)
-import           XMonad.Hooks.EwmhDesktops           (ewmh, fullscreenEventHook)
+import           XMonad.Hooks.EwmhDesktops           (ewmh, ewmhFullscreen)
 import           XMonad.Hooks.InsertPosition         (Focus (Newer),
                                                       Position (Below),
                                                       insertPosition)
@@ -569,7 +569,6 @@ myServerModeHook = return
 myEventHook :: Event -> X All
 myEventHook = handleEventHook def
               <+> refocusLastWhen isFloat
-              <+> fullscreenEventHook
               <+> minimizeEventHook
               <+> serverModeEventHookCmd' myServerModeHook
 
@@ -667,7 +666,7 @@ myXMobar = statusBarProp "xmobar"
 
 -- main
 
-myConfig = ewmh . docks $ def
+myConfig = ewmhFullscreen . ewmh . docks $ def
     { modMask = mod4Mask
     , terminal = "termite"
     , workspaces = map show [1..5]
