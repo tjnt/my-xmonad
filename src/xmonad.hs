@@ -486,16 +486,23 @@ myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
 -- Layout Hook
 
 myLayoutHook = refocusLastLayoutHook . trackFloating
-             . avoidStruts . boringWindows . minimize
+             . avoidStruts . boringWindows
              $ toggleLayouts expand normal
   where
-    tall   = smartBorders . spacing $ ResizableTall 1 (3/100) (1/2) []
-    mirror = smartBorders . spacing $ Mirror (ResizableTall 1 (3/100) (1/2) [])
-    float  = smartBorders simplestFloat
-    three  = smartBorders . spacing $ ThreeColMid 1 (3/100) (1/2)
-    grid   = smartBorders . spacing $ Grid
-    circle = smartBorders Circle
-    full   = noBorders Full
+    tall   = minimize . smartBorders . spacing
+           $ ResizableTall 1 (3/100) (1/2) []
+    mirror = minimize . smartBorders . spacing
+           $ Mirror (ResizableTall 1 (3/100) (1/2) [])
+    float  = minimize . smartBorders
+           $ simplestFloat
+    three  = minimize . smartBorders . spacing
+           $ ThreeColMid 1 (3/100) (1/2)
+    grid   = minimize . smartBorders . spacing
+           $ Grid
+    circle = minimize . smartBorders
+           $ Circle
+    full   = minimize . noBorders
+           $ Full
 
     normal = rename "Tall"   tall
          ||| rename "Mirror" mirror
