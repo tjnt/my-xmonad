@@ -666,7 +666,8 @@ myXMobar = statusBarProp "xmobar"
 
 -- main
 
-myConfig = ewmhFullscreen . ewmh . docks $ def
+main :: IO ()
+main = xmonad . ewmhFullscreen . ewmh . withSB myXMobar . docks $ def
     { modMask = mod4Mask
     , terminal = "termite"
     , workspaces = map show [1..5]
@@ -681,6 +682,3 @@ myConfig = ewmhFullscreen . ewmh . docks $ def
     , mouseBindings = myMouseBindings
     }
     `additionalKeysP` myKeys
-
-main :: IO ()
-main = xmonad . withSB myXMobar $ myConfig
