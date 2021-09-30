@@ -227,14 +227,12 @@ volumeDown target =
 
 wifiToggle :: X ()
 wifiToggle = do
-    spawnAndWait "wifi toggle"
-    w <- (!!2) . words <$> spawnWithOutput "wifi"
+    w <- (!!2) . words <$> spawnWithOutput "wifi toggle"
     dunstifyLow ("wifi turn " <> w) ""
 
 boluetoothToggle :: X ()
 boluetoothToggle = do
-    spawnAndWait "bluetooth toggle"
-    w <- (!!2) . words <$> spawnWithOutput "bluetooth"
+    w <- (!!2) . words <$> spawnWithOutput "bluetooth toggle"
     dunstifyLow ("bluetooth turn " <> w) ""
 
 clipboardHistory :: String -> X()
