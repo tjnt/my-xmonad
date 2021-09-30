@@ -70,7 +70,9 @@ import           XMonad.Actions.Minimize             (maximizeWindowAndFocus,
                                                       withLastMinimized)
 import           XMonad.Actions.Promote              (promote)
 import           XMonad.Actions.SinkAll              (sinkAll)
-import           XMonad.Actions.SpawnOn              (manageSpawn, spawnHere)
+import           XMonad.Actions.SpawnOn              (manageSpawn,
+                                                      shellPromptHere,
+                                                      spawnHere)
 import           XMonad.Actions.TiledWindowDragging  (dragWindow)
 import           XMonad.Actions.TreeSelect           (TSConfig (..),
                                                       TSNode (..), cancel,
@@ -126,7 +128,6 @@ import           XMonad.Prompt                       (XPConfig, XPPosition (..),
                                                       fgColor, font, height,
                                                       position,
                                                       promptBorderWidth)
-import           XMonad.Prompt.Shell                 (shellPrompt)
 import qualified XMonad.StackSet                     as W
 import           XMonad.Util.Cursor                  (setDefaultCursor)
 import           XMonad.Util.EZConfig                (additionalKeysP)
@@ -365,7 +366,7 @@ myKeys =
     , ("M-C-<Return>",    spawnTerminalAndDo doCenterFloat "--exec=tmux")
     , ("M-C-S-<Return>",  spawnTerminalAndDo doCenterFloat "")
       -- shell prompt
-    , ("M-S-p",           shellPrompt myXPConfig)
+    , ("M-S-p",           shellPromptHere myXPConfig)
       -- tree select
     , ("M-o",             myTreeSelectAction)
       -- clipboard history
