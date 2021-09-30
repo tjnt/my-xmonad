@@ -84,7 +84,7 @@ config =
                 , "--used-icon-pattern", xmobarFont 1 "\xf85a"
                 ] 10
             , Run $ MultiCoreTemp
-                [ "--template", xmobarFont 1 "<avgbar>" <> "<avg> ℃"
+                [ "--template", xmobarFont 1 "<avgbar>" <> "<avg>℃"
                 , "--bfore",    "\xf2cb\xf2cb\xf2ca\xf2ca\xf2c9\xf2c9\xf2c8\xf2c8\xf2c7\xf2c7"
                 , "--bwidth",   "0"
                 , "--Low",      "40"
