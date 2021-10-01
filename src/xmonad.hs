@@ -523,6 +523,7 @@ myManageHook =
     <+> manageSpawn
     <+> composeAll
         [ className =? "Xmessage"    --> doFloat
+        , className =? "mpv"         --> doFloat
         , className =? "MPlayer"     --> doFloat
         , className =? "mplayer2"    --> doFloat
         , className =? "Pavucontrol" --> doFloat
