@@ -99,7 +99,7 @@ config =
                 , "--High",     "1024000"
                 , "--normal",   base03
                 , "--high",     base01
-                , "--width",    "4"
+                , "--width",    "5"
                 , "--"
                 , "--rx-icon-pattern", xmobarFont 1 "\xf6d9"
                 , "--tx-icon-pattern", xmobarFont 1 "\xfa51"
