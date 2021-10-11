@@ -345,6 +345,7 @@ myScratchpads :: NamedScratchpads
 myScratchpads =
     [ NS "ytop" (termcmd "ytop" "ytop") (title =? "ytop") defaultFloating
     , NS "pulsemixer" (termcmd "pulsemixer" "pulsemixer") (title =? "pulsemixer") defaultFloating
+    , NS "qalculate" "qalculate-gtk" (className =? "Qalculate-gtk") defaultFloating
     , NS "terminal" "termite --title scratch-terminal" (title =? "scratch-terminal") defaultFloating
     ]
   where
@@ -435,9 +436,10 @@ myKeys =
     , ("M-<F4>",          spawnHere "firefox -private-window")
     , ("M-<F5>",          spawnHere "thunderbird")
     , ("M-<F8>",          spawnTerminal "--exec ranger")
-    , ("M-<F9>",          spawnTerminalOrClose "--exec htop --title htop" (title =? "htop"))
-    , ("M-<F10>",         spawnTerminalOrClose "--exec ytop --title ytop" (title =? "ytop"))
-    , ("M-<F11>",         namedScratchpadAction myScratchpads "pulsemixer")
+    , ("M-<F9>",          spawnTerminalOrClose "--exec ytop --title ytop" (title =? "ytop"))
+    , ("M-S-<F9>",        spawnTerminalOrClose "--exec htop --title htop" (title =? "htop"))
+    , ("M-<F10>",         namedScratchpadAction myScratchpads "pulsemixer")
+    , ("M-<F11>",         namedScratchpadAction myScratchpads "qalculate")
     , ("M-<F12>",         namedScratchpadAction myScratchpads "terminal")
       -- screenshot
     , ("<Print>",                   captureScreen)
@@ -528,6 +530,7 @@ myManageHook =
         , className =? "mplayer2"    --> doFloat
         , className =? "Pavucontrol" --> doFloat
         , className =? "Peek"        --> doFloat
+        , className =? "Qalculate-gtk" --> doFloat
         , className =? "Firefox" <&&> resource =? "Toolkit" --> doFloat
         , title =? "htop"            --> doFullFloat
         , title =? "ytop"            --> doRectFloat (W.RationalRect 0 0 0.5 0.6)
