@@ -343,10 +343,10 @@ myTreeSelectAction = do
 
 myScratchpads :: NamedScratchpads
 myScratchpads =
-    [ NS "ytop" (termcmd "ytop" "ytop") (title =? "ytop") defaultFloating
-    , NS "pulsemixer" (termcmd "pulsemixer" "pulsemixer") (title =? "pulsemixer") defaultFloating
-    , NS "qalculate" "qalculate-gtk" (className =? "Qalculate-gtk") defaultFloating
+    [ NS "pulsemixer" (termcmd "pulsemixer" "pulsemixer") (title =? "pulsemixer") defaultFloating
     , NS "terminal" "termite --title scratch-terminal" (title =? "scratch-terminal") defaultFloating
+    , NS "qalculate" "qalculate-gtk" (className =? "Qalculate-gtk") defaultFloating
+    -- , NS "ytop" (termcmd "ytop" "ytop") (title =? "ytop") defaultFloating
     ]
   where
     termcmd c t = printf "termite --exec %s --title %s" c t
@@ -439,7 +439,8 @@ myKeys =
     , ("M-<F9>",          spawnTerminalOrClose "--exec ytop --title ytop" (title =? "ytop"))
     , ("M-S-<F9>",        spawnTerminalOrClose "--exec htop --title htop" (title =? "htop"))
     , ("M-<F10>",         namedScratchpadAction myScratchpads "pulsemixer")
-    , ("M-<F11>",         namedScratchpadAction myScratchpads "qalculate")
+    , ("M-<F11>",         spawnTerminalOrClose "--exec hcalc" (title =? "hcalc"))
+    , ("M-S-<F11>",       namedScratchpadAction myScratchpads "qalculate")
     , ("M-<F12>",         namedScratchpadAction myScratchpads "terminal")
       -- screenshot
     , ("<Print>",                   captureScreen)
@@ -537,6 +538,7 @@ myManageHook =
         , title =? "pulsemixer"      --> doRectFloat (W.RationalRect 0 0 0.5 0.4)
         , title =? "scratch-terminal"--> doRectFloat (W.RationalRect 0 0 1.0 0.4)
         , title =? "clipboard"       --> doRectFloat (W.RationalRect 0 0 0.4 1.0)
+        , title =? "hcalc"           --> doRectFloat (W.RationalRect 0 0 0.4 0.4)
         , title =? "nmtui"           --> doFloat
         , title =? "nmtui-edit"      --> doFloat
         , title =? "nmtui-connect"   --> doFloat
