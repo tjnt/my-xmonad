@@ -19,16 +19,12 @@ packages:
   original:
     hackage: xmonad-contrib-0.17.0
 - completed:
-    name: xmobar
-    version: '0.40'
-    git: https://github.com/jaor/xmobar.git
+    hackage: xmobar-0.41@sha256:ff09056df9932affa170ebac46daf826ef811833402838198da78562f2470c35,14139
     pantry-tree:
-      size: 7776
-      sha256: 2ca50fa8885dcc9efcc7a826d5b201095a7a5728d5dccd4cf473d38a26537313
-    commit: 6525d5102ef3e1649bc71d29734bbae93cc8c1b7
+      size: 8558
+      sha256: 2fc57ba20380cfd8f07722f2457e0773020caa2023bae02550b664380168d40e
   original:
-    git: https://github.com/jaor/xmobar.git
-    commit: 6525d5102ef3e1649bc71d29734bbae93cc8c1b7
+    hackage: xmobar-0.41
 - completed:
     hackage: netlink-1.1.1.0@sha256:d83424b5ba9921191449e4b1f53c7cba7f4375f2c55a9b737c77e982e1f40d00,3689
     pantry-tree:
