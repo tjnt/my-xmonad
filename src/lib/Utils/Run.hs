@@ -11,7 +11,7 @@ module Utils.Run
     ) where
 
 import           Control.Exception       (catch)
-import           Control.Monad           (void, when)
+import           Control.Monad           (guard, void, when)
 import           Data.Functor            ((<&>))
 import qualified Data.List               as L
 import           GHC.IO.Exception        (IOException)
@@ -29,7 +29,7 @@ spawnWithOutput :: String -> X String
 spawnWithOutput cmd = io $ do
     (hin, hout, herr, _) <- runInteractiveCommand cmd
     out <- hGetContents hout
-    when (out == out) $ return () -- wait for exit
+    guard (out == out) -- wait for exit
     hClose hin >> hClose hout >> hClose herr
     return out
 

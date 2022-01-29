@@ -1,6 +1,6 @@
 module Theme.Xresources (xprop) where
 
-import           Control.Monad    (when)
+import           Control.Monad    (guard)
 import           Data.Bifunctor   (bimap)
 import           Data.Char        (isSpace)
 import           Data.List        (dropWhileEnd, elemIndex, find)
@@ -13,7 +13,7 @@ unsafeRunProcessWithInput :: FilePath -> [String] -> String
 unsafeRunProcessWithInput cmd args = unsafeDupablePerformIO $ do
     (hin, hout, herr, _) <- runInteractiveProcess cmd args Nothing Nothing
     out <- hGetContents hout
-    when (out == out) $ return () -- wait for exit
+    guard (out == out) -- wait for exit
     hClose hin >> hClose hout >> hClose herr
     return out
 
