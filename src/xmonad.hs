@@ -24,7 +24,7 @@ import           Utils.Dunst                         (dunstCloseAll,
                                                       dunstRestart,
                                                       dunstifyIndicator,
                                                       dunstifyLow)
-import           Utils.Run                           (spawnAndWait,
+import           Utils.Run                           (spawnAndWait, spawnIfDown,
                                                       spawnTerminal,
                                                       spawnTerminalAndDo,
                                                       spawnTerminalOrClose,
@@ -582,16 +582,16 @@ myEventHook = handleEventHook def
 myStartupHook :: X ()
 myStartupHook = do
     setDefaultCursor xC_left_ptr
-    spawnOnce "compton -b"
-    spawnOnce "dunst"
-    spawnOnce $ printf
+    spawnIfDown "compton -b"
+    spawnIfDown "dunst"
+    spawnIfDown $ printf
               "trayer --edge top --align right --widthtype request --height 31 \
                \--expand true --transparent true --alpha 0 --tint 0x%s \
                \--SetDockType true --SetPartialStrut true" $ tail basebg
     spawnOnce "feh --randomize --bg-fill $HOME/.wallpaper/*"
-    spawnOnce "xbindkeys"
-    spawnOnce "dropbox start"
-    spawnOnce "clipd"
+    spawnIfDown "xbindkeys"
+    spawnIfDown "dropbox start"
+    spawnIfDown "clipd"
     -- spawnOnce "nm-tray"
     -- spawnOnce "pnmixer"
     -- spawnOnce "blueman-applet"
