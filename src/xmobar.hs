@@ -154,25 +154,23 @@ config =
 wifiIcon :: IO String
 wifiIcon = do
     stdout <- trim <$> readProcess "wifi" [] ""
-    return . xmobarFont 1
-           $ if isSubsequenceOf "on" stdout
-                then xmobarColor base02 "" "\xfaa8"
-                else "\xfaa9"
+    let icon | isSubsequenceOf "on" stdout = xmobarColor base02 "" "\xfaa8"
+             | otherwise = "\xfaa9"
+    return $ xmobarFont 1 icon
 
 bluetoothIcon :: IO String
 bluetoothIcon = do
     stdout <- trim <$> readProcess "bluetooth" [] ""
-    return . xmobarFont 1
-           $ if isSubsequenceOf "on" stdout
-                then xmobarColor base0C "" "\xf5ae"
-                else "\xf5b1"
+    let icon | isSubsequenceOf "on" stdout = xmobarColor base0C "" "\xf5ae"
+             | otherwise = "\xf5b1"
+    return $ xmobarFont 1 icon
 
 data DeviceInfo = DeviceInfo
     { devConnected :: Bool
     , devName      :: String
     , devIcon      :: String
     }
-  deriving (Show)
+  deriving (Eq, Show)
 
 deviceIcons :: IO String
 deviceIcons = do
@@ -190,7 +188,7 @@ deviceIcons = do
         unless conn $ (MaybeT . return) Nothing
         name <- dbusTrimValue <$> MaybeT (readProcess' "dbus-send" (dbusArgs addr "Name") "")
         icon <- dbusTrimValue <$> MaybeT (readProcess' "dbus-send" (dbusArgs addr "Icon") "")
-        return $ DeviceInfo { devConnected = conn, devName = name, devIcon = icon }
+        return DeviceInfo { devConnected = conn, devName = name, devIcon = icon }
       where
         dbusArgs s p =
             [ "--print-reply=literal"
@@ -201,7 +199,7 @@ deviceIcons = do
             , "string:org.bluez.Device1"
             , "string:" <> p
             ]
-        dbusTrimValue s = unwords . tail . words $ s
+        dbusTrimValue = unwords . tail . words
 
     convertIcon dev = xmobarFont 1 . fromMaybe "\xf128"
                     $ msum [ devName dev `M.lookup` deviceIconMap1
@@ -225,16 +223,15 @@ deviceIcons = do
 dunstNotifyCount :: IO String
 dunstNotifyCount = do
     stdout <- trim <$> readProcess "dunstctl" ["count", "history"] ""
-    let icon = xmobarFont 1
-                $ case stdout of
-                    ""  -> xmobarColor base01 "" "\xf861"
-                    "0" -> "\xf860"
-                    _   -> xmobarColor base02 "" "\xf868"
-    return $ printf "%s %s" icon stdout
+    let icon = case stdout of
+                   ""  -> xmobarColor base01 "" "\xf861"
+                   "0" -> "\xf860"
+                   _   -> xmobarColor base02 "" "\xf868"
+    return $ printf "%s %s" (xmobarFont 1 icon) stdout
 
 runTerminal :: String -> String -> String -> String -> String
-runTerminal cmd title = xmobarAction
-                 $ "termite --exec " <> wrap "\"" "\"" cmd
+runTerminal cmd title =
+    xmobarAction $ "termite --exec " <> wrap "\"" "\"" cmd
                  <> if null title then "" else " --title " <> title
 
 homeDir :: String
