@@ -5,12 +5,14 @@ module Utils.Run
     , spawnTerminalAndDo
     , spawnOrClose
     , spawnTerminalOrClose
+    , spawnIfDown
     , readProcess
     , readProcess'
     ) where
 
 import           Control.Exception       (catch)
 import           Control.Monad           (void, when)
+import           Data.Functor            ((<&>))
 import qualified Data.List               as L
 import           GHC.IO.Exception        (IOException)
 import           System.IO               (hClose, hGetContents)
@@ -21,6 +23,7 @@ import           XMonad                  (ManageHook, Query, X, ask, asks,
 import           XMonad.Actions.SpawnOn  (spawnAndDo)
 import           XMonad.Actions.WindowGo (ifWindow)
 import qualified XMonad.StackSet         as W
+import           XMonad.Util.Run         (runProcessWithInput)
 
 spawnWithOutput :: String -> X String
 spawnWithOutput cmd = io $ do
@@ -63,8 +66,14 @@ spawnOrClose = closeMaybe . spawn
 spawnTerminalOrClose :: String -> Query Bool -> X ()
 spawnTerminalOrClose = closeMaybe . spawnTerminal
 
+spawnIfDown :: String -> X ()
+spawnIfDown cmd = io $ pidof (head $ words cmd) >>= \ps -> when (null ps) $ spawn cmd
+
 readProcess' :: FilePath -> [String] -> String -> IO (Maybe String)
-readProcess' path args input = (Just <$> readProcess path args input) `catch` handler
-  where
-    handler :: IOException -> IO (Maybe String)
-    handler _ = return Nothing
+readProcess' path args input = (Just <$> readProcess path args input) `catch` econst Nothing
+
+pidof :: FilePath -> IO [Int]
+pidof x = (runProcessWithInput "pidof" [x] [] <&> (map read . words)) `catch` econst []
+
+econst :: Monad m => a -> IOException -> m a
+econst = const . return
