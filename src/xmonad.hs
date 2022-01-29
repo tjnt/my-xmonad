@@ -197,7 +197,7 @@ notifyVolumeChange target = do
         <$> spawnWithOutput (printf "amixer get %s" target)
     when (length w == 6) $
         let (v, t) = (trimVol (w!!4), trimMut (w!!5))
-            msg = printf "%s volume%s" target (bool " [mute]" "" (t=="on"))
+            msg = printf "%s volume%s" target $ bool " [mute]" "" (t=="on")
          in dunstifyIndicator v msg ""
   where
     trimVol = takeWhile (/='%') . tail
@@ -263,18 +263,16 @@ myXPConfig = def
 
 applicationMenu :: IO (Tree (TSNode (X ())))
 applicationMenu = Node (TSNode "Application Menu" "Open application menu" (return ()))
-                . convert . construct template <$> readDescktopEntrys
+                . convert . construct <$> readDescktopEntrys
   where
     categories = [ "WebBrowser", "AudioVideo", "Office", "Utility"
                  , "System", "Settings", "Other"
                  ]
-    template = M.fromList $ map (,[]) categories
-    construct m []     = m
-    construct m (e:es) =
-        let ks = maybe [] (`intersect` M.keys template) $ desktopEntryCategories e
-            k = if null ks then "Other" else head ks
-            m' = M.insertWith (\a b -> head a:b) k [e] m
-         in construct m' es
+    construct []     = M.empty
+    construct (e:es) =
+        let ks = maybe [] (`intersect` categories) $ desktopEntryCategories e
+            k = bool (head ks) "Other" (null ks)
+         in M.insertWith (\a b -> head a:b) k [e] $ construct es
     convert m = map mkCategoryNode categories
       where
         mkCategoryNode cate =
@@ -651,8 +649,7 @@ myXMobar = statusBarProp "xmobar"
     iconsFmtReplace' :: String -> ([String] -> String)
                      -> WorkspaceId -> [String] -> String
     iconsFmtReplace' s cat ws is =
-        clickable ws $ case is of [] -> s
-                                  _  -> cat is
+        clickable ws $ bool (cat is) s (null is)
       where
         clickable n = xmobarAction ("xmonadctl view-workspace-" <> n) "1"
 
