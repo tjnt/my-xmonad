@@ -19,12 +19,12 @@ packages:
   original:
     hackage: xmonad-contrib-0.17.0
 - completed:
-    hackage: xmobar-0.41@sha256:ff09056df9932affa170ebac46daf826ef811833402838198da78562f2470c35,14139
+    hackage: xmobar-0.43@sha256:140378e5a03f684e854881963f1e40ac6b9640a495f4f5c22460635fc0a593a1,14899
     pantry-tree:
-      size: 8558
-      sha256: 2fc57ba20380cfd8f07722f2457e0773020caa2023bae02550b664380168d40e
+      size: 9344
+      sha256: 9bc0db9a6b4455c7b11d1418b7843410d74348d380f7d85f55db2bc155edf5cb
   original:
-    hackage: xmobar-0.41
+    hackage: xmobar-0.43
 - completed:
     hackage: netlink-1.1.1.0@sha256:d83424b5ba9921191449e4b1f53c7cba7f4375f2c55a9b737c77e982e1f40d00,3689
     pantry-tree:
@@ -32,13 +32,6 @@ packages:
       sha256: 42a57a2db0d8b44e04a04905ed56994b7293d2f244595bf3e65480c36d114ac3
   original:
     hackage: netlink-1.1.1.0
-- completed:
-    hackage: libmpd-0.9.2.0@sha256:b514fe25cb131a8a563f1162524358b374c8ce7dde0de073f8a6849496fbe8c8,4010
-    pantry-tree:
-      size: 3772
-      sha256: 4af2758d0bd5fb52612d76b154bb4f5a2bae36fd2a668fca8d227041f600f477
-  original:
-    hackage: libmpd-0.9.2.0
 snapshots:
 - completed:
     size: 587819
