@@ -246,6 +246,11 @@ captureScreen = spawn $
     <> "-e 'dunstify -a xmonad -u low -h int:transient:1 \"saved capture\" \"$f\" ;"
     <> "feh --title screen-capture \"$f\" &'"
 
+-- layout cycle
+
+myLayoutsCycle :: [String]
+myLayoutsCycle = ["Tall", "Mirror", "Float"]
+
 -- shell prompt
 
 myXPConfig :: XPConfig
@@ -400,7 +405,7 @@ myKeys =
     , ("M-S-d",           shiftTo Next nonNSP)
     , ("M-S-s",           shiftTo Prev nonNSP)
       -- cycle specific layout
-    , ("M-<Space>",       cycleThroughLayouts ["Tall", "Mirror", "Float"])
+    , ("M-<Space>",       cycleThroughLayouts myLayoutsCycle)
       -- direct layout switch
     , ("M-6",             sendMessage $ JumpToLayout "Tall")
     , ("M-7",             sendMessage $ JumpToLayout "Mirror")
@@ -559,6 +564,8 @@ myServerModeHook = return
     , ("volume-capture-down",   volumeDown    "Capture")
     , ("wifi-toggle",           wifiToggle)
     , ("bluetooth-toggle",      boluetoothToggle)
+    , ("next-layout",           cycleThroughLayouts myLayoutsCycle)
+    , ("prev-layout",           cycleThroughLayouts (reverse myLayoutsCycle))
     ]
     <> workspaceCommands
   where
@@ -606,7 +613,9 @@ myPP = xmobarPP
     , ppHidden          = xmobarColor base06 basebg
     , ppHiddenNoWindows = xmobarColor base06 basebg
     , ppTitle           = xmobarColor base04 basebg
-    , ppLayout          = fromMaybe "" . (layoutIcons M.!?)
+    , ppLayout          = xmobarAction "xmonadctl next-layout" "1"
+                        . xmobarAction "xmonadctl prev-layout" "3"
+                        . fromMaybe "？" . (layoutIcons M.!?)
     , ppOutput          = putStrLn
     , ppWsSep           = " "
     , ppSep             = "  "
