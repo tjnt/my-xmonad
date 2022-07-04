@@ -233,8 +233,8 @@ wifiToggle = do
     w <- (!!2) . words <$> spawnWithOutput "wifi toggle"
     dunstifyLow ("wifi turn " <> w) ""
 
-boluetoothToggle :: X ()
-boluetoothToggle = do
+bluetoothToggle :: X ()
+bluetoothToggle = do
     w <- (!!2) . words <$> spawnWithOutput "bluetooth toggle"
     dunstifyLow ("bluetooth turn " <> w) ""
 
@@ -465,7 +465,7 @@ myKeys =
       -- toggle wifi
     , ("<XF86WLAN>",                wifiToggle)
       -- toggle bluetooth
-    , ("<XF86Bluetooth>",           boluetoothToggle)
+    , ("<XF86Bluetooth>",           bluetoothToggle)
     ]
   where
     convert :: (Integral a, Num b) => (a,a) -> (b,b)
@@ -566,7 +566,7 @@ myServerModeHook = return
     , ("volume-capture-up",     volumeUp      "Capture")
     , ("volume-capture-down",   volumeDown    "Capture")
     , ("wifi-toggle",           wifiToggle)
-    , ("bluetooth-toggle",      boluetoothToggle)
+    , ("bluetooth-toggle",      bluetoothToggle)
     , ("next-layout",           cycleThroughLayouts myLayoutsCycle)
     , ("prev-layout",           cycleThroughLayouts (reverse myLayoutsCycle))
     , ("toggle-insert-mode",    toggleInsertMode)
