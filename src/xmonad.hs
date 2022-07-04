@@ -156,6 +156,9 @@ toggleFloat = withFocused $ \win -> do
        then withFocused $ windows . W.sink
        else floatLocation win >>= windows . W.float win . snd
 
+toggleInsertMode :: X()
+toggleInsertMode = toggleHookAllNew "insertBelow" >> runLogHook
+
 brightnessCtrl :: Int -> X ()
 brightnessCtrl param = do
     maxV <- io $ read <$> readFile fileMax :: X Float
@@ -396,8 +399,8 @@ myKeys =
     , ("M-g",             centerFloat)
       -- toggle manage hook
     , ("M-b",             sendMessage ToggleStruts)
-      -- toggle manage hook
-    , ("M-v",             toggleHookAllNew "insertBelow" >> runLogHook)
+      -- toggle window insert mode
+    , ("M-v",             toggleInsertMode)
       -- cycle workspaces
     , ("M-a",             toggleWS)
     , ("M-d",             moveTo  Next nonNSP)
@@ -566,6 +569,7 @@ myServerModeHook = return
     , ("bluetooth-toggle",      boluetoothToggle)
     , ("next-layout",           cycleThroughLayouts myLayoutsCycle)
     , ("prev-layout",           cycleThroughLayouts (reverse myLayoutsCycle))
+    , ("toggle-insert-mode",    toggleInsertMode)
     ]
     <> workspaceCommands
   where
@@ -637,9 +641,10 @@ myPP = xmobarPP
       where
         icon = printf "<icon=%s/>"
 
-    extToggleHookPP = maybe (Just iconAbove) return
+    extToggleHookPP = fmap clickable . maybe (Just iconAbove) return
                   <$> willHookAllNewPP "insertBelow" (const iconBelow)
       where
+        clickable = xmobarAction "xmonadctl toggle-insert-mode" "1"
         iconAbove = xmobarFont 1 "\xfa53"
         iconBelow = xmobarFont 1 "\xfa54"
 
