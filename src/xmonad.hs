@@ -617,9 +617,7 @@ myPP = xmobarPP
     , ppHidden          = xmobarColor base06 basebg
     , ppHiddenNoWindows = xmobarColor base06 basebg
     , ppTitle           = xmobarColor base04 basebg
-    , ppLayout          = xmobarAction "xmonadctl next-layout" "1"
-                        . xmobarAction "xmonadctl prev-layout" "3"
-                        . fromMaybe "？" . (layoutIcons M.!?)
+    , ppLayout          = ppLayoutIcons
     , ppOutput          = putStrLn
     , ppWsSep           = " "
     , ppSep             = "  "
@@ -629,16 +627,19 @@ myPP = xmobarPP
     order (w:l:t:e:xs) = w:l:e:t:xs
     order xs           = xs
 
-    layoutIcons = M.fromList
-        [ ("Tall",   icon "layout-tall.xpm")
-        , ("Mirror", icon "layout-mirror.xpm")
-        , ("Float",  icon "layout-float.xpm")
-        , ("Three",  icon "layout-three.xpm")
-        , ("Grid",   icon "layout-grid.xpm")
-        , ("Circle", icon "layout-circle.xpm")
-        , ("Full",   icon "layout-full.xpm")
-        ]
+    ppLayoutIcons = clickable . fromMaybe "？" . (layoutIcons M.!?)
       where
+        clickable = xmobarAction "xmonadctl next-layout" "1"
+                  . xmobarAction "xmonadctl prev-layout" "3"
+        layoutIcons = M.fromList
+            [ ("Tall",   icon "layout-tall.xpm")
+            , ("Mirror", icon "layout-mirror.xpm")
+            , ("Float",  icon "layout-float.xpm")
+            , ("Three",  icon "layout-three.xpm")
+            , ("Grid",   icon "layout-grid.xpm")
+            , ("Circle", icon "layout-circle.xpm")
+            , ("Full",   icon "layout-full.xpm")
+            ]
         icon = printf "<icon=%s/>"
 
     extToggleHookPP = fmap clickable . maybe (Just iconAbove) return
