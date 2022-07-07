@@ -32,6 +32,7 @@ import           Utils.Run                           (spawnAndWait, spawnIfDown,
 import           Utils.XdgDesktopEntry
 import           XMonad                              (Button, Event,
                                                       Full (Full), KeyMask,
+                                                      KeySym, Layout,
                                                       ManageHook,
                                                       Mirror (Mirror), Query,
                                                       Window, WorkspaceId, X,
@@ -130,7 +131,7 @@ import           XMonad.Prompt                       (XPConfig, XPPosition (..),
                                                       promptBorderWidth)
 import qualified XMonad.StackSet                     as W
 import           XMonad.Util.Cursor                  (setDefaultCursor)
-import           XMonad.Util.EZConfig                (additionalKeysP)
+import           XMonad.Util.EZConfig                (mkKeymap)
 import           XMonad.Util.NamedScratchpad         (NamedScratchpad (NS),
                                                       NamedScratchpads,
                                                       defaultFloating,
@@ -359,8 +360,8 @@ myScratchpads =
 
 -- Key bindings
 
-myKeys :: [(String, X ())]
-myKeys =
+myKeys :: XConfig Layout -> M.Map (KeyMask, KeySym) (X ())
+myKeys conf = M.union (XMonad.keys def conf) . mkKeymap conf $
     [ -- focus (BoringWindows)
       ("M-j",             focusDown)
     , ("M-k",             focusUp)
@@ -696,6 +697,6 @@ main = xmonad . ewmhFullscreen . ewmh . withSB myXMobar . docks $ def
     , manageHook = myManageHook
     , handleEventHook = myEventHook
     , startupHook = myStartupHook
+    , keys = myKeys
     , mouseBindings = myMouseBindings
     }
-    `additionalKeysP` myKeys
