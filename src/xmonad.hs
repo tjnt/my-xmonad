@@ -74,6 +74,7 @@ import           XMonad.Actions.SinkAll              (sinkAll)
 import           XMonad.Actions.SpawnOn              (manageSpawn,
                                                       shellPromptHere,
                                                       spawnHere)
+import           XMonad.Actions.SwapWorkspaces       (swapWithCurrent)
 import           XMonad.Actions.TiledWindowDragging  (dragWindow)
 import           XMonad.Actions.TreeSelect           (TSConfig (..),
                                                       TSNode (..), cancel,
@@ -467,7 +468,9 @@ myKeys conf = M.union (XMonad.keys def conf) . mkKeymap conf $
     , ("<XF86WLAN>",                wifiToggle)
       -- toggle bluetooth
     , ("<XF86Bluetooth>",           bluetoothToggle)
-    ]
+    ] ++
+    -- swap workspaces
+    [ ("M-C-" ++ i, windows $ swapWithCurrent i) | i <- workspaces conf ]
   where
     convert :: (Integral a, Num b) => (a,a) -> (b,b)
     convert = bimap fromIntegral fromIntegral
