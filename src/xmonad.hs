@@ -1,6 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
-{-# LANGUAGE TupleSections #-}
 
 import           Control.Exception                   (catch)
 import           Control.Monad                       (when)
