@@ -60,8 +60,8 @@ import           XMonad                              (Button, Event,
                                                       (=?))
 import           XMonad.Actions.CopyWindow           (kill1)
 import           XMonad.Actions.CycleSelectedLayouts (cycleThroughLayouts)
-import           XMonad.Actions.CycleWS              (Direction1D (Next, Prev),
-                                                      WSType (WSIs), moveTo,
+import           XMonad.Actions.CycleWS              (WSType (WSIs),
+                                                      findWorkspace, moveTo,
                                                       shiftTo, toggleWS)
 import           XMonad.Actions.FlexibleResize       (mouseResizeWindow)
 import           XMonad.Actions.FloatKeys            (keysMoveWindow,
@@ -114,7 +114,6 @@ import           XMonad.Hooks.ToggleHook             (runLogHook, toggleHook,
 import           XMonad.Layout.BoringWindows         (boringWindows, focusDown,
                                                       focusMaster, focusUp)
 import           XMonad.Layout.Circle                (Circle (..))
-import           XMonad.Layout.Gaps                  (Direction2D (..))
 import           XMonad.Layout.Grid                  (Grid (Grid))
 import           XMonad.Layout.LayoutCombinators     (JumpToLayout (JumpToLayout),
                                                       (|||))
@@ -147,6 +146,9 @@ import           XMonad.Util.NamedScratchpad         (NamedScratchpad (NS),
                                                       namedScratchpadManageHook,
                                                       scratchpadWorkspaceTag)
 import           XMonad.Util.SpawnOnce               (spawnOnce)
+import           XMonad.Util.Types                   (Direction1D (Next, Prev),
+                                                      Direction2D (D, L, R, U))
+import           XMonad.Util.WorkspaceCompare        (getSortByIndex)
 
 -- Functions
 
@@ -164,6 +166,11 @@ toggleFloat = withFocused $ \win -> do
     if win `M.member` floats
        then withFocused $ windows . W.sink
        else floatLocation win >>= windows . W.float win . snd
+
+-- XMonad.Actions.SwapWorkspaces.swapTo
+-- extension add WSType parameter
+swapTo :: Direction1D -> WSType -> X ()
+swapTo dir t = findWorkspace getSortByIndex dir t 1 >>= windows . swapWithCurrent
 
 toggleInsertMode :: X()
 toggleInsertMode = toggleHookAllNew "insertBelow" >> runLogHook
@@ -480,11 +487,13 @@ keyBindings conf =
     ] ++
     category "additional workspace operation"
     [
-      ("M-a",    toggleWS,             "toggle previous workspace")
-    , ("M-d",    moveTo  Next nonNSP,  "move left workspace")
-    , ("M-s",    moveTo  Prev nonNSP,  "move right workspace")
+      ("M-a",    toggleWS,             "toggle to previously workspace")
+    , ("M-d",    moveTo  Next nonNSP,  "move to next workspace")
+    , ("M-s",    moveTo  Prev nonNSP,  "move to previous workspace")
     , ("M-S-d",  shiftTo Next nonNSP,  "shift to next workspace")
-    , ("M-S-s",  shiftTo Prev nonNSP,  "shift previous next workspace")
+    , ("M-S-s",  shiftTo Prev nonNSP,  "shift to previous workspace")
+    , ("M-C-d",  swapTo  Next nonNSP,  "swap to next workspace")
+    , ("M-C-s",  swapTo  Prev nonNSP,  "swap to previous workspace")
     ] ++
     category "toggle manage hook"
     [
