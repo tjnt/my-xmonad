@@ -15,6 +15,8 @@ import           Hooks.AvoidDocksFloat               (doFloat, doFullFloat,
                                                       doRectFloat)
 import           Numeric                             (showFFloat)
 import           System.Exit                         (exitSuccess)
+import           System.IO                           (hClose, hPutStr,
+                                                      openTempFile)
 import           Text.Printf                         (printf)
 import           Theme.Theme                         (base01, base04, base06,
                                                       base0C, basebg, basefg,
@@ -550,9 +552,11 @@ myKeys conf = keys conf
             $ addDescrKeys' ((modMask conf .|. shiftMask, xK_slash), showHelp) keyBindings conf
   where
     showHelp xs = addName "Show Keybindings" $ do
-        let fpath = "/tmp/xmonad-keyguide.txt"
-        io $ writeFile fpath . unlines $ showKm xs
-        spawnTerminal $ printf "--exec 'less %s'" fpath
+        path <- io $ do
+            (p, h) <- openTempFile "/tmp" "xmonad-keyguide.txt"
+            hPutStr h (unlines (showKm xs)) >> hClose h
+            return p
+        spawnTerminal $ printf "--exec 'sh -c \"less %s ; rm -f %s\"'" path path
 
 -- Mouse bindings
 
