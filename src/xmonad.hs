@@ -380,70 +380,60 @@ myScratchpads =
 keyBindings :: XConfig Layout -> [((KeyMask, KeySym), NamedAction)]
 keyBindings conf =
     category "launching terminal"
-    [
-      ("M-<Return>",     spawnTerminal "--exec tmux",                    "launch terminal")
+    [ ("M-<Return>",     spawnTerminal "--exec tmux",                    "launch terminal")
     , ("M-S-<Return>",   spawnTerminal "",                               "launch terminal without tmux")
     , ("M-C-<Return>",   spawnTerminalAndDo doCenterFloat "--exec=tmux", "launch terminal (float)")
     , ("M-C-S-<Return>", spawnTerminalAndDo doCenterFloat "",            "launch terminal without tmux (float)")
     ] ++
     category "launching extensions"
-    [
-      ("M-p",    shellPromptHere myXPConfig,  "launch shell prompt")
+    [ ("M-p",    shellPromptHere myXPConfig,  "launch shell prompt")
     , ("M-o",    myTreeSelectAction,          "launch tree select menu")
     , ("M-y",    clipboardHistory "sel",      "clipboard history")
     , ("M-S-y",  clipboardHistory "del",      "clipboard history (del)")
     ] ++
     category "close / full / minimize"
-    [
-      ("M-c",    kill1,                                    "close the focused window")
+    [ ("M-c",    kill1,                                    "close the focused window")
     , ("M-f",    sendMessage ToggleLayout,                 "toggle fullscreen")
     , ("M-z",    withFocused minimizeWindow,               "minimize focused window")
     , ("M-x",    withLastMinimized maximizeWindowAndFocus, "restore last minimized window")
     ] ++
     category "changing layouts"
-    [
-      ("M-<Space>",    cycleThroughLayouts myLayoutsCycle,  "next layout")
+    [ ("M-<Space>",    cycleThroughLayouts myLayoutsCycle,  "next layout")
     , ("M-S-<Space>",  setLayout $ layoutHook conf,         "reset the layout")
     , ("M-r",          refresh >> warpToWindow 0.5 0.5,     "refresh windows and warp pointer")
     ] ++
     category "direct jump to layout"
-    [
-      ("M-6",        sendMessage $ JumpToLayout "Tall",    "layout Tall")
+    [ ("M-6",        sendMessage $ JumpToLayout "Tall",    "layout Tall")
     , ("M-7",        sendMessage $ JumpToLayout "Mirror",  "layout Mirror")
     , ("M-8",        sendMessage $ JumpToLayout "Float",   "layout Float")
     , ("M-9",        sendMessage $ JumpToLayout "Three",   "layout Three")
     , ("M-0",        sendMessage $ JumpToLayout "Grid",    "layout Grid")
     ] ++
     category "move focus up or down the window stack"
-    [
-      ("M-j",        focusDown,    "focus down")
+    [ ("M-j",        focusDown,    "focus down")
     , ("M-k",        focusUp,      "focus up")
     , ("M-m",        focusMaster,  "focus the master")
     , ("M-<Tab>",    focusDown,    "focus down")
     , ("M-S-<Tab>",  focusUp,      "focus up")
     ] ++
     category "modifying the window order"
-    [
-      ("M-S-m",  promote,             "swap with the master")
+    [ ("M-S-m",  promote,             "swap with the master")
     , ("M-S-j",  windows W.swapDown,  "swap with the master")
     , ("M-S-k",  windows W.swapUp,    "swap with the master")
     ] ++
     category "resizing the master/slave ratio"
-    [
-      ("M-h",    sendMessage Shrink,        "shrink the master area")
+    [ ("M-h",    sendMessage Shrink,        "shrink the master area")
     , ("M-l",    sendMessage Expand,        "expand the master area")
     , ("M-n",    sendMessage MirrorShrink,  "shrink the slave area")
     , ("M-u",    sendMessage MirrorExpand,  "expand the slave area")
     ] ++
     category "floating layer support"
-    [
-      ("M-t",    toggleFloat,  "toggle float / sink the focused window")
+    [ ("M-t",    toggleFloat,  "toggle float / sink the focused window")
     , ("M-S-t",  sinkAll,      "sink all floating windows")
     , ("M-g",    centerFloat,  "float the focused window and move center")
     ] ++
     category "moving floating window by key"
-    [
-      ("M-<Up>",         withFocused $ keysMoveWindow'   (0,-10),        "move up")
+    [ ("M-<Up>",         withFocused $ keysMoveWindow'   (0,-10),        "move up")
     , ("M-<Down>",       withFocused $ keysMoveWindow'   (0,10),         "move down")
     , ("M-<Left>",       withFocused $ keysMoveWindow'   (-10,0),        "move left")
     , ("M-<Right>",      withFocused $ keysMoveWindow'   (10,0),         "move right")
@@ -461,18 +451,15 @@ keyBindings conf =
     , ("M-C-S-<Right>",  withFocused $ snapGrow          R Nothing,      "snap grow right")
     ] ++
     category "change the number of windows in the master area"
-    [
-      ("M-,",    sendMessage (IncMasterN 1),     "Increment the number of windows in the master area")
+    [ ("M-,",    sendMessage (IncMasterN 1),     "Increment the number of windows in the master area")
     , ("M-.",    sendMessage (IncMasterN (-1)),  "Deincrement the number of windows in the master area")
     ] ++
     category "quit, or restart"
-    [
-      ("M-q",    restartXmonad,   "restart xmonad")
+    [ ("M-q",    restartXmonad,   "restart xmonad")
     , ("M-S-q",  io exitSuccess,  "quit xmonad")
     ] ++
     category "switching workspaces"
-    [
-      (m ++ i,  windows $ f i,  d ++ i)
+    [ (m ++ i,  windows $ f i,  d ++ i)
     | i <- workspaces conf
     , (f, m, d) <- [ (W.greedyView,     "M-",    "switch to workspace ")
                    , (W.shift,          "M-S-",  "move client to workspace ")
@@ -480,16 +467,14 @@ keyBindings conf =
                    ]
     ] ++
     category "switching screens"
-    [
-      (m ++ k,  screenWorkspace sc >>= flip whenJust (windows . f),  d ++ show sc)
+    [ (m ++ k,  screenWorkspace sc >>= flip whenJust (windows . f),  d ++ show sc)
     | (k, sc) <- zip ["w", "e", "r"] [0..]
     , (f, m, d) <- [ (W.view,   "M-",    "switch to screen number ")
                    , (W.shift,  "M-S-",  "move client to screen number ")
                    ]
     ] ++
     category "additional workspace operation"
-    [
-      ("M-a",    toggleWS,             "toggle to previously workspace")
+    [ ("M-a",    toggleWS,             "toggle to previously workspace")
     , ("M-d",    moveTo  Next nonNSP,  "move to next workspace")
     , ("M-s",    moveTo  Prev nonNSP,  "move to previous workspace")
     , ("M-S-d",  shiftTo Next nonNSP,  "shift to next workspace")
@@ -498,19 +483,16 @@ keyBindings conf =
     , ("M-C-s",  swapTo  Prev nonNSP,  "swap to previous workspace")
     ] ++
     category "toggle manage hook"
-    [
-      ("M-b",    sendMessage ToggleStruts,  "toggle show / hide status bar")
+    [ ("M-b",    sendMessage ToggleStruts,  "toggle show / hide status bar")
     , ("M-v",    toggleInsertMode,          "toggle window insert mode")
     ] ++
     category "dunst operation"
-    [
-      ("M-[",    dunstCloseAll,    "close all dunst notification")
+    [ ("M-[",    dunstCloseAll,    "close all dunst notification")
     , ("M-S-[",  dunstRestart,     "clear all dunst notification (restart dunst)")
     , ("M-]",    dunstHistoryPop,  "show dunst notification from history")
     ] ++
     category "launch applications"
-    [
-      ("M-<F2>",     spawnHere "chromium",                 "chromium")
+    [ ("M-<F2>",     spawnHere "chromium",                 "chromium")
     , ("M-<F3>",     spawnHere "firefox",                  "firefox")
     , ("M-<F4>",     spawnHere "firefox -private-window",  "firefox (private)")
     , ("M-<F5>",     spawnHere "thunderbird",              "thunderbird")
@@ -523,8 +505,7 @@ keyBindings conf =
     , ("M-<F12>",    namedScratchpadAction myScratchpads "terminal",          "terminal (scratchpad)")
     ] ++
     category "special & multimedia keys"
-    [
-      ("<Print>",                   captureScreen,            "capture screenshot")
+    [ ("<Print>",                   captureScreen,            "capture screenshot")
     , ("<XF86AudioMute>",           volumeToggle  "Master",   "toggle master volume on / off")
     , ("<XF86AudioRaiseVolume>",    volumeUp      "Master",   "master volume up")
     , ("<XF86AudioLowerVolume>",    volumeDown    "Master",   "master volume down")
@@ -554,8 +535,7 @@ myKeys conf = keys conf
     showHelp xs = addName "Show Keybindings" $ do
         path <- io $ do
             (p, h) <- openTempFile "/tmp" "xmonad-keyguide.txt"
-            hPutStr h (unlines (showKm xs)) >> hClose h
-            return p
+            hPutStr h (unlines (showKm xs)) >> hClose h >> return p
         spawnTerminal $ printf "--exec 'sh -c \"less %s ; rm -f %s\"'" path path
 
 -- Mouse bindings
