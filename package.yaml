@@ -31,11 +31,11 @@ library:
   source-dirs: src/lib
   exposed-modules:
     - Theme.Theme
-    - Plugins.SimpleReader
     - Utils.XdgDesktopEntry
     - Utils.Run
     - Utils.Dunst
     - Hooks.AvoidDocksFloat
+    - Xmobar.Plugins.SimpleIOReader
   dependencies:
     - xmonad
     - xmobar

@@ -1,25 +1,25 @@
-import           Control.Monad             (msum, unless)
-import           Control.Monad.Trans.Maybe (MaybeT (MaybeT), runMaybeT)
-import           Data.Function             ((&))
-import           Data.List                 (isSubsequenceOf)
-import qualified Data.Map.Strict           as M
-import           Data.Maybe                (catMaybes, fromMaybe)
-import           Plugins.SimpleReader      (SimpleReader (SimpleReader))
-import           System.Environment        (getEnv)
-import           System.IO.Unsafe          (unsafeDupablePerformIO)
-import           Text.Printf               (printf)
-import           Theme.Theme               (base01, base02, base03, base07,
-                                            base0C, basebg, myFont)
-import           Utils.Run                 (readProcess, readProcess')
-import           XMonad.Hooks.StatusBar.PP (trim, wrap, xmobarAction,
-                                            xmobarColor, xmobarFont)
-import           Xmobar                    (Align (L), Command (Com),
-                                            Config (..), Date (Date),
-                                            Monitors (Battery, Brightness, Cpu, DynNetwork, Memory, MultiCoreTemp, Volume, Wireless),
-                                            Runnable (Run),
-                                            XMonadLog (UnsafeXMonadLog),
-                                            XPosition (TopSize), defaultConfig,
-                                            xmobar)
+import           Control.Monad                 (msum, unless)
+import           Control.Monad.Trans.Maybe     (MaybeT (MaybeT), runMaybeT)
+import           Data.Function                 ((&))
+import           Data.List                     (isSubsequenceOf)
+import qualified Data.Map.Strict               as M
+import           Data.Maybe                    (catMaybes, fromMaybe)
+import           System.Environment            (getEnv)
+import           System.IO.Unsafe              (unsafeDupablePerformIO)
+import           Text.Printf                   (printf)
+import           Theme.Theme                   (base01, base02, base03, base07,
+                                                base0C, basebg, myFont)
+import           Utils.Run                     (readProcess, readProcess')
+import           XMonad.Hooks.StatusBar.PP     (trim, wrap, xmobarAction,
+                                                xmobarColor, xmobarFont)
+import           Xmobar                        (Align (L), Command (Com),
+                                                Config (..), Date (Date),
+                                                Monitors (Battery, Brightness, Cpu, DynNetwork, Memory, MultiCoreTemp, Volume, Wireless),
+                                                Runnable (Run),
+                                                XMonadLog (UnsafeXMonadLog),
+                                                XPosition (TopSize),
+                                                defaultConfig, xmobar)
+import           Xmobar.Plugins.SimpleIOReader (SimpleIOReader (SimpleIOReader))
 
 config :: Config
 config =
@@ -123,13 +123,13 @@ config =
                 , "--onc",      base02
                 , "--offc",     base01
                 ] 20
-            , Run $ SimpleReader wifiIcon "wifi" 100
+            , Run $ SimpleIOReader wifiIcon "wifi" 100
             , Run $ Wireless "wlp3s0"
                 [ "--template", "<quality>%"
                 , "--width",    "3"
                 ] 10
-            , Run $ SimpleReader bluetoothIcon "bluetooth" 100
-            , Run $ SimpleReader deviceIcons "deviceicons" 100
+            , Run $ SimpleIOReader bluetoothIcon "bluetooth" 100
+            , Run $ SimpleIOReader deviceIcons "deviceicons" 100
             , Run $ Battery
                 [ "--template", "<acstatus>"
                 , "--bfore",    "\xf244\xf243\xf243\xf243\xf242\xf242\xf242\xf241\xf241\xf240"
@@ -145,7 +145,7 @@ config =
                 , "-O",         xmobarFont 1 "<leftbar> " <> "<left>% " <> xmobarFont 1 "\xf0e7 " <> "<watts>w"
                 , "-i",         xmobarFont 1 "\xf1e6 " <> "<left>%"
                 ] 100
-            , Run $ SimpleReader dunstNotifyCount "dunst" 50
+            , Run $ SimpleIOReader dunstNotifyCount "dunst" 50
             , Run $ Date "%m/%d %a %H:%M" "date" 100
             , Run $ Com (xmonadDir <> "/scripts/trayer-padding-icon.sh") [] "trayerpad" 100
             ]
