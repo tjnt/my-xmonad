@@ -467,8 +467,8 @@ keyBindings conf =
                    ]
     ] ++
     category "switching screens"
-    [ (m ++ k,  screenWorkspace sc >>= flip whenJust (windows . f),  d ++ show sc)
-    | (k, sc) <- zip ["w", "e", "r"] [0..]
+    [ (m ++ k,  screenWorkspace i >>= flip whenJust (windows . f),  d ++ show i)
+    | (k, i) <- zip ["w", "e"] [0..]
     , (f, m, d) <- [ (W.view,   "M-",    "switch to screen number ")
                    , (W.shift,  "M-S-",  "move client to screen number ")
                    ]
