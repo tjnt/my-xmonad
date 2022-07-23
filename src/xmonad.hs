@@ -544,14 +544,12 @@ myMouseBindings :: XConfig l -> M.Map (KeyMask, Button) (Window -> X ())
 myMouseBindings XConfig { modMask = modm } = M.fromList
     [ ((modm, button1), \w ->
             focus w >> mouseMoveWindow w >>
-            afterDrag (snapMagicMove (Just 50) (Just 50) w) >>
-            windows W.shiftMaster)
+            afterDrag (snapMagicMove (Just 50) (Just 50) w))
     , ((modm .|. shiftMask, button1), dragWindow)
     , ((modm, button2), windows . (W.shiftMaster .) . W.focusWindow)
     , ((modm, button3), \w ->
             focus w >> mouseResizeWindow w >>
-            afterDrag (snapMagicResize [R,D] (Just 50) (Just 50) w) >>
-            windows W.shiftMaster)
+            afterDrag (snapMagicResize [R,D] (Just 50) (Just 50) w))
     , ((modm, button4), \_ -> windows W.swapUp)
     , ((modm, button5), \_ -> windows W.swapDown)
     ]
