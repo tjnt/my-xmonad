@@ -56,7 +56,7 @@ config =
                                      . runTerminal "nmtui-connect" "" "3"
                 , "%bluetooth%" & (<> "%deviceicons%")
                                 . xmobarAction "xmonadctl bluetooth-toggle" "1"
-                                . xmobarAction "blueman-manager" "3"
+                                . runTerminal  "bluetooth-tui-exe" "" "3"
                 , "%dunst%" & xmobarAction "dunstctl history-pop" "1"
                             . xmobarAction "killall dunst ; dunst" "3"
                 , "%battery%"
