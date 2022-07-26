@@ -32,6 +32,17 @@ packages:
       sha256: 42a57a2db0d8b44e04a04905ed56994b7293d2f244595bf3e65480c36d114ac3
   original:
     hackage: netlink-1.1.1.0
+- completed:
+    name: dbus-bluetooth
+    version: 0.1.0.0
+    git: https://github.com/tjnt/dbus-bluetooth.git
+    pantry-tree:
+      size: 423
+      sha256: c4277351530e7929fb0ddb09d93c288c4cf83afb34027dc9f30091655e04f9cc
+    commit: b308e33d746d7baeec8b4f06645b86e33f1065f6
+  original:
+    git: https://github.com/tjnt/dbus-bluetooth.git
+    commit: b308e33d746d7baeec8b4f06645b86e33f1065f6
 snapshots:
 - completed:
     size: 590100

@@ -1,15 +1,17 @@
+import           Control.Exception             (SomeException, bracket, catch)
 import           Control.Monad                 (msum, unless)
-import           Control.Monad.Trans.Maybe     (MaybeT (MaybeT), runMaybeT)
 import           Data.Function                 ((&))
 import           Data.List                     (isSubsequenceOf)
 import qualified Data.Map.Strict               as M
-import           Data.Maybe                    (catMaybes, fromMaybe)
+import           Data.Maybe                    (fromMaybe, mapMaybe)
+import           Network.Bluetooth             (Device (..), closeClient,
+                                                devices, newClient)
 import           System.Environment            (getEnv)
 import           System.IO.Unsafe              (unsafeDupablePerformIO)
 import           Text.Printf                   (printf)
 import           Theme.Theme                   (base01, base02, base03, base07,
                                                 base0C, basebg, myFont)
-import           Utils.Run                     (readProcess, readProcess')
+import           Utils.Run                     (readProcess)
 import           XMonad.Hooks.StatusBar.PP     (trim, wrap, xmobarAction,
                                                 xmobarColor, xmobarFont)
 import           Xmobar                        (Align (L), Command (Com),
@@ -165,60 +167,35 @@ bluetoothIcon = do
              | otherwise = "\xf5b1"
     return $ xmobarFont 1 icon
 
-data DeviceInfo = DeviceInfo
-    { devConnected :: Bool
-    , devName      :: String
-    , devIcon      :: String
-    }
-  deriving (Eq, Show)
-
 deviceIcons :: IO String
 deviceIcons = do
-    devices <- map (replace ':' '_' . (!! 1) . words) . lines
-        <$> readProcess "bluetoothctl" ["paired-devices"] ""
-    res <- catMaybes <$> mapM getDeviceInfo devices
-    return . concatMap ((' ' :) . convertIcon) $ res
+    bracket newClient closeClient $ \client -> do
+        devs <- devices client
+        return . concatMap (' ' :) $ mapMaybe convertIcon devs
+    `catch` handler
   where
-    replace a b = map (\x -> if x == a then b else x)
-
-    getDeviceInfo :: String -> IO (Maybe DeviceInfo)
-    getDeviceInfo addr = runMaybeT $ do
-        conn <- ("true" `isSubsequenceOf`) <$>
-            MaybeT (readProcess' "dbus-send" (dbusArgs addr "Connected") "")
-        unless conn $ (MaybeT . return) Nothing
-        name <- dbusTrimValue <$> MaybeT (readProcess' "dbus-send" (dbusArgs addr "Name") "")
-        icon <- dbusTrimValue <$> MaybeT (readProcess' "dbus-send" (dbusArgs addr "Icon") "")
-        return DeviceInfo { devConnected = conn, devName = name, devIcon = icon }
-      where
-        dbusArgs s p =
-            [ "--print-reply=literal"
-            , "--system"
-            , "--dest=org.bluez"
-            , "/org/bluez/hci0/dev_" <> s
-            , "org.freedesktop.DBus.Properties.Get"
-            , "string:org.bluez.Device1"
-            , "string:" <> p
-            ]
-        dbusTrimValue = unwords . tail . words
-
-    convertIcon dev = xmobarFont 1 . fromMaybe "\xf128"
-                    $ msum [ devName dev `M.lookup` deviceIconMap1
-                           , devIcon dev `M.lookup` deviceIconMap2
-                           ]
-      where
-        deviceIconMap1 :: M.Map String String
-        deviceIconMap1 = M.fromList
-            [ ("HHKB-BT", "\xf812")
-            , ("AKG K371-BT", "\xf7ca")
-            , ("Bose Mini II SoundLink", "\xf9c2")
-            ]
-        deviceIconMap2 :: M.Map String String
-        deviceIconMap2 = M.fromList
-            [ ("audio-card", "\xf5af")
-            , ("input-mouse", "\xf87c")
-            , ("input-keyboard", "\xf80b")
-            , ("input-gaming", "\xf11b")
-            ]
+    convertIcon dev = do
+        conn <- devConnected dev
+        unless conn Nothing
+        name <- devName dev
+        icon <- devIcon dev
+        Just . xmobarFont 1 . fromMaybe "\xf128"
+            $ msum [ deviceIconMap1 M.!? name
+                   , deviceIconMap2 M.!? icon
+                   ]
+    deviceIconMap1 = M.fromList
+        [ ("HHKB-BT", "\xf812")
+        , ("AKG K371-BT", "\xf7ca")
+        , ("Bose Mini II SoundLink", "\xf9c2")
+        ]
+    deviceIconMap2 = M.fromList
+        [ ("audio-card", "\xf5af")
+        , ("input-mouse", "\xf87c")
+        , ("input-keyboard", "\xf80b")
+        , ("input-gaming", "\xf11b")
+        ]
+    handler :: SomeException -> IO String
+    handler _ = return "ERR"
 
 dunstNotifyCount :: IO String
 dunstNotifyCount = do
