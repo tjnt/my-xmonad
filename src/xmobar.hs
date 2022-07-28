@@ -74,7 +74,7 @@ config =
                 , "--width",    "3"
                 , "--"
                 , "--load-icon-pattern", xmobarFont 1 "\xfb19"
-                ] 10
+                ] 20
             , Run $ Memory
                 [ "--template", "<usedipat><usedratio>%"
                 , "--Low",      "40"
@@ -84,7 +84,7 @@ config =
                 , "--width",    "3"
                 , "--"
                 , "--used-icon-pattern", xmobarFont 1 "\xf85a"
-                ] 10
+                ] 20
             , Run $ MultiCoreTemp
                 [ "--template", xmobarFont 1 "<avgbar>" <> "<avg>℃"
                 , "--bfore",    "\xf2cb\xf2cb\xf2ca\xf2ca\xf2c9\xf2c9\xf2c8\xf2c8\xf2c7\xf2c7"
@@ -94,7 +94,7 @@ config =
                 , "--width",    "3"
                 -- , "--normal",   base03
                 -- , "--high",     base01
-                ] 50
+                ] 40
             , Run $ DynNetwork
                 [ "--template", "<rxipat><rx>kb  <txipat><tx>kb"
                 , "--Low",      "102400"
@@ -105,7 +105,7 @@ config =
                 , "--"
                 , "--rx-icon-pattern", xmobarFont 1 "\xf6d9"
                 , "--tx-icon-pattern", xmobarFont 1 "\xfa51"
-                ] 10
+                ] 20
             , Run $ Brightness
                 [ "--template", xmobarFont 1 "<bar>" <> "<percent>%"
                 , "--bfore",    "\xf5d9\xf5da\xf5db\xf5dc\xf5dd\xf5dd\xf5de\xf5de\xf5df\xf5df"
@@ -113,7 +113,7 @@ config =
                 , "--width",    "3"
                 , "--"
                 , "-D",         "intel_backlight"
-                ] 20
+                ] 40
             , Run $ Volume "default" "Master"
                 [ "--template", "<status><volume>%"
                 , "--bfore",    "\xfa7e\xfa7e\xfa7f\xfa7f\xfa7f\xfa7d\xfa7d\xfa7d\xf028\xf028"
@@ -124,12 +124,12 @@ config =
                 , "--off",      xmobarFont 1 "\xfa80"
                 , "--onc",      base02
                 , "--offc",     base01
-                ] 20
+                ] 40
             , Run $ SimpleIOReader wifiIcon "wifi" 100
             , Run $ Wireless "wlp3s0"
                 [ "--template", "<quality>%"
                 , "--width",    "3"
-                ] 10
+                ] 40
             , Run $ SimpleIOReader bluetoothIcon "bluetooth" 100
             , Run $ SimpleIOReader deviceIcons "deviceicons" 100
             , Run $ Battery
@@ -147,7 +147,7 @@ config =
                 , "-O",         xmobarFont 1 "<leftbar> " <> "<left>% " <> xmobarFont 1 "\xf0e7 " <> "<watts>w"
                 , "-i",         xmobarFont 1 "\xf1e6 " <> "<left>%"
                 ] 100
-            , Run $ SimpleIOReader dunstNotifyCount "dunst" 50
+            , Run $ SimpleIOReader dunstNotifyCount "dunst" 40
             , Run $ Date "%m/%d %a %H:%M" "date" 100
             , Run $ Com (xmonadDir <> "/scripts/trayer-padding-icon.sh") [] "trayerpad" 100
             ]
