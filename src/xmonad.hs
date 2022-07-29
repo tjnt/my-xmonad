@@ -5,7 +5,8 @@ import           Control.Exception                   (catch)
 import           Control.Monad                       (when)
 import           Data.Bifunctor                      (bimap)
 import           Data.Bool                           (bool)
-import           Data.List                           (intersect, sortOn)
+import           Data.List                           (intersect, isPrefixOf,
+                                                      sortOn)
 import qualified Data.Map                            as M
 import           Data.Maybe                          (fromMaybe, mapMaybe)
 import           Data.Monoid                         (All)
@@ -266,6 +267,11 @@ captureScreen = spawn $
     "scrot -s $(xdg-user-dir PICTURES)/%Y-%m-%d-%T-shot.png "
     <> "-e 'dunstify -a xmonad -u low -h int:transient:1 \"saved capture\" \"$f\" ;"
     <> "feh --title screen-capture \"$f\" &'"
+
+-- | modify XMonad.Hooks.ManageHelpers (^?)
+-- q ^? x. if the result of x 'isPrefixOf' q, return True
+(^?) :: (Eq a, Functor m) => m [a] -> [a] -> m Bool
+q ^? x = (x `isPrefixOf`) <$> q
 
 -- layout cycle
 
@@ -607,9 +613,7 @@ myManageHook =
         , title =? "scratch-terminal"--> doRectFloat (W.RationalRect 0 0 1.0 0.4)
         , title =? "clipboard"       --> doRectFloat (W.RationalRect 0 0 0.4 1.0)
         , title =? "hcalc"           --> doRectFloat (W.RationalRect 0 0 0.4 0.4)
-        , title =? "nmtui"           --> doFloat
-        , title =? "nmtui-edit"      --> doFloat
-        , title =? "nmtui-connect"   --> doFloat
+        , title ^? "nmtui"           --> doFloat
         , title =? "screen-capture"  --> doFloat
         , isFullscreen               --> doFullFloat
         , isDialog                   --> doFloat
@@ -735,7 +739,7 @@ myXMobar = statusBarProp "xmobar"
         [ className =? "Termite"     -?> appIconFont 2 "\xe795"
         , className =? "Firefox"     -?> appIconFont 2 "\xe745"
         , className =? "Chromium"    -?> appIconFont 2 "\xe743"
-        , className =? "thunderbird" -?> appIconFont 1 "\xf6ed"
+        , className ^? "thunderbird" -?> appIconFont 1 "\xf6ed"
         , className =? "Vieb"        -?> appIconFont 1 "\xe7c5"
         , className =? "Gvim"        -?> appIconFont 1 "\xe7c5"
         , pure True                  -?> appIconFont 1 "\xfc63"
