@@ -502,13 +502,14 @@ keyBindings conf =
     , ("M-<F3>",     spawnHere "firefox",                  "firefox")
     , ("M-<F4>",     spawnHere "firefox -private-window",  "firefox (private)")
     , ("M-<F5>",     spawnHere "thunderbird",              "thunderbird")
-    , ("M-<F8>",     spawnTerminal "--exec ranger",        "ranger")
-    , ("M-<F9>",     spawnTerminalOrClose "--exec ytop --title ytop" (title =? "ytop"), "ytop")
-    , ("M-S-<F9>",   spawnTerminalOrClose "--exec htop --title htop" (title =? "htop"), "htop")
-    , ("M-<F10>",    namedScratchpadAction myScratchpads "pulsemixer",        "pulsemixer")
-    , ("M-<F11>",    spawnTerminalOrClose "--exec hcalc" (title =? "hcalc"),  "hcalc")
-    , ("M-S-<F11>",  namedScratchpadAction myScratchpads "qalculate",         "qalculate")
-    , ("M-<F12>",    namedScratchpadAction myScratchpads "terminal",          "terminal (scratchpad)")
+    , ("M-<F7>",     spawnTerminalOrClose "--exec ytop --title ytop" (title =? "ytop"), "ytop")
+    , ("M-S-<F7>",   spawnTerminalOrClose "--exec htop --title htop" (title =? "htop"), "htop")
+    , ("M-<F8>",     spawnTerminalOrClose "--exec nmtui" (title ^? "nmtui"), "nmtui")
+    , ("M-<F9>",     namedScratchpadAction myScratchpads "pulsemixer", "pulsemixer")
+    , ("M-<F10>",    spawnTerminalOrClose "--exec bluetooth-tui" (title =? "bluetooth-tui"), "bluetooth-tui")
+    , ("M-<F11>",    spawnTerminalOrClose "--exec hcalc" (title =? "hcalc"), "hcalc")
+    , ("M-S-<F11>",  namedScratchpadAction myScratchpads "qalculate", "qalculate")
+    , ("M-<F12>",    namedScratchpadAction myScratchpads "terminal",  "terminal (scratchpad)")
     ] ++
     category "special & multimedia keys"
     [ ("<Print>",                   captureScreen,            "capture screenshot")
@@ -614,6 +615,7 @@ myManageHook =
         , title =? "clipboard"       --> doRectFloat (W.RationalRect 0 0 0.4 1.0)
         , title =? "hcalc"           --> doRectFloat (W.RationalRect 0 0 0.4 0.4)
         , title ^? "nmtui"           --> doFloat
+        , title =? "bluetooth-tui"   --> doFloat
         , title =? "screen-capture"  --> doFloat
         , isFullscreen               --> doFullFloat
         , isDialog                   --> doFloat
