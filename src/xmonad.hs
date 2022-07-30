@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 
 import           Control.Exception                   (catch)
-import           Control.Monad                       (when)
+import           Control.Monad                       (unless, when)
 import           Data.Bifunctor                      (bimap)
 import           Data.Bool                           (bool)
 import           Data.List                           (intersect, isPrefixOf,
@@ -56,6 +56,7 @@ import           XMonad                              (Button, Event,
                                                       shiftMask, spawn, title,
                                                       whenJust, windows,
                                                       windowset, withFocused,
+                                                      withWindowSet,
                                                       xC_left_ptr,
                                                       xK_bracketleft, xK_q,
                                                       xK_slash, xmonad, (-->),
@@ -73,9 +74,11 @@ import           XMonad.Actions.FloatSnap            (afterDrag, snapGrow,
                                                       snapMagicMove,
                                                       snapMagicResize, snapMove,
                                                       snapShrink)
-import           XMonad.Actions.Minimize             (maximizeWindowAndFocus,
+import           XMonad.Actions.Minimize             (maximizeWindow,
+                                                      maximizeWindowAndFocus,
                                                       minimizeWindow,
-                                                      withLastMinimized)
+                                                      withLastMinimized,
+                                                      withMinimized)
 import           XMonad.Actions.Promote              (promote)
 import           XMonad.Actions.SinkAll              (sinkAll)
 import           XMonad.Actions.SpawnOn              (manageSpawn,
@@ -136,6 +139,7 @@ import           XMonad.Prompt                       (XPConfig, XPPosition (..),
                                                       fgColor, font, height,
                                                       position,
                                                       promptBorderWidth)
+import           XMonad.Prompt.XMonad                (xmonadPromptCT)
 import qualified XMonad.StackSet                     as W
 import           XMonad.Util.Cursor                  (setDefaultCursor)
 import           XMonad.Util.EZConfig                (mkNamedKeymap)
@@ -148,6 +152,7 @@ import           XMonad.Util.NamedScratchpad         (NamedScratchpad (NS),
                                                       namedScratchpadAction,
                                                       namedScratchpadManageHook,
                                                       scratchpadWorkspaceTag)
+import           XMonad.Util.NamedWindows            (getName)
 import           XMonad.Util.SpawnOnce               (spawnOnce)
 import           XMonad.Util.Types                   (Direction1D (Next, Prev),
                                                       Direction2D (D, L, R, U))
@@ -169,6 +174,26 @@ toggleFloat = withFocused $ \win -> do
     if win `M.member` floats
        then withFocused $ windows . W.sink
        else floatLocation win >>= windows . W.float win . snd
+
+-- minimize window operation
+
+minimizeAllWindows :: X ()
+minimizeAllWindows = withWindowSet $ mapM_ minimizeWindow . W.index
+
+minimizeUnfocusedWindows :: X ()
+minimizeUnfocusedWindows = withFocused $ \w -> do
+    ws <- gets (W.index . windowset)
+    mapM_ minimizeWindow $ filter (/= w) ws
+
+restoreAllMinimized :: X ()
+restoreAllMinimized = withMinimized $ mapM_ maximizeWindow
+
+restoreSelectedMinimized :: X ()
+restoreSelectedMinimized = withMinimized $ \ws -> do
+    unless (null ws) $ do
+        ns <- mapM (fmap show . getName) ws
+        let cmds = zip ns $ map maximizeWindowAndFocus ws
+        xmonadPromptCT "select minimized" cmds myXPConfig
 
 -- XMonad.Actions.SwapWorkspaces.swapTo
 -- extension add WSType parameter
@@ -401,7 +426,11 @@ keyBindings conf =
     [ ("M-c",    kill1,                                    "close the focused window")
     , ("M-f",    sendMessage ToggleLayout,                 "toggle fullscreen")
     , ("M-z",    withFocused minimizeWindow,               "minimize focused window")
+    , ("M-S-z",  minimizeAllWindows,                       "minimize all windows")
+    , ("M-C-z",  minimizeUnfocusedWindows,                 "minimize windows expect focused")
     , ("M-x",    withLastMinimized maximizeWindowAndFocus, "restore last minimized window")
+    , ("M-S-x",  restoreAllMinimized,                      "restore all minimized window")
+    , ("M-C-x",  restoreSelectedMinimized,                 "restore selected minimized window")
     ] ++
     category "changing layouts"
     [ ("M-<Space>",    cycleThroughLayouts myLayoutsCycle,  "next layout")
