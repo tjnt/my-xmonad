@@ -48,7 +48,7 @@ import           XMonad                              (Button, Event,
                                                       config, controlMask, def,
                                                       directories,
                                                       floatLocation, focus,
-                                                      gets, io, mod4Mask,
+                                                      gets, io, kill, mod4Mask,
                                                       mouseMoveWindow,
                                                       noModMask, refresh,
                                                       resource, screenWorkspace,
@@ -62,7 +62,6 @@ import           XMonad                              (Button, Event,
                                                       xK_slash, xmonad, (-->),
                                                       (.|.), (<&&>), (<+>),
                                                       (=?))
-import           XMonad.Actions.CopyWindow           (kill1)
 import           XMonad.Actions.CycleSelectedLayouts (cycleThroughLayouts)
 import           XMonad.Actions.CycleWS              (WSType (WSIs),
                                                       findWorkspace, moveTo,
@@ -423,7 +422,7 @@ keyBindings conf =
     , ("M-S-y",  clipboardHistory "del",      "clipboard history (del)")
     ] ++
     category "close / full / minimize"
-    [ ("M-c",    kill1,                                    "close the focused window")
+    [ ("M-c",    kill,                                     "close the focused window")
     , ("M-f",    sendMessage ToggleLayout,                 "toggle fullscreen")
     , ("M-z",    withFocused minimizeWindow,               "minimize focused window")
     , ("M-S-z",  minimizeAllWindows,                       "minimize all windows")
