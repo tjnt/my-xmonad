@@ -211,16 +211,9 @@ brightnessCtrl param = do
 
 cycleMonitor :: (String, String) -> X ()
 cycleMonitor (primary, secondary) = do
-    x <- io $ (read <$> readFile file) `catch` handler :: X Int
-    let x' = succ x `rem` 4
-    io $ x' `seq` writeFile file $ show x'
-    spawn $ "xrandr " ++
-        case x' of
-            0 -> single
-            1 -> rightof
-            2 -> leftof
-            3 -> external
-            _ -> single
+    n <- (`rem` length mode) . succ <$> io ((read <$> readFile file) `catch` handler)
+    io $ n `seq` writeFile file $ show n
+    spawn $ "xrandr " ++ mode !! n
   where
     handler :: IOException -> IO Int
     handler _ = return 0
@@ -229,6 +222,7 @@ cycleMonitor (primary, secondary) = do
     rightof  = printf "--output %s --auto --output %s --auto --right-of %s" primary secondary primary
     leftof   = printf "--output %s --auto --output %s --auto --left-of %s" primary secondary primary
     external = printf "--output %s --off --output %s --auto" primary secondary
+    mode     = [single, rightof, leftof, external]
 
 notifyVolumeChange :: String -> X ()
 notifyVolumeChange target = do
