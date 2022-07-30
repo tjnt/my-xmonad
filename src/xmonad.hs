@@ -183,8 +183,9 @@ restoreSelectedMinimized :: X ()
 restoreSelectedMinimized = withMinimized $ \ws -> do
     unless (null ws) $ do
         ns <- mapM (fmap show . getName) ws
-        let cmds = zip ns $ map maximizeWindowAndFocus ws
-        xmonadPromptCT "select minimized" cmds myXPConfig
+        let ns' = zipWith (printf "%d:%s") [(0::Int)..] ns
+            cmds = zip ns' $ map maximizeWindowAndFocus ws
+         in xmonadPromptCT "select minimized" cmds myXPConfig
 
 -- XMonad.Actions.SwapWorkspaces.swapTo
 -- extension add WSType parameter
