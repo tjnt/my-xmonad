@@ -79,7 +79,6 @@ import           XMonad.Actions.Minimize             (maximizeWindow,
                                                       withLastMinimized,
                                                       withMinimized)
 import           XMonad.Actions.Promote              (promote)
-import           XMonad.Actions.SinkAll              (sinkAll)
 import           XMonad.Actions.SpawnOn              (manageSpawn,
                                                       shellPromptHere,
                                                       spawnHere)
@@ -90,6 +89,7 @@ import           XMonad.Actions.TreeSelect           (TSConfig (..),
                                                       defaultNavigation,
                                                       treeselectAction)
 import           XMonad.Actions.Warp                 (warpToWindow)
+import           XMonad.Actions.WithAll              (killAll, sinkAll)
 import           XMonad.Hooks.DynamicIcons           (IconConfig (..), appIcon,
                                                       dynamicIconsPP,
                                                       iconsGetFocus)
@@ -423,6 +423,7 @@ keyBindings conf =
     ] ++
     category "close / full / minimize"
     [ ("M-c",    kill,                                     "close the focused window")
+    , ("M-S-c",  killAll,                                  "close all windows")
     , ("M-f",    sendMessage ToggleLayout,                 "toggle fullscreen")
     , ("M-z",    withFocused minimizeWindow,               "minimize focused window")
     , ("M-S-z",  minimizeAllWindows,                       "minimize all windows")
