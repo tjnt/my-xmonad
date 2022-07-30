@@ -374,9 +374,7 @@ myTreeSelectAction = do
     layoutMenu =
         [ Node (TSNode "Layout menu" "Open layout menu" (return ()))
           (map (\s -> Node (TSNode s "" (sendMessage $ JumpToLayout s)) [])
-            [ "Tall" , "Mirror", "Float"
-            , "Three", "Grid",   "Circle"
-            ]
+            [ "Tall", "Mirror", "Float", "Three", "Grid", "Circle" ]
           )
         ]
 
@@ -549,7 +547,10 @@ keyBindings conf =
     keysMoveWindow' = keysMoveWindow . convert
     keysResizeWindow' d g = keysResizeWindow (convert d) (convert g)
     nonNSP = WSIs . return $ (/= scratchpadWorkspaceTag) . W.tag
-    restartXmonad = spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi"
+    restartXmonad = spawn
+        "if type xmonad; \
+        \ then xmonad --recompile &&  xmonad --restart; \
+        \ else xmessage xmonad not in \\$PATH: \"$PATH\"; fi"
 
 myKeys :: XConfig Layout -> M.Map (KeyMask, KeySym) (X ())
 myKeys conf = keys conf
@@ -666,9 +667,9 @@ myServerModeHook = return
 
 myEventHook :: Event -> X All
 myEventHook = handleEventHook def
-              <+> refocusLastWhen isFloat
-              <+> minimizeEventHook
-              <+> serverModeEventHookCmd' myServerModeHook
+          <+> refocusLastWhen isFloat
+          <+> minimizeEventHook
+          <+> serverModeEventHookCmd' myServerModeHook
 
 -- Startup Hook
 
