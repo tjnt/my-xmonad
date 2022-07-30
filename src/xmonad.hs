@@ -56,7 +56,7 @@ import           XMonad                              (Button, Event,
                                                       shiftMask, spawn, title,
                                                       whenJust, windows,
                                                       windowset, withFocused,
-                                                      withWindowSet,
+                                                      withUnfocused,
                                                       xC_left_ptr,
                                                       xK_bracketleft, xK_q,
                                                       xK_slash, xmonad, (-->),
@@ -89,7 +89,7 @@ import           XMonad.Actions.TreeSelect           (TSConfig (..),
                                                       defaultNavigation,
                                                       treeselectAction)
 import           XMonad.Actions.Warp                 (warpToWindow)
-import           XMonad.Actions.WithAll              (killAll, sinkAll)
+import           XMonad.Actions.WithAll              (killAll, sinkAll, withAll)
 import           XMonad.Hooks.DynamicIcons           (IconConfig (..), appIcon,
                                                       dynamicIconsPP,
                                                       iconsGetFocus)
@@ -175,14 +175,6 @@ toggleFloat = withFocused $ \win -> do
        else floatLocation win >>= windows . W.float win . snd
 
 -- minimize window operation
-
-minimizeAllWindows :: X ()
-minimizeAllWindows = withWindowSet $ mapM_ minimizeWindow . W.index
-
-minimizeUnfocusedWindows :: X ()
-minimizeUnfocusedWindows = withFocused $ \w -> do
-    ws <- gets (W.index . windowset)
-    mapM_ minimizeWindow $ filter (/= w) ws
 
 restoreAllMinimized :: X ()
 restoreAllMinimized = withMinimized $ mapM_ maximizeWindow
@@ -426,8 +418,8 @@ keyBindings conf =
     , ("M-S-c",  killAll,                                  "close all windows")
     , ("M-f",    sendMessage ToggleLayout,                 "toggle fullscreen")
     , ("M-z",    withFocused minimizeWindow,               "minimize focused window")
-    , ("M-S-z",  minimizeAllWindows,                       "minimize all windows")
-    , ("M-C-z",  minimizeUnfocusedWindows,                 "minimize windows expect focused")
+    , ("M-S-z",  withAll minimizeWindow,                   "minimize all windows")
+    , ("M-C-z",  withUnfocused minimizeWindow,             "minimize windows expect focused")
     , ("M-x",    withLastMinimized maximizeWindowAndFocus, "restore last minimized window")
     , ("M-S-x",  restoreAllMinimized,                      "restore all minimized window")
     , ("M-C-x",  restoreSelectedMinimized,                 "restore selected minimized window")
