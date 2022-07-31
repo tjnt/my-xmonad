@@ -119,6 +119,7 @@ import           XMonad.Hooks.ToggleHook             (runLogHook, toggleHook,
 import           XMonad.Layout.BoringWindows         (boringWindows, focusDown,
                                                       focusMaster, focusUp)
 import           XMonad.Layout.Circle                (Circle (..))
+import           XMonad.Layout.DraggingVisualizer    (draggingVisualizer)
 import           XMonad.Layout.Grid                  (Grid (Grid))
 import           XMonad.Layout.LayoutCombinators     (JumpToLayout (JumpToLayout),
                                                       (|||))
@@ -584,17 +585,17 @@ myLayoutHook = refocusLastLayoutHook . trackFloating
              . avoidStruts . boringWindows
              $ toggleLayouts expand normal
   where
-    tall   = minimize . smartBorders . spacing
+    tall   = draggingVisualizer . minimize . smartBorders . spacing
            $ ResizableTall 1 (3/100) (1/2) []
-    mirror = minimize . smartBorders . spacing
+    mirror = draggingVisualizer . minimize . smartBorders . spacing
            $ Mirror (ResizableTall 1 (3/100) (1/2) [])
     float  = minimize . smartBorders
            $ simplestFloat
-    three  = minimize . smartBorders . spacing
+    three  = draggingVisualizer . minimize . smartBorders . spacing
            $ ThreeColMid 1 (3/100) (1/2)
-    grid   = minimize . smartBorders . spacing
+    grid   = draggingVisualizer . minimize . smartBorders . spacing
            $ Grid
-    circle = minimize . smartBorders
+    circle = draggingVisualizer . minimize . smartBorders
            $ Circle
     full   = minimize . noBorders
            $ Full
