@@ -589,8 +589,8 @@ myLayoutHook = refocusLastLayoutHook . trackFloating
            $ ResizableTall 1 (3/100) (1/2) []
     mirror = draggingVisualizer . minimize . smartBorders . spacing
            $ Mirror (ResizableTall 1 (3/100) (1/2) [])
-    float  = minimize . smartBorders
-           $ simplestFloat
+    float  = minimize
+             simplestFloat
     three  = draggingVisualizer . minimize . smartBorders . spacing
            $ ThreeColMid 1 (3/100) (1/2)
     grid   = draggingVisualizer . minimize . smartBorders . spacing
