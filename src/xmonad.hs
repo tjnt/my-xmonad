@@ -375,7 +375,7 @@ myTreeSelectAction = do
     layoutMenu =
         [ Node (TSNode "Layout menu" "Open layout menu" (return ()))
           (map (\s -> Node (TSNode s "" (sendMessage $ JumpToLayout s)) [])
-            [ "Tall", "Mirror", "Float", "Three", "Grid", "Circle" ]
+            [ "Tall", "Mirror", "Three", "Grid", "Circle", "Float" ]
           )
         ]
 
@@ -426,9 +426,9 @@ keyBindings conf =
     category "direct jump to layout"
     [ ("M-6",        sendMessage $ JumpToLayout "Tall",    "layout Tall")
     , ("M-7",        sendMessage $ JumpToLayout "Mirror",  "layout Mirror")
-    , ("M-8",        sendMessage $ JumpToLayout "Float",   "layout Float")
-    , ("M-9",        sendMessage $ JumpToLayout "Three",   "layout Three")
-    , ("M-0",        sendMessage $ JumpToLayout "Grid",    "layout Grid")
+    , ("M-8",        sendMessage $ JumpToLayout "Three",   "layout Three")
+    , ("M-9",        sendMessage $ JumpToLayout "Grid",    "layout Grid")
+    , ("M-0",        sendMessage $ JumpToLayout "Float",   "layout Float")
     ] ++
     category "move focus up or down the window stack"
     [ ("M-j",        focusDown,    "focus down")
@@ -589,23 +589,23 @@ myLayoutHook = refocusLastLayoutHook . trackFloating
            $ ResizableTall 1 (3/100) (1/2) []
     mirror = draggingVisualizer . minimize . smartBorders . spacing
            $ Mirror (ResizableTall 1 (3/100) (1/2) [])
-    float  = minimize
-             simplestFloat
     three  = draggingVisualizer . minimize . smartBorders . spacing
            $ ThreeColMid 1 (3/100) (1/2)
     grid   = draggingVisualizer . minimize . smartBorders . spacing
            $ Grid
     circle = draggingVisualizer . minimize . smartBorders
            $ Circle
+    float  = minimize
+             simplestFloat
     full   = minimize . noBorders
            $ Full
 
     normal = rename "Tall"   tall
          ||| rename "Mirror" mirror
-         ||| rename "Float"  float
          ||| rename "Three"  three
          ||| rename "Grid"   grid
          ||| rename "Circle" circle
+         ||| rename "Float"  float
     expand = rename "Full"   full
 
     spacing = spacingRaw True (Border 4 4 8 8) True (Border 4 4 4 4) True
@@ -720,10 +720,10 @@ myPP = xmobarPP
         layoutIcons = M.fromList
             [ ("Tall",   icon "layout-tall.xpm")
             , ("Mirror", icon "layout-mirror.xpm")
-            , ("Float",  icon "layout-float.xpm")
             , ("Three",  icon "layout-three.xpm")
             , ("Grid",   icon "layout-grid.xpm")
             , ("Circle", icon "layout-circle.xpm")
+            , ("Float",  icon "layout-float.xpm")
             , ("Full",   icon "layout-full.xpm")
             ]
         icon = printf "<icon=%s/>"
