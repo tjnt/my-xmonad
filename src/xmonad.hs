@@ -407,11 +407,14 @@ keyBindings conf =
     , ("M-y",    clipboardHistory "sel",      "clipboard history")
     , ("M-S-y",  clipboardHistory "del",      "clipboard history (del)")
     ] ++
-    category "close / full / minimize"
-    [ ("M-c",    kill,                                     "close the focused window")
-    , ("M-S-c",  killAll,                                  "close all windows")
-    , ("M-f",    sendMessage ToggleLayout,                 "toggle fullscreen")
-    , ("M-z",    withFocused minimizeWindow,               "minimize focused window")
+    category "close, full, refresh window"
+    [ ("M-c",    kill,                             "close the focused window")
+    , ("M-S-c",  killAll,                          "close all windows")
+    , ("M-f",    sendMessage ToggleLayout,         "toggle fullscreen")
+    , ("M-r",    refresh >> warpToWindow 0.5 0.5,  "refresh windows and warp pointer")
+    ] ++
+    category "minimize, restore window"
+    [ ("M-z",    withFocused minimizeWindow,               "minimize focused window")
     , ("M-S-z",  withAll minimizeWindow,                   "minimize all windows")
     , ("M-C-z",  withUnfocused minimizeWindow,             "minimize windows expect focused")
     , ("M-x",    withLastMinimized maximizeWindowAndFocus, "restore last minimized window")
@@ -419,9 +422,8 @@ keyBindings conf =
     , ("M-C-x",  restoreSelectedMinimized,                 "restore selected minimized window")
     ] ++
     category "changing layouts"
-    [ ("M-<Space>",    cycleThroughLayouts myLayoutsCycle,  "next layout")
-    , ("M-S-<Space>",  setLayout $ layoutHook conf,         "reset the layout")
-    , ("M-r",          refresh >> warpToWindow 0.5 0.5,     "refresh windows and warp pointer")
+    [ ("M-<Space>",    cycleThroughLayouts myLayoutsCycle, "next layout")
+    , ("M-S-<Space>",  setLayout $ layoutHook conf,        "reset the layout")
     ] ++
     category "direct jump to layout"
     [ ("M-6",        sendMessage $ JumpToLayout "Tall",    "layout Tall")
