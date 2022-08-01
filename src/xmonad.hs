@@ -252,15 +252,16 @@ notifyBrightnessChange = do
     fileCur = dir <> "actual_brightness"
 
 volumeToggle, volumeUp, volumeDown :: String -> X ()
-volumeToggle target =
-    spawnAndWait (printf "amixer -q set %s toggle" target) >>
-    notifyVolumeChange target
-volumeUp target =
-    spawnAndWait (printf "amixer -q set %s 10%%+" target) >>
-    notifyVolumeChange target
-volumeDown target =
-    spawnAndWait (printf "amixer -q set %s 10%%-" target) >>
-    notifyVolumeChange target
+volumeToggle target = spawnAndWait (printf "amixer -q set %s toggle" target)
+                   >> notifyVolumeChange target
+volumeUp     target = spawnAndWait (printf "amixer -q set %s 10%%+" target)
+                   >> notifyVolumeChange target
+volumeDown   target = spawnAndWait (printf "amixer -q set %s 10%%-" target)
+                   >> notifyVolumeChange target
+
+brightnessUp, brightnessDown :: X ()
+brightnessUp   = brightnessCtrl 10    >> notifyBrightnessChange
+brightnessDown = brightnessCtrl (-10) >> notifyBrightnessChange
 
 wifiToggle :: X ()
 wifiToggle = do
@@ -539,8 +540,8 @@ keyBindings conf =
     , ("<XF86AudioMicMute>",        volumeToggle  "Capture",  "toggle capture volume on / off")
     , ("S-<XF86AudioRaiseVolume>",  volumeUp      "Capture",  "capture volume up")
     , ("S-<XF86AudioLowerVolume>",  volumeDown    "Capture",  "capture volume down")
-    , ("<XF86MonBrightnessUp>",     brightnessCtrl 10    >> notifyBrightnessChange,  "monitor brightness up")
-    , ("<XF86MonBrightnessDown>",   brightnessCtrl (-10) >> notifyBrightnessChange,  "monitor brightness down")
+    , ("<XF86MonBrightnessUp>",     brightnessUp,    "monitor brightness up")
+    , ("<XF86MonBrightnessDown>",   brightnessDown,  "monitor brightness down")
     , ("<XF86Display>",             cycleMonitor ("eDP1", "HDMI2"),  "cycle monitor mode")
     , ("<XF86WLAN>",                wifiToggle,       "toggle wifi on / off")
     , ("<XF86Bluetooth>",           bluetoothToggle,  "toggle bluetooth on / off")
@@ -654,6 +655,8 @@ myServerModeHook = return
     , ("volume-capture-toggle", volumeToggle  "Capture")
     , ("volume-capture-up",     volumeUp      "Capture")
     , ("volume-capture-down",   volumeDown    "Capture")
+    , ("brightness-up",         brightnessUp)
+    , ("brightness-down",       brightnessDown)
     , ("wifi-toggle",           wifiToggle)
     , ("bluetooth-toggle",      bluetoothToggle)
     , ("next-layout",           cycleThroughLayouts myLayoutsCycle)
