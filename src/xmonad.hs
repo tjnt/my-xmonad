@@ -32,15 +32,16 @@ import           Utils.Run                           (spawnAndWait, spawnIfDown,
                                                       spawnTerminalAndDo,
                                                       spawnTerminalOrClose,
                                                       spawnWithOutput)
-import           Utils.XdgDesktopEntry
+import           Utils.XdgDesktopEntry               (DesktopEntry (..),
+                                                      readDescktopEntrys)
 import           XMonad                              (Button, Event,
                                                       Full (Full),
-                                                      IncMasterN (..), KeyMask,
-                                                      KeySym, Layout,
+                                                      IncMasterN (IncMasterN),
+                                                      KeyMask, KeySym, Layout,
                                                       ManageHook,
                                                       Mirror (Mirror), Query,
-                                                      Resize (..), Window,
-                                                      WorkspaceId, X,
+                                                      Resize (Expand, Shrink),
+                                                      Window, WorkspaceId, X,
                                                       XConfig (..), asks,
                                                       button1, button2, button3,
                                                       button4, button5, cfgDir,
@@ -85,7 +86,7 @@ import           XMonad.Actions.SpawnOn              (manageSpawn,
 import           XMonad.Actions.SwapWorkspaces       (swapWithCurrent)
 import           XMonad.Actions.TiledWindowDragging  (dragWindow)
 import           XMonad.Actions.TreeSelect           (TSConfig (..),
-                                                      TSNode (..), cancel,
+                                                      TSNode (TSNode), cancel,
                                                       defaultNavigation,
                                                       treeselectAction)
 import           XMonad.Actions.Warp                 (warpToWindow)
@@ -118,23 +119,25 @@ import           XMonad.Hooks.ToggleHook             (runLogHook, toggleHook,
                                                       willHookAllNewPP)
 import           XMonad.Layout.BoringWindows         (boringWindows, focusDown,
                                                       focusMaster, focusUp)
-import           XMonad.Layout.Circle                (Circle (..))
+import           XMonad.Layout.Circle                (Circle (Circle))
 import           XMonad.Layout.DraggingVisualizer    (draggingVisualizer)
 import           XMonad.Layout.Grid                  (Grid (Grid))
 import           XMonad.Layout.LayoutCombinators     (JumpToLayout (JumpToLayout),
                                                       (|||))
 import           XMonad.Layout.Minimize              (minimize)
 import           XMonad.Layout.NoBorders             (noBorders, smartBorders)
-import           XMonad.Layout.Renamed               (Rename (..), renamed)
+import           XMonad.Layout.Renamed               (Rename (Replace), renamed)
 import           XMonad.Layout.ResizableTile         (MirrorResize (MirrorExpand, MirrorShrink),
                                                       ResizableTall (ResizableTall))
 import           XMonad.Layout.SimplestFloat         (simplestFloat)
-import           XMonad.Layout.Spacing               (Border (..), spacingRaw)
+import           XMonad.Layout.Spacing               (Border (Border),
+                                                      spacingRaw)
 import           XMonad.Layout.ThreeColumns          (ThreeCol (ThreeColMid))
-import           XMonad.Layout.ToggleLayouts         (ToggleLayout (..),
+import           XMonad.Layout.ToggleLayouts         (ToggleLayout (ToggleLayout),
                                                       toggleLayouts)
 import           XMonad.Layout.TrackFloating         (trackFloating)
-import           XMonad.Prompt                       (XPConfig, XPPosition (..),
+import           XMonad.Prompt                       (XPConfig,
+                                                      XPPosition (Top),
                                                       alwaysHighlight, bgColor,
                                                       fgColor, font, height,
                                                       position,
