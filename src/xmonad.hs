@@ -166,10 +166,7 @@ import           XMonad.Util.Types                   (Direction1D (Next, Prev),
                                                       Direction2D (D, L, R, U))
 import           XMonad.Util.WorkspaceCompare        (getSortByIndex)
 
--- Functions
-
-showDigits :: (RealFloat a) => Int -> a -> String
-showDigits d n = showFFloat (Just d) n ""
+-- floating window operation
 
 centerFloat :: X ()
 centerFloat = withFocused $ \win -> do
@@ -204,20 +201,6 @@ swapTo dir t = findWorkspace getSortByIndex dir t 1 >>= windows . swapWithCurren
 toggleInsertMode :: X()
 toggleInsertMode = toggleHookAllNew "insertBelow" >> runLogHook
 
-brightnessCtrl :: Int -> X ()
-brightnessCtrl param = do
-    maxV <- io $ read <$> readFile fileMax :: X Float
-    curV <- io $ read <$> readFile fileCur :: X Float
-    let step = maxV / 100
-        minV = step * 10
-        value = curV + step * fromIntegral param
-        ajust = showDigits 0 (max minV $ min maxV value)
-    spawnAndWait $ printf "echo %s | sudo tee %s > /dev/null" ajust fileCur
-  where
-    dir = "/sys/class/backlight/intel_backlight/"
-    fileMax = dir <> "max_brightness"
-    fileCur = dir <> "brightness"
-
 cycleMonitor :: (String, String) -> X ()
 cycleMonitor (primary, secondary) = do
     n <- (`rem` length mode) . succ <$> io ((read <$> readFile file) `catch` handler)
@@ -233,8 +216,11 @@ cycleMonitor (primary, secondary) = do
     external = printf "--output %s --off --output %s --auto" primary secondary
     mode     = [single, rightof, leftof, external]
 
-notifyVolumeChange :: String -> X ()
-notifyVolumeChange target = do
+-- volume control
+
+volumeChange :: String -> String -> X ()
+volumeChange target param = do
+    spawnAndWait $ printf "amixer -q set %s %s" target param
     w <- words . last . lines
         <$> spawnWithOutput (printf "amixer get %s" target)
     when (length w == 6) $
@@ -245,28 +231,32 @@ notifyVolumeChange target = do
     trimVol = takeWhile (/='%') . tail
     trimMut = takeWhile (/=']') . tail
 
-notifyBrightnessChange :: X ()
-notifyBrightnessChange = do
-    maxV <- io $ read <$> readFile fileMax
-    curV <- io $ read <$> readFile fileCur
-    let v = showDigits 0 ((curV / maxV) * 100)
-     in dunstifyIndicator v "brightness" ""
+volumeToggle, volumeUp, volumeDown :: String -> X ()
+volumeToggle target = volumeChange target "toggle"
+volumeUp     target = volumeChange target "10%+"
+volumeDown   target = volumeChange target "10%-"
+
+-- brightness control
+
+brightnessChange :: Int -> X ()
+brightnessChange param = do
+    maxV <- io $ read <$> readFile fileMax :: X Float
+    curV <- io $ read <$> readFile fileCur :: X Float
+    let step = maxV / 100
+        minV = step * 10
+        newV = max minV . min maxV $ curV + step * fromIntegral param
+    spawnAndWait $ printf "echo %s | sudo tee %s > /dev/null" (showDigits 0 newV) fileCur
+    dunstifyIndicator (showDigits 0 ((newV / maxV) * 100)) "brightness" ""
   where
+    showDigits :: (RealFloat a) => Int -> a -> String
+    showDigits d n = showFFloat (Just d) n ""
     dir = "/sys/class/backlight/intel_backlight/"
     fileMax = dir <> "max_brightness"
-    fileCur = dir <> "actual_brightness"
-
-volumeToggle, volumeUp, volumeDown :: String -> X ()
-volumeToggle target = spawnAndWait (printf "amixer -q set %s toggle" target)
-                   >> notifyVolumeChange target
-volumeUp     target = spawnAndWait (printf "amixer -q set %s 10%%+" target)
-                   >> notifyVolumeChange target
-volumeDown   target = spawnAndWait (printf "amixer -q set %s 10%%-" target)
-                   >> notifyVolumeChange target
+    fileCur = dir <> "brightness"
 
 brightnessUp, brightnessDown :: X ()
-brightnessUp   = brightnessCtrl 10    >> notifyBrightnessChange
-brightnessDown = brightnessCtrl (-10) >> notifyBrightnessChange
+brightnessUp   = brightnessChange 10
+brightnessDown = brightnessChange (-10)
 
 wifiToggle :: X ()
 wifiToggle = do
