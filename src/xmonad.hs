@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 
-import           Control.Exception                   (catch)
+import           Control.Exception                   (bracket, catch)
 import           Control.Monad                       (unless, when)
 import           Data.Bifunctor                      (bimap)
 import           Data.Bool                           (bool)
@@ -315,7 +315,7 @@ myXPConfig = def
 -- tree select
 
 applicationMenu :: IO (Tree (TSNode (X ())))
-applicationMenu = Node (TSNode "Application Menu" "Open application menu" (return ()))
+applicationMenu = Node (TSNode "Applications" "Open application menu" (return ()))
                 . convert . construct <$> readDescktopEntrys
   where
     categories = [ "WebBrowser", "AudioVideo", "Office", "Utility"
@@ -346,9 +346,9 @@ applicationMenu = Node (TSNode "Application Menu" "Open application menu" (retur
 myTreeSelectAction :: X ()
 myTreeSelectAction = do
     appMenu <- io applicationMenu
-    treeselectAction myTsConfig $ myTsMenu <> layoutMenu <> [appMenu]
+    treeselectAction tsConfig [powerMenu, layoutMenu, appMenu]
   where
-    myTsConfig = def
+    tsConfig = def
         { ts_hidechildren = True
         , ts_font         = myFont
         , ts_background   = readColor basebg "C0"
@@ -366,27 +366,21 @@ myTreeSelectAction = do
       where
         readColor color alpha =
             read . (++) "0x" . (++) alpha . tail $ color
-        navigation = M.union
-            defaultNavigation $
-            M.fromList
-                [ ((noModMask, xK_q), cancel)
-                , ((controlMask, xK_bracketleft), cancel)
-                ]
-    myTsMenu =
-        [ Node (TSNode "System menu" "Open system menu" (return ()))
-            [ Node (TSNode "Monitor OFF" "" (spawn "xset dpms force standby")) []
-            , Node (TSNode "Standby" "" (spawn "systemctl suspend")) []
-            , Node (TSNode "Hibernate" "" (spawn "systemctl hibernate")) []
-            , Node (TSNode "Shutdown" "" (spawn "systemctl poweroff")) []
-            , Node (TSNode "Reboot"   ""   (spawn "systemctl reboot")) []
+        navigation = M.union defaultNavigation $ M.fromList
+            [ ((noModMask, xK_q), cancel)
+            , ((controlMask, xK_bracketleft), cancel)
             ]
+    powerMenu = Node (TSNode "Power" "Open power menu" (return ()))
+        [ Node (TSNode "Monitor OFF" "" (spawn "xset dpms force standby")) []
+        , Node (TSNode "Standby" "" (spawn "systemctl suspend")) []
+        , Node (TSNode "Hibernate" "" (spawn "systemctl hibernate")) []
+        , Node (TSNode "Shutdown" "" (spawn "systemctl poweroff")) []
+        , Node (TSNode "Reboot"   ""   (spawn "systemctl reboot")) []
         ]
-    layoutMenu =
-        [ Node (TSNode "Layout menu" "Open layout menu" (return ()))
-          (map (\s -> Node (TSNode s "" (sendMessage $ JumpToLayout s)) [])
-            [ "Tall", "Mirror", "Three", "Grid", "Circle", "Float" ]
-          )
-        ]
+    layoutMenu = Node (TSNode "Layout" "Open layout menu" (return ()))
+        (map (\s -> Node (TSNode s "" (sendMessage $ JumpToLayout s)) [])
+          [ "Tall", "Mirror", "Three", "Grid", "Circle", "Float" ]
+        )
 
 -- scratch pad
 
@@ -576,9 +570,8 @@ myKeys conf = keys conf
             $ addDescrKeys' ((modMask conf .|. shiftMask, xK_slash), showHelp) keyBindings conf
   where
     showHelp xs = addName "Show Keybindings" $ do
-        path <- io $ do
-            (p, h) <- openTempFile "/tmp" "xmonad-keyguide.txt"
-            hPutStr h (unlines (showKm xs)) >> hClose h >> return p
+        path <- io . bracket (openTempFile "/tmp" "xmonad-keyguide.txt") (hClose . snd)
+                   $ \(p,h) -> hPutStr h (unlines (showKm xs)) >> return p
         spawnTerminal $ printf "--exec 'sh -c \"less %s ; rm -f %s\"'" path path
 
 -- Mouse bindings
@@ -767,8 +760,7 @@ myXMobar = statusBarProp "xmobar"
 
     iconsFmtReplace' :: String -> ([String] -> String)
                      -> WorkspaceId -> [String] -> String
-    iconsFmtReplace' s cat ws is =
-        clickable ws $ bool (cat is) s (null is)
+    iconsFmtReplace' s cat ws is = clickable ws $ bool (cat is) s (null is)
       where
         clickable n = xmobarAction ("xmonadctl view-workspace-" <> n) "1"
 
