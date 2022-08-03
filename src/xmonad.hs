@@ -406,8 +406,8 @@ keyBindings :: XConfig Layout -> [((KeyMask, KeySym), NamedAction)]
 keyBindings conf =
     category "launching terminal"
     [ ("M-<Return>",     spawnTerminal "--exec tmux",                    "launch terminal")
-    , ("M-S-<Return>",   spawnTerminal "",                               "launch terminal without tmux")
-    , ("M-C-<Return>",   spawnTerminalAndDo doCenterFloat "--exec=tmux", "launch terminal (float)")
+    , ("M-S-<Return>",   spawnTerminalAndDo doCenterFloat "--exec=tmux", "launch terminal (float)")
+    , ("M-C-<Return>",   spawnTerminal "",                               "launch terminal without tmux")
     , ("M-C-S-<Return>", spawnTerminalAndDo doCenterFloat "",            "launch terminal without tmux (float)")
     ] ++
     category "launching extensions"
