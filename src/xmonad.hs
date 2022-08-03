@@ -131,7 +131,12 @@ import           XMonad.Layout.ResizableTile         (MirrorResize (MirrorExpand
                                                       ResizableTall (ResizableTall))
 import           XMonad.Layout.SimplestFloat         (simplestFloat)
 import           XMonad.Layout.Spacing               (Border (Border),
-                                                      spacingRaw)
+                                                      decScreenWindowSpacing,
+                                                      incScreenWindowSpacing,
+                                                      setScreenWindowSpacing,
+                                                      spacingRaw,
+                                                      toggleScreenSpacingEnabled,
+                                                      toggleWindowSpacingEnabled)
 import           XMonad.Layout.ThreeColumns          (ThreeCol (ThreeColMid))
 import           XMonad.Layout.ToggleLayouts         (ToggleLayout (ToggleLayout),
                                                       toggleLayouts)
@@ -513,6 +518,12 @@ keyBindings conf =
     [ ("M-b",    sendMessage ToggleStruts,  "toggle show / hide status bar")
     , ("M-v",    toggleInsertMode,          "toggle window insert mode")
     ] ++
+    category "modifying window spacing"
+    [ ("M-=",    incScreenWindowSpacing 2,  "increase spacing")
+    , ("M--",    decScreenWindowSpacing 2,  "decrease spacing")
+    , ("M-S-=",  setScreenWindowSpacing 4,  "reset spacing")
+    , ("M-S--",  toggleSpacing,             "toggle spacing")
+    ] ++
     category "dunst operation"
     [ ("M-[",    dunstCloseAll,    "close all dunst notification")
     , ("M-S-[",  dunstRestart,     "clear all dunst notification (restart dunst)")
@@ -554,6 +565,7 @@ keyBindings conf =
     keysMoveWindow' = keysMoveWindow . convert
     keysResizeWindow' d g = keysResizeWindow (convert d) (convert g)
     nonNSP = WSIs . return $ (/= scratchpadWorkspaceTag) . W.tag
+    toggleSpacing = toggleScreenSpacingEnabled >> toggleWindowSpacingEnabled
     restartXmonad = spawn
         "if type xmonad; \
         \ then xmonad --recompile &&  xmonad --restart; \
@@ -612,8 +624,8 @@ myLayoutHook = refocusLastLayoutHook . trackFloating
          ||| rename "Float"  float
     expand = rename "Full"   full
 
-    spacing = spacingRaw True (Border 4 4 8 8) True (Border 4 4 4 4) True
-    rename s = renamed [ Replace s ]
+    spacing = spacingRaw True (Border 4 4 4 4) True (Border 4 4 4 4) True
+    rename s = renamed [Replace s]
 
 -- Manage Hook
 
