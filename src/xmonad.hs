@@ -120,7 +120,8 @@ import           XMonad.Hooks.ToggleHook             (runLogHook, toggleHook,
 import           XMonad.Hooks.UrgencyHook            (BorderUrgencyHook (BorderUrgencyHook),
                                                       withUrgencyHook)
 import           XMonad.Layout.BoringWindows         (boringWindows, focusDown,
-                                                      focusMaster, focusUp)
+                                                      focusMaster, focusUp,
+                                                      swapDown, swapUp)
 import           XMonad.Layout.Circle                (Circle (Circle))
 import           XMonad.Layout.DraggingVisualizer    (draggingVisualizer)
 import           XMonad.Layout.Grid                  (Grid (Grid))
@@ -435,9 +436,9 @@ keyBindings conf =
     , ("M-S-<Tab>",  focusUp,      "focus up")
     ] ++
     category "modifying the window order"
-    [ ("M-S-m",  promote,             "swap with the master")
-    , ("M-S-j",  windows W.swapDown,  "swap with the master")
-    , ("M-S-k",  windows W.swapUp,    "swap with the master")
+    [ ("M-S-m",      promote,      "swap with the master")
+    , ("M-S-j",      swapDown,     "swap with the next window")
+    , ("M-S-k",      swapUp,       "swap with the previous window")
     ] ++
     category "resizing the master/slave ratio"
     [ ("M-h",    sendMessage Shrink,        "shrink the master area")
@@ -575,8 +576,8 @@ myMouseBindings XConfig { modMask = modm } = M.fromList
     , ((modm, button2), \w -> focus w >> windows W.shiftMaster)
     , ((modm, button3), \w -> focus w >> mouseResizeWindow w
                            >> afterDrag (snapMagicResize [R,D] (Just 50) (Just 50) w))
-    , ((modm, button4), const $ windows W.swapUp)
-    , ((modm, button5), const $ windows W.swapDown)
+    , ((modm, button4), const swapUp)
+    , ((modm, button5), const swapDown)
     , ((modm .|. shiftMask, button1), dragWindow)
     ]
 
