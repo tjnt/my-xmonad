@@ -20,8 +20,8 @@ import           System.IO                           (hClose, hPutStr,
                                                       openTempFile)
 import           Text.Printf                         (printf)
 import           Theme.Theme                         (base01, base04, base06,
-                                                      base0C, basebg, basefg,
-                                                      myFont)
+                                                      base0B, base0C, basebg,
+                                                      basefg, myFont)
 import           Utils.Dunst                         (dunstCloseAll,
                                                       dunstHistoryPop,
                                                       dunstRestart,
@@ -117,6 +117,8 @@ import           XMonad.Hooks.StatusBar.PP           (PP (..), filterOutWsPP,
 import           XMonad.Hooks.ToggleHook             (runLogHook, toggleHook,
                                                       toggleHookAllNew,
                                                       willHookAllNewPP)
+import           XMonad.Hooks.UrgencyHook            (BorderUrgencyHook (BorderUrgencyHook),
+                                                      withUrgencyHook)
 import           XMonad.Layout.BoringWindows         (boringWindows, focusDown,
                                                       focusMaster, focusUp)
 import           XMonad.Layout.Circle                (Circle (Circle))
@@ -699,7 +701,7 @@ myPP :: PP
 myPP = xmobarPP
     { ppOrder           = order
     , ppCurrent         = xmobarColor base01 basebg . xmobarBorder "Bottom" base01 2
-    , ppUrgent          = xmobarColor base06 basebg
+    , ppUrgent          = xmobarColor base0B basebg
     , ppVisible         = xmobarColor base04 basebg
     , ppHidden          = xmobarColor base06 basebg
     , ppHiddenNoWindows = xmobarColor base06 basebg
@@ -770,7 +772,8 @@ myXMobar = statusBarProp "xmobar"
 -- main
 
 main :: IO ()
-main = xmonad . ewmhFullscreen . ewmh . withSB myXMobar . docks $ def
+main = xmonad . withUrgencyHook (BorderUrgencyHook base0B)
+     . ewmhFullscreen . ewmh . withSB myXMobar . docks $ def
     { modMask = mod4Mask
     , terminal = "termite"
     , workspaces = map show [1..5]
