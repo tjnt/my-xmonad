@@ -620,25 +620,25 @@ myManageHook =
     toggleHook "insertBelow" (insertPosition Below Newer)
     <+> manageSpawn
     <+> composeAll
-        [ className =? "Xmessage"    --> doFloat
-        , className =? "mpv"         --> doFloat
-        , className =? "MPlayer"     --> doFloat
-        , className =? "mplayer2"    --> doFloat
-        , className =? "Pavucontrol" --> doFloat
-        , className =? "Peek"        --> doFloat
-        , className =? "Qalculate-gtk" --> doFloat
+        [ className =? "Xmessage"       --> doFloat
+        , className =? "mpv"            --> doFloat
+        , className =? "MPlayer"        --> doFloat
+        , className =? "mplayer2"       --> doFloat
+        , className =? "Pavucontrol"    --> doFloat
+        , className =? "Peek"           --> doFloat
+        , className =? "Qalculate-gtk"  --> doFloat
         , className =? "Firefox" <&&> resource =? "Toolkit" --> doFloat
-        , title =? "htop"            --> doFullFloat
-        , title =? "ytop"            --> doRectFloat (W.RationalRect 0 0 0.5 0.6)
-        , title =? "pulsemixer"      --> doRectFloat (W.RationalRect 0 0 0.5 0.4)
-        , title =? "scratch-terminal"--> doRectFloat (W.RationalRect 0 0 1.0 0.4)
-        , title =? "clipboard"       --> doRectFloat (W.RationalRect 0 0 0.4 1.0)
-        , title =? "hcalc"           --> doRectFloat (W.RationalRect 0 0 0.4 0.4)
-        , title ^? "nmtui"           --> doFloat
-        , title =? "bluetooth-tui"   --> doFloat
-        , title =? "screen-capture"  --> doFloat
-        , isFullscreen               --> doFullFloat
-        , isDialog                   --> doFloat
+        , title =? "htop"               --> doFullFloat
+        , title =? "ytop"               --> doRectFloat (W.RationalRect 0 0 0.5 0.6)
+        , title =? "pulsemixer"         --> doRectFloat (W.RationalRect 0 0 0.5 0.4)
+        , title =? "scratch-terminal"   --> doRectFloat (W.RationalRect 0 0 1.0 0.4)
+        , title =? "clipboard"          --> doRectFloat (W.RationalRect 0 0 0.4 1.0)
+        , title =? "hcalc"              --> doRectFloat (W.RationalRect 0 0 0.4 0.4)
+        , title ^? "nmtui"              --> doFloat
+        , title =? "bluetooth-tui"      --> doFloat
+        , title =? "screen-capture"     --> doFloat
+        , isFullscreen                  --> doFullFloat
+        , isDialog                      --> doFloat
         ]
     <+> namedScratchpadManageHook myScratchpads
 
