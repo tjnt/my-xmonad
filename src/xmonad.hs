@@ -292,11 +292,6 @@ captureScreen = spawn $
 (^?) :: (Eq a, Functor m) => m [a] -> [a] -> m Bool
 q ^? x = (x `isPrefixOf`) <$> q
 
--- layout cycle
-
-myLayoutsCycle :: [String]
-myLayoutsCycle = ["Tall", "Mirror", "Float"]
-
 -- shell prompt
 
 myXPConfig :: XPConfig
@@ -586,6 +581,11 @@ myMouseBindings XConfig { modMask = modm } = M.fromList
     , ((modm, button5), const swapDown)
     , ((modm .|. shiftMask, button1), dragWindow)
     ]
+
+-- layout cycle
+
+myLayoutsCycle :: [String]
+myLayoutsCycle = ["Tall", "Mirror", "Float"]
 
 -- Layout Hook
 
