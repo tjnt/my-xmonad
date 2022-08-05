@@ -591,30 +591,30 @@ myMouseBindings XConfig { modMask = modm } = M.fromList
 
 myLayoutHook = refocusLastLayoutHook . trackFloating
              . avoidStruts . boringWindows
-             $ toggleLayouts expand normal
+             . toggleLayouts full
+             $ tall ||| mirror ||| three ||| grid ||| circle ||| float
   where
-    tall   = draggingVisualizer . minimize . smartBorders . spacing
+    tall   = rename "Tall"
+           . draggingVisualizer . minimize . smartBorders . spacing
            $ ResizableTall 1 (3/100) (1/2) []
-    mirror = draggingVisualizer . minimize . smartBorders . spacing
+    mirror = rename "Mirror"
+           . draggingVisualizer . minimize . smartBorders . spacing
            $ Mirror (ResizableTall 1 (3/100) (1/2) [])
-    three  = draggingVisualizer . minimize . smartBorders . spacing
+    three  = rename "Three"
+           . draggingVisualizer . minimize . smartBorders . spacing
            $ ThreeColMid 1 (3/100) (1/2)
-    grid   = draggingVisualizer . minimize . smartBorders . spacing
+    grid   = rename "Grid"
+           . draggingVisualizer . minimize . smartBorders . spacing
            $ Grid
-    circle = draggingVisualizer . minimize . smartBorders
+    circle = rename "Circle"
+           . draggingVisualizer . minimize . smartBorders
            $ Circle
-    float  = minimize
-             simplestFloat
-    full   = minimize . noBorders
+    float  = rename "Float"
+           . minimize
+           $ simplestFloat
+    full   = rename "Full"
+           . minimize . noBorders
            $ Full
-
-    normal = rename "Tall"   tall
-         ||| rename "Mirror" mirror
-         ||| rename "Three"  three
-         ||| rename "Grid"   grid
-         ||| rename "Circle" circle
-         ||| rename "Float"  float
-    expand = rename "Full"   full
 
     spacing = spacingRaw True (Border 4 4 4 4) True (Border 4 4 4 4) True
     rename s = renamed [Replace s]
