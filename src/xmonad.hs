@@ -54,7 +54,8 @@ import           XMonad                              (Button, Event,
                                                       noModMask, refresh,
                                                       resource, screenWorkspace,
                                                       sendMessage, setLayout,
-                                                      shiftMask, spawn, title,
+                                                      shiftMask, spawn,
+                                                      stringProperty, title,
                                                       whenJust, windows,
                                                       windowset, withFocused,
                                                       withUnfocused,
@@ -62,7 +63,7 @@ import           XMonad                              (Button, Event,
                                                       xK_bracketleft, xK_q,
                                                       xK_slash, xmonad, (-->),
                                                       (.|.), (<&&>), (<+>),
-                                                      (=?))
+                                                      (<||>), (=?))
 import           XMonad.Actions.CycleSelectedLayouts (cycleThroughLayouts)
 import           XMonad.Actions.CycleWS              (WSType (WSIs),
                                                       findWorkspace, moveTo,
@@ -385,7 +386,7 @@ myScratchpads :: NamedScratchpads
 myScratchpads =
     [ NS "pulsemixer" (termcmd "pulsemixer" "pulsemixer") (title =? "pulsemixer") defaultFloating
     , NS "terminal" "termite --title scratch-terminal" (title =? "scratch-terminal") defaultFloating
-    , NS "qalculate" "qalculate-gtk" (className =? "Qalculate-gtk") defaultFloating
+    , NS "qalculate" "qalculate-gtk" (title =? "Qalculate!") defaultFloating
     -- , NS "ytop" (termcmd "ytop" "ytop") (title =? "ytop") defaultFloating
     ]
   where
@@ -631,8 +632,10 @@ myManageHook =
         , className =? "mplayer2"       --> doFloat
         , className =? "Pavucontrol"    --> doFloat
         , className =? "Peek"           --> doFloat
-        , className =? "Qalculate-gtk"  --> doFloat
-        , className =? "Firefox" <&&> resource =? "Toolkit" --> doFloat
+        , className =? "Firefox"
+            <&&> resourceAny ["Browser", "Places", "Toolkit"] --> doFloat
+        , className ^? "thunderbird"
+            <&&> roleAny ["About", "filterlist"] --> doFloat
         , title =? "htop"               --> doFullFloat
         , title =? "ytop"               --> doRectFloat (W.RationalRect 0 0 0.5 0.6)
         , title =? "pulsemixer"         --> doRectFloat (W.RationalRect 0 0 0.5 0.4)
@@ -642,10 +645,15 @@ myManageHook =
         , title ^? "nmtui"              --> doFloat
         , title =? "bluetooth-tui"      --> doFloat
         , title =? "screen-capture"     --> doFloat
+        , title =? "Qalculate!"         --> doFloat
         , isFullscreen                  --> doFullFloat
         , isDialog                      --> doFloat
         ]
     <+> namedScratchpadManageHook myScratchpads
+  where
+    role = stringProperty "WM_WINDOW_ROLE"
+    resourceAny xs = foldr1 (<||>) [ resource =? x | x <- xs ]
+    roleAny xs = foldr1 (<||>) [ role =? x | x <- xs ]
 
 -- Event Hook
 
