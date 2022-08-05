@@ -174,7 +174,11 @@ import           XMonad.Util.WorkspaceCompare        (getSortByIndex)
 centerFloat :: X ()
 centerFloat = withFocused $ \win -> do
     (_, W.RationalRect _ _ w h) <- floatLocation win
-    windows $ W.float win $ W.RationalRect ((1 - w) / 2) ((1 - h) / 2) w h
+    windows . W.float win $ W.RationalRect ((1 - w) / 2) ((1 - h) / 2) w h
+
+fullFloat :: X ()
+fullFloat = withFocused $ \win ->
+    windows . W.float win $ W.RationalRect 0 0 1 1
 
 toggleFloat :: X ()
 toggleFloat = withFocused $ \win -> do
@@ -450,6 +454,7 @@ keyBindings conf =
     [ ("M-t",    toggleFloat,  "toggle float / sink the focused window")
     , ("M-S-t",  sinkAll,      "sink all floating windows")
     , ("M-g",    centerFloat,  "float the focused window and move center")
+    , ("M-S-g",  fullFloat,    "float the focused window with full screen")
     ] ++
     category "moving floating window by key"
     [ ("M-<Up>",         withFocused $ keysMoveWindow'   (0,-10),        "move up")
