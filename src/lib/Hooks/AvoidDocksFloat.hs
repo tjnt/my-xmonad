@@ -2,6 +2,10 @@ module Hooks.AvoidDocksFloat
     ( doFloat
     , doRectFloat
     , doFullFloat
+    , doLeftHalfFloat
+    , doRightHalfFloat
+    , doUpperHalfFloat
+    , doLowerHalfFloat
     ) where
 
 import qualified Data.Set                 as S
@@ -24,6 +28,18 @@ doRectFloat r = ask >>= \w ->
 
 doFullFloat :: ManageHook
 doFullFloat = doRectFloat (W.RationalRect 0 0 1 1)
+
+doLeftHalfFloat :: ManageHook
+doLeftHalfFloat = doRectFloat (W.RationalRect 0 0 0.5 1)
+
+doRightHalfFloat :: ManageHook
+doRightHalfFloat = doRectFloat (W.RationalRect 0.5 0 0.5 1)
+
+doUpperHalfFloat :: ManageHook
+doUpperHalfFloat = doRectFloat (W.RationalRect 0 0 1 0.5)
+
+doLowerHalfFloat :: ManageHook
+doLowerHalfFloat = doRectFloat (W.RationalRect 0 0.5 1 0.5)
 
 calcRect :: W.RationalRect -> X W.RationalRect
 calcRect r = do

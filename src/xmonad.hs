@@ -2,18 +2,22 @@
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 
 import           Control.Exception                   (bracket, catch)
-import           Control.Monad                       (unless, when)
+import           Control.Monad                       (unless, when, (<=<))
 import           Data.Bifunctor                      (bimap)
 import           Data.Bool                           (bool)
 import           Data.List                           (intersect, isPrefixOf,
                                                       sortOn)
 import qualified Data.Map                            as M
 import           Data.Maybe                          (fromMaybe, mapMaybe)
-import           Data.Monoid                         (All)
+import           Data.Monoid                         (All, appEndo)
 import           Data.Tree                           (Tree (Node))
 import           GHC.IO.Exception                    (IOException)
 import           Hooks.AvoidDocksFloat               (doFloat, doFullFloat,
-                                                      doRectFloat)
+                                                      doLeftHalfFloat,
+                                                      doLowerHalfFloat,
+                                                      doRectFloat,
+                                                      doRightHalfFloat,
+                                                      doUpperHalfFloat)
 import           Numeric                             (showFFloat)
 import           System.Exit                         (exitSuccess)
 import           System.IO                           (hClose, hPutStr,
@@ -52,7 +56,8 @@ import           XMonad                              (Button, Event,
                                                       gets, io, kill, mod4Mask,
                                                       mouseMoveWindow,
                                                       noModMask, refresh,
-                                                      resource, screenWorkspace,
+                                                      resource, runQuery,
+                                                      screenWorkspace,
                                                       sendMessage, setLayout,
                                                       shiftMask, spawn,
                                                       stringProperty, title,
@@ -170,16 +175,15 @@ import           XMonad.Util.Types                   (Direction1D (Next, Prev),
                                                       Direction2D (D, L, R, U))
 import           XMonad.Util.WorkspaceCompare        (getSortByIndex)
 
+-- execute manage hook in X action
+
+doManageHook :: ManageHook -> Window -> X ()
+doManageHook mh = windows . appEndo <=< runQuery mh
+
 -- floating window operation
 
-centerFloat :: X ()
-centerFloat = withFocused $ \win -> do
-    (_, W.RationalRect _ _ w h) <- floatLocation win
-    windows . W.float win $ W.RationalRect ((1 - w) / 2) ((1 - h) / 2) w h
-
-fullFloat :: X ()
-fullFloat = withFocused $ \win ->
-    windows . W.float win $ W.RationalRect 0 0 1 1
+floatAndDo :: ManageHook -> X ()
+floatAndDo = withFocused . doManageHook
 
 toggleFloat :: X ()
 toggleFloat = withFocused $ \win -> do
@@ -447,10 +451,14 @@ keyBindings conf =
     , ("M-u",    sendMessage MirrorExpand,  "expand the slave area")
     ] ++
     category "floating layer support"
-    [ ("M-t",    toggleFloat,  "toggle float / sink the focused window")
-    , ("M-S-t",  sinkAll,      "sink all floating windows")
-    , ("M-g",    centerFloat,  "float the focused window and move center")
-    , ("M-S-g",  fullFloat,    "float the focused window with full screen")
+    [ ("M-t",    toggleFloat,                  "toggle float / sink the focused window")
+    , ("M-S-t",  sinkAll,                      "sink all floating windows")
+    , ("M-g c",  floatAndDo doCenterFloat,     "float the focused window and move center")
+    , ("M-g f",  floatAndDo doFullFloat,       "float the focused window with full screen")
+    , ("M-g h",  floatAndDo doLeftHalfFloat,   "float the focused window with left half screen")
+    , ("M-g l",  floatAndDo doRightHalfFloat,  "float the focused window with right half screen")
+    , ("M-g k",  floatAndDo doUpperHalfFloat,  "float the focused window with upper half screen")
+    , ("M-g j",  floatAndDo doLowerHalfFloat,  "float the focused window with lower half screen")
     ] ++
     category "moving floating window by key"
     [ ("M-<Up>",         withFocused $ keysMoveWindow'   (0,-10),        "move up")
