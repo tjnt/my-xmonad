@@ -29,8 +29,8 @@ homeDir = unsafeDupablePerformIO (getEnv "HOME")
 xmonadDir :: String
 xmonadDir = homeDir <> "/.xmonad"
 
-runTerminal :: String -> String -> String -> String -> String
-runTerminal cmd title =
+xmobarActionT :: String -> String -> String -> String -> String
+xmobarActionT cmd title =
     xmobarAction $ "termite --exec " <> wrap "\"" "\"" cmd
                  <> if null title then "" else " --title " <> title
 
@@ -99,27 +99,27 @@ myTemplate =
     xmobarFont 3 "\xe777"
     <> " %UnsafeXMonadLog% }{"
     <> concatMap (wrap " " " ")
-        [ "%cpu%"             & runTerminal "htop -s PERCENT_CPU" "htop" "3"
-        , "%memory%"          & runTerminal "htop -s PERCENT_MEM" "htop" "3"
+        [ "%cpu%"             & xmobarActionT "htop -s PERCENT_CPU" "htop" "3"
+        , "%memory%"          & xmobarActionT "htop -s PERCENT_MEM" "htop" "3"
         , "%multicoretemp%"
-        , "%dynnetwork%"      & runTerminal "nmtui-edit" "" "3"
-        , "%bright%"          & xmobarAction "xmonadctl brightness-up" "4"
-                              . xmobarAction "xmonadctl brightness-down" "5"
-        , "%default:Master%"  & xmobarAction "xmonadctl volume-master-toggle" "1"
-                              . xmobarAction "xmonadctl volume-master-up" "4"
-                              . xmobarAction "xmonadctl volume-master-down" "5"
-                              . runTerminal "pulsemixer" "" "3"
-        , "%wifi%%wlp3s0wi%"  & xmobarAction "xmonadctl wifi-toggle" "1"
-                              . runTerminal "nmtui-connect" "" "3"
+        , "%dynnetwork%"      & xmobarActionT "nmtui-edit" "" "3"
+        , "%bright%"          & xmobarAction  "xmonadctl brightness-up" "4"
+                              . xmobarAction  "xmonadctl brightness-down" "5"
+        , "%default:Master%"  & xmobarAction  "xmonadctl volume-master-toggle" "1"
+                              . xmobarAction  "xmonadctl volume-master-up" "4"
+                              . xmobarAction  "xmonadctl volume-master-down" "5"
+                              . xmobarActionT "pulsemixer" "" "3"
+        , "%wifi%%wlp3s0wi%"  & xmobarAction  "xmonadctl wifi-toggle" "1"
+                              . xmobarActionT "nmtui-connect" "" "3"
         , "%bluetooth%"       & (<> "%deviceicons%")
-                              . xmobarAction "xmonadctl bluetooth-toggle" "1"
-                              . runTerminal  "bluetooth-tui" "" "3"
-        , "%dunst%"           & xmobarAction "dunstctl history-pop" "1"
-                              . xmobarAction "killall dunst ; dunst" "3"
+                              . xmobarAction  "xmonadctl bluetooth-toggle" "1"
+                              . xmobarActionT "bluetooth-tui" "" "3"
+        , "%dunst%"           & xmobarAction  "dunstctl history-pop" "1"
+                              . xmobarAction  "killall dunst ; dunst" "3"
         , "%battery%"
-        , "%date%"            & runTerminal "sh -c 'ncal -C -A1 ; \
-                                            \ read -p \\\"press enter, close this.\\\" a'"
-                                            "xmobar-cal" "3"
+        , "%date%"            & xmobarActionT "sh -c 'ncal -C -A1 ; \
+                                              \ read -p \\\"press enter, close this.\\\" a'"
+                                              "xmobar-cal" "3"
         ]
     <> "%trayerpad%"
 
