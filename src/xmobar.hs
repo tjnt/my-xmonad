@@ -117,7 +117,9 @@ myTemplate =
         , "%dunst%"           & xmobarAction "dunstctl history-pop" "1"
                               . xmobarAction "killall dunst ; dunst" "3"
         , "%battery%"
-        , "%date%"
+        , "%date%"            & runTerminal "sh -c 'ncal -C -A1 ; \
+                                            \ read -p \\\"press enter, close this.\\\" a'"
+                                            "xmobar-cal" "3"
         ]
     <> "%trayerpad%"
 

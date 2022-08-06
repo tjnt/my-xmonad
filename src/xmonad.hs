@@ -653,6 +653,7 @@ myManageHook =
         , title ^? "nmtui"              --> doFloat
         , title =? "bluetooth-tui"      --> doFloat
         , title =? "screen-capture"     --> doFloat
+        , title =? "xmobar-cal"         --> doRectFloat (W.RationalRect 0.7 0 0.3 0.3)
         , title =? "Qalculate!"         --> doFloat
         , isFullscreen                  --> doFullFloat
         , isDialog                      --> doFloat
