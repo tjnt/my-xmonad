@@ -11,8 +11,7 @@ case "$1" in
             && xclip -o -selection clipboard | xsel --clipboard
                     ;;
     "del")
-        recid=$(clipc --list | $fzf | awk '{print $1}')
-        [[ -n $recid ]] \
-            && clipc --delete $recid
+        recid=$(clipc --list | $fzf -m | awk '{print $1}')
+        for i in $recid; do clipc --delete $i; done
                     ;;
 esac
