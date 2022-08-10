@@ -87,6 +87,12 @@ dunstNotifyCount = do
                    _   -> xmobarColor base02 "" "\xf868"
     return $ printf "%s %s" (xmobarFont 1 icon) stdout
 
+dateAndTimeFormat :: String
+dateAndTimeFormat = printf "%s %%m/%%d %%a %s %%H:%%M" calendar clock
+  where
+   calendar = xmobarFont 1 "\xf073"
+   clock = xmobarFont 1 "\xf64f"
+
 myAdditionalFonts :: [String]
 myAdditionalFonts =
     [ "xft:RictyDiminished Nerd Font:style=Regular:size=10"
@@ -209,7 +215,7 @@ myCommands =
         , "-i",         xmobarFont 1 "\xf1e6 " <> "<left>%"
         ] 100
     , Run $ SimpleIOReader dunstNotifyCount "dunst" 40
-    , Run $ Date "%m/%d %a %H:%M" "date" 100
+    , Run $ Date dateAndTimeFormat "date" 100
     , Run $ Com (xmonadDir <> "/scripts/trayer-padding-icon.sh") [] "trayerpad" 100
     ]
 
