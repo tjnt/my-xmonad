@@ -72,6 +72,7 @@ executables:
       - xmobar
       - xmonad-contrib
       - containers
+      - directory
       - dbus-bluetooth
       - my-xmonad
   xmonadctl:

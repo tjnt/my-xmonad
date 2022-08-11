@@ -1,11 +1,15 @@
+{-# LANGUAGE RecordWildCards #-}
+
 import           Control.Exception             (SomeException, bracket, catch)
-import           Control.Monad                 (msum, unless)
+import           Control.Monad                 (filterM, msum, unless, when)
 import           Data.Function                 ((&))
-import           Data.List                     (isSubsequenceOf)
+import           Data.List                     (isPrefixOf, isSubsequenceOf,
+                                                isSuffixOf)
 import qualified Data.Map.Strict               as M
 import           Data.Maybe                    (fromMaybe, mapMaybe)
 import           Network.Bluetooth             (Device (..), closeClient,
                                                 devices, newClient)
+import           System.Directory              (listDirectory)
 import           System.Environment            (getEnv)
 import           System.IO.Unsafe              (unsafeDupablePerformIO)
 import           Text.Printf                   (printf)
@@ -16,7 +20,7 @@ import           XMonad.Hooks.StatusBar.PP     (trim, wrap, xmobarAction,
                                                 xmobarColor, xmobarFont)
 import           Xmobar                        (Align (L), Command (Com),
                                                 Config (..), Date (Date),
-                                                Monitors (Battery, Brightness, Cpu, DynNetwork, Memory, MultiCoreTemp, Volume, Wireless),
+                                                Monitors (Battery, Brightness, Cpu, DynNetwork, Memory, Volume, Wireless),
                                                 Runnable (Run),
                                                 XMonadLog (UnsafeXMonadLog),
                                                 XPosition (TopSize),
@@ -33,6 +37,52 @@ xmobarActionT :: String -> String -> String -> String -> String
 xmobarActionT cmd title =
     xmobarAction $ "termite --exec " <> wrap "\"" "\"" cmd
                  <> if null title then "" else " --title " <> title
+
+data IconParam a = IconParam
+    { iconPatterns        :: [String]
+    , iconLowV, iconHighV :: a
+    , iconLowC, iconHighC :: String
+    , iconMinV, iconMaxV  :: a
+    }
+
+choseIcon :: RealFrac a => IconParam a -> a -> String
+choseIcon IconParam {..} val = xmobarFont 1 $ iconPatterns !! max 0 pos
+  where
+    pc = (val - iconMinV) / (iconMaxV - iconMinV)
+    pos = let len = length iconPatterns
+           in pred . min len $ round (fromIntegral len * pc)
+
+withColor :: Ord a => IconParam a -> a -> (String -> String)
+withColor IconParam {..} val
+  | iconHighV <= val = xmobarColor iconHighC ""
+  | iconLowV  <= val = xmobarColor iconLowC ""
+  | otherwise        = id
+
+coreTemp :: String -> IconParam Float -> IO String
+coreTemp template iconP = maybe "ERR" formatTemp <$> readTemp
+  where
+    readTemp :: IO (Maybe Float)
+    readTemp = do
+        subdir <- head <$> filterSubDir (matcher "hwmon" "") hwmonPath
+        labels <- filterM isCoreLabel =<< filterSubDir (matcher "temp" "label") subdir
+        values <- mapM (fmap (/ 1000) . read1Line . labelToInput) labels :: IO [Float]
+        return $ do
+            when (null values) Nothing
+            Just $ sum values / fromIntegral (length values)
+        `catch` ((const $ return Nothing) :: SomeException -> IO (Maybe Float))
+      where
+        filterSubDir m p = map ((p <> "/") <>) . filter m <$> listDirectory p
+        matcher prefix suffix s = prefix `isPrefixOf` s && suffix `isSuffixOf` s
+        isCoreLabel p = readFile p >>= \a -> return $ take 4 a == "Core"
+        labelToInput = (++ "input") . reverse . drop 5 . reverse
+        read1Line f = read . head . lines <$> readFile f
+        hwmonPath = "/sys/bus/platform/devices/coretemp.0/hwmon"
+
+    formatTemp :: Float -> String
+    formatTemp val = printf template (color icon) (round val :: Int)
+      where
+        icon  = choseIcon iconP val
+        color = withColor iconP val
 
 wifiIcon :: IO String
 wifiIcon = do
@@ -152,16 +202,25 @@ myCommands =
         , "--"
         , "--used-icon-pattern", xmobarFont 1 "\xf85a"
         ] 20
-    , Run $ MultiCoreTemp
-        [ "--template", xmobarFont 1 "<avgbar>" <> "<avg>℃"
-        , "--bfore",    "\xf2cb\xf2cb\xf2ca\xf2ca\xf2c9\xf2c9\xf2c8\xf2c8\xf2c7\xf2c7"
-        , "--bwidth",   "0"
-        , "--Low",      "40"
-        , "--High",     "60"
-        , "--width",    "3"
-        -- , "--normal",   base03
-        -- , "--high",     base01
-        ] 40
+    , Run $ SimpleIOReader
+        (coreTemp "%s%3d℃"
+          IconParam
+            { iconPatterns = ["\xf2cb","\xf2ca","\xf2c9","\xf2c8","\xf2c7"]
+            , iconLowV = 40, iconHighV = 60
+            , iconLowC = base03, iconHighC = base01
+            , iconMinV = 20, iconMaxV = 100
+            }
+        ) "multicoretemp" 40
+    -- , Run $ MultiCoreTemp
+    --     [ "--template", xmobarFont 1 "<avgbar>" <> "<avg>℃"
+    --     , "--bfore",    "\xf2cb\xf2cb\xf2ca\xf2ca\xf2c9\xf2c9\xf2c8\xf2c8\xf2c7\xf2c7"
+    --     , "--bwidth",   "0"
+    --     , "--Low",      "40"
+    --     , "--High",     "60"
+    --     , "--width",    "3"
+    --     -- , "--normal",   base03
+    --     -- , "--high",     base01
+    --     ] 40
     , Run $ DynNetwork
         [ "--template", "<rxipat><rx>kb  <txipat><tx>kb"
         , "--Low",      "102400"
