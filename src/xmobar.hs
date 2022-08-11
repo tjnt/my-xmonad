@@ -103,7 +103,7 @@ deviceIcons = do
     bracket newClient closeClient $ \client -> do
         devs <- devices client
         return . concatMap (' ' :) $ mapMaybe convertIcon devs
-    `catch` handler
+    `catch` (const $ return "ERR" :: SomeException -> IO String)
   where
     convertIcon dev = do
         conn <- devConnected dev
@@ -125,8 +125,6 @@ deviceIcons = do
         , ("input-keyboard", "\xf80b")
         , ("input-gaming", "\xf11b")
         ]
-    handler :: SomeException -> IO String
-    handler _ = return "ERR"
 
 dunstNotifyCount :: IO String
 dunstNotifyCount = do
@@ -149,35 +147,6 @@ myAdditionalFonts =
     , "xft:RictyDiminished Nerd Font:style=Regular:size=12"
     , "xft:RictyDiminished Nerd Font:style=Regular:size=20"
     ]
-
-myTemplate :: String
-myTemplate =
-    xmobarFont 3 "\xe777"
-    <> " %UnsafeXMonadLog% }{"
-    <> concatMap (wrap " " " ")
-        [ "%cpu%"             & xmobarActionT "htop -s PERCENT_CPU" "htop" "3"
-        , "%memory%"          & xmobarActionT "htop -s PERCENT_MEM" "htop" "3"
-        , "%multicoretemp%"
-        , "%dynnetwork%"      & xmobarActionT "nmtui-edit" "" "3"
-        , "%bright%"          & xmobarAction  "xmonadctl brightness-up" "4"
-                              . xmobarAction  "xmonadctl brightness-down" "5"
-        , "%default:Master%"  & xmobarAction  "xmonadctl volume-master-toggle" "1"
-                              . xmobarAction  "xmonadctl volume-master-up" "4"
-                              . xmobarAction  "xmonadctl volume-master-down" "5"
-                              . xmobarActionT "pulsemixer" "" "3"
-        , "%wifi%%wlp3s0wi%"  & xmobarAction  "xmonadctl wifi-toggle" "1"
-                              . xmobarActionT "nmtui-connect" "" "3"
-        , "%bluetooth%"       & (<> "%deviceicons%")
-                              . xmobarAction  "xmonadctl bluetooth-toggle" "1"
-                              . xmobarActionT "bluetooth-tui" "" "3"
-        , "%dunst%"           & xmobarAction  "dunstctl history-pop" "1"
-                              . xmobarAction  "killall dunst ; dunst" "3"
-        , "%battery%"
-        , "%date%"            & xmobarActionT "sh -c 'ncal -C -A1 ; \
-                                              \ read -p \\\"press enter, close this.\\\" a'"
-                                              "xmobar-cal" "3"
-        ]
-    <> "%trayerpad%"
 
 myCommands :: [Runnable]
 myCommands =
@@ -210,17 +179,7 @@ myCommands =
             , iconLowC = base03, iconHighC = base01
             , iconMinV = 20, iconMaxV = 100
             }
-        ) "multicoretemp" 40
-    -- , Run $ MultiCoreTemp
-    --     [ "--template", xmobarFont 1 "<avgbar>" <> "<avg>℃"
-    --     , "--bfore",    "\xf2cb\xf2cb\xf2ca\xf2ca\xf2c9\xf2c9\xf2c8\xf2c8\xf2c7\xf2c7"
-    --     , "--bwidth",   "0"
-    --     , "--Low",      "40"
-    --     , "--High",     "60"
-    --     , "--width",    "3"
-    --     -- , "--normal",   base03
-    --     -- , "--high",     base01
-    --     ] 40
+        ) "coretemp" 40
     , Run $ DynNetwork
         [ "--template", "<rxipat><rx>kb  <txipat><tx>kb"
         , "--Low",      "102400"
@@ -278,6 +237,35 @@ myCommands =
     , Run $ Com (xmonadDir <> "/scripts/trayer-padding-icon.sh") [] "trayerpad" 100
     ]
 
+myTemplate :: String
+myTemplate =
+    xmobarFont 3 "\xe777"
+    <> " %UnsafeXMonadLog% }{"
+    <> concatMap (wrap " " " ")
+        [ "%cpu%"             & xmobarActionT "htop -s PERCENT_CPU" "htop" "3"
+        , "%memory%"          & xmobarActionT "htop -s PERCENT_MEM" "htop" "3"
+        , "%coretemp%"
+        , "%dynnetwork%"      & xmobarActionT "nmtui-edit" "" "3"
+        , "%bright%"          & xmobarAction  "xmonadctl brightness-up" "4"
+                              . xmobarAction  "xmonadctl brightness-down" "5"
+        , "%default:Master%"  & xmobarAction  "xmonadctl volume-master-toggle" "1"
+                              . xmobarAction  "xmonadctl volume-master-up" "4"
+                              . xmobarAction  "xmonadctl volume-master-down" "5"
+                              . xmobarActionT "pulsemixer" "" "3"
+        , "%wifi%%wlp3s0wi%"  & xmobarAction  "xmonadctl wifi-toggle" "1"
+                              . xmobarActionT "nmtui-connect" "" "3"
+        , "%bluetooth%"       & (<> "%deviceicons%")
+                              . xmobarAction  "xmonadctl bluetooth-toggle" "1"
+                              . xmobarActionT "bluetooth-tui" "" "3"
+        , "%dunst%"           & xmobarAction  "dunstctl history-pop" "1"
+                              . xmobarAction  "killall dunst ; dunst" "3"
+        , "%battery%"
+        , "%date%"            & xmobarActionT "sh -c 'ncal -C -A1 ; \
+                                              \ read -p \\\"press enter, close this.\\\" a'"
+                                              "xmobar-cal" "3"
+        ]
+    <> "%trayerpad%"
+
 main :: IO ()
 main = xmobar $ defaultConfig
     { font = myFont
@@ -291,6 +279,6 @@ main = xmobar $ defaultConfig
     , iconRoot = xmonadDir <> "/icons"
     , sepChar = "%"
     , alignSep = "}{"
-    , template = myTemplate
     , commands = myCommands
+    , template = myTemplate
     }
