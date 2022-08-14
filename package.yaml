@@ -36,6 +36,7 @@ library:
     - Utils.Dunst
     - Hooks.AvoidDocksFloat
     - Xmobar.Plugins.SimpleIOReader
+    - Xmobar.Plugins.SimpleIOMonitor
   dependencies:
     - xmonad
     - xmobar
