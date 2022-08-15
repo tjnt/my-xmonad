@@ -1,31 +1,36 @@
-{-# LANGUAGE RecordWildCards #-}
-
-import           Control.Exception             (SomeException, bracket, catch)
-import           Control.Monad                 (filterM, msum, unless, when)
-import           Data.Function                 ((&))
-import           Data.List                     (isPrefixOf, isSubsequenceOf,
-                                                isSuffixOf)
-import qualified Data.Map.Strict               as M
-import           Data.Maybe                    (fromMaybe, mapMaybe)
-import           Network.Bluetooth             (Device (..), closeClient,
-                                                devices, newClient)
-import           System.Directory              (listDirectory)
-import           System.Environment            (getEnv)
-import           System.IO.Unsafe              (unsafeDupablePerformIO)
-import           Text.Printf                   (printf)
-import           Theme.Theme                   (base01, base02, base03, base07,
-                                                base0C, basebg, myFont)
-import           Utils.Run                     (readProcess)
-import           XMonad.Hooks.StatusBar.PP     (trim, wrap, xmobarAction,
-                                                xmobarColor, xmobarFont)
-import           Xmobar                        (Align (L), Command (Com),
-                                                Config (..), Date (Date),
-                                                Monitors (Battery, Brightness, Cpu, DynNetwork, Volume, Wireless),
-                                                Runnable (Run),
-                                                XMonadLog (UnsafeXMonadLog),
-                                                XPosition (TopSize),
-                                                defaultConfig, xmobar)
-import           Xmobar.Plugins.SimpleIOReader (SimpleIOReader (SimpleIOReader))
+import           Control.Exception              (SomeException, bracket, catch)
+import           Control.Monad                  (filterM, msum, unless, when)
+import           Data.Function                  ((&))
+import           Data.IORef                     (IORef, newIORef, readIORef,
+                                                 writeIORef)
+import           Data.List                      (isPrefixOf, isSubsequenceOf,
+                                                 isSuffixOf)
+import qualified Data.Map.Strict                as M
+import           Data.Maybe                     (fromMaybe, mapMaybe)
+import           Network.Bluetooth              (Device (..), closeClient,
+                                                 devices, newClient)
+import           System.Directory               (listDirectory)
+import           System.Environment             (getEnv)
+import           System.IO.Unsafe               (unsafeDupablePerformIO)
+import           Text.Printf                    (printf)
+import           Theme.Theme                    (base01, base02, base03, base07,
+                                                 base0C, basebg, myFont)
+import           Utils.Run                      (readProcess)
+import           XMonad.Hooks.StatusBar.PP      (trim, wrap, xmobarAction,
+                                                 xmobarColor, xmobarFont)
+import           Xmobar                         (Align (L), Command (Com),
+                                                 Config (..), Date (Date),
+                                                 Monitors (Battery, Brightness, DynNetwork, Volume, Wireless),
+                                                 Runnable (Run),
+                                                 XMonadLog (UnsafeXMonadLog),
+                                                 XPosition (TopSize),
+                                                 defaultConfig, xmobar)
+import           Xmobar.Plugins.Monitors.Common (Monitor, io,
+                                                 showPercentWithColors,
+                                                 showWithColors)
+import           Xmobar.Plugins.SimpleIOMonitor (SimpleIOMonitor (SimpleIOMonitor),
+                                                 SimpleIOMonitorOpts, showIcon)
+import           Xmobar.Plugins.SimpleIOReader  (SimpleIOReader (SimpleIOReader))
 
 homeDir :: String
 homeDir = unsafeDupablePerformIO (getEnv "HOME")
@@ -38,60 +43,51 @@ xmobarActionT cmd title =
     xmobarAction $ "termite --exec " <> wrap "\"" "\"" cmd
                  <> if null title then "" else " --title " <> title
 
-data IconParam a = IconParam
-    { iconPattern         :: [String]
-    , iconLowV, iconHighV :: a
-    , iconLowC, iconHighC :: String
-    , iconMinV, iconMaxV  :: a
-    }
-
-choseIcon :: RealFrac a => [String] -> a -> a -> a -> String
-choseIcon []  _ _ _ = ""
-choseIcon [p] _ _ _ = xmobarFont 1 p
-choseIcon ptn mn mx val = xmobarFont 1 $ ptn !! max 0 pos
+cpuUsage :: SimpleIOMonitorOpts -> Monitor [String]
+cpuUsage = go $ unsafeDupablePerformIO (readCpu >>= newIORef)
   where
-    pc = (val - mn) / (mn - mx)
-    pos = let len = length ptn
-           in pred . min len $ round (fromIntegral len * pc)
+    readCpu = map read . tail . words . head . lines
+          <$> readFile "/proc/stat"
+    go :: IORef [Int] -> SimpleIOMonitorOpts -> Monitor [String]
+    go ref opts = do
+        diff <- io $ do
+            prev <- readIORef ref
+            crnt <- readCpu
+            writeIORef ref crnt
+            return $ zipWith (-) crnt prev
+        let sd = fromIntegral $ sum diff
+            div' n = if sd /= 0 then fromIntegral n / sd else 0
+            totalratio = cpuTotal $ map div' diff
+        val <- showPercentWithColors totalratio
+        return [showIcon opts (totalratio * 100), val]
+      where
+        cpuTotal (u:n:s:_) = sum [u, n, s]
+        cpuTotal _         = error "invalid cpu data"
 
-withColor :: Ord a => (a, String) -> (a, String) -> a -> (String -> String)
-withColor (low, lowc) (high, highc) val
-  | high <= val = xmobarColor highc ""
-  | low  <= val = xmobarColor lowc ""
-  | otherwise        = id
-
-formatWithIcon :: RealFloat a => String -> IconParam a -> a -> String
-formatWithIcon fmt IconParam {..} val = printf fmt (color icon) (round val :: Int)
-  where
-    icon  = choseIcon iconPattern iconMinV iconMaxV val
-    color = withColor (iconLowV, iconLowC) (iconHighV, iconHighC) val
-
-memUsage :: String -> IconParam Float -> IO String
-memUsage fmt ip = do
-    m <- M.fromList . map ((\ ln -> (head ln, read (ln !! 1) :: Float)) . words)
-      . take 8 . lines <$> fileMEM
+memUsage :: SimpleIOMonitorOpts -> Monitor [String]
+memUsage opts = io readMem >>= \m -> do
     let total = m M.! "MemTotal:"; free = m M.! "MemFree:"
         buffer = m M.! "Buffers:"; cache = m M.! "Cached:"
         available = M.findWithDefault (free + buffer + cache) "MemAvailable:" m
         used = total - available
         usedratio = used / total
-    return $ formatWithIcon fmt ip (usedratio * 100)
-    `catch` ((const $ return "ERR") :: SomeException -> IO String)
+    val <- showPercentWithColors usedratio
+    return [showIcon opts (usedratio * 100), val]
   where
-    fileMEM = readFile "/proc/meminfo"
+    readMem = M.fromList . map ((\ ln -> (head ln, read (ln !! 1) :: Float)) . words)
+            . take 8 . lines <$> readFile "/proc/meminfo"
 
-coreTemp :: String -> IconParam Float -> IO String
-coreTemp fmt ip = maybe "ERR" (formatWithIcon fmt ip) <$> readTemp
+coreTemp :: SimpleIOMonitorOpts -> Monitor [String]
+coreTemp opts = io readTemp >>= (\values -> do
+    when (null values) $ error "read value is empty"
+    let avg = sum values / fromIntegral (length values)
+    val <- showWithColors (show . (round :: Float -> Int)) avg
+    return [showIcon opts avg, val])
   where
-    readTemp :: IO (Maybe Float)
     readTemp = do
         subdir <- head <$> filterSubDir (matcher "hwmon" "") hwmonPath
         labels <- filterM isCoreLabel =<< filterSubDir (matcher "temp" "label") subdir
-        values <- mapM (fmap (/ 1000) . read1Line . labelToInput) labels :: IO [Float]
-        return $ do
-            when (null values) Nothing
-            Just $ sum values / fromIntegral (length values)
-        `catch` ((const $ return Nothing) :: SomeException -> IO (Maybe Float))
+        mapM (fmap (/ 1000) . read1Line . labelToInput) labels
       where
         filterSubDir m p = map ((p <> "/") <>) . filter m <$> listDirectory p
         matcher prefix suffix s = prefix `isPrefixOf` s && suffix `isSuffixOf` s
@@ -167,34 +163,44 @@ myAdditionalFonts =
 myCommands :: [Runnable]
 myCommands =
     [ Run UnsafeXMonadLog
-    , Run $ Cpu
-        [ "--template", "<ipat><total>%"
-        , "--Low",      "40"
-        , "--High",     "85"
-        , "--normal",   base03
-        , "--high",     base01
-        , "--width",    "3"
+    , Run $ SimpleIOMonitor
+        cpuUsage
+        [ "--template",          "<icon><value>%"
+        , "--width",             "3"
         , "--"
-        , "--load-icon-pattern", xmobarFont 1 "\xfb19"
-        ] 20
-    , Run $ SimpleIOReader
-        (memUsage "%s%3d%%"
-          IconParam
-              { iconPattern = ["\xf85a"]
-              , iconLowV = 50, iconHighV = 90
-              , iconLowC = base03, iconHighC = base01
-              , iconMinV = 0, iconMaxV = 0
-              }
-        ) "memory" 20
-    , Run $ SimpleIOReader
-        (coreTemp "%s%3d℃"
-          IconParam
-            { iconPattern = ["\xf2cb","\xf2ca","\xf2c9","\xf2c8","\xf2c7"]
-            , iconLowV = 40, iconHighV = 60
-            , iconLowC = base03, iconHighC = base01
-            , iconMinV = 20, iconMaxV = 100
-            }
-        ) "coretemp" 40
+        , "--icon-pattern",      "\xfb19"
+        , "--icon-font-no",      "1"
+        , "--icon-normal-color", base03
+        , "--icon-high-color",   base01
+        , "--icon-low-value",    "40"
+        , "--icon-high-value",   "80"
+        ] "cpu" 20
+    , Run $ SimpleIOMonitor
+        memUsage
+        [ "--template",          "<icon><value>%"
+        , "--width",             "3"
+        , "--"
+        , "--icon-pattern",      "\xf85a"
+        , "--icon-font-no",      "1"
+        , "--icon-normal-color", base03
+        , "--icon-high-color",   base01
+        , "--icon-low-value",    "50"
+        , "--icon-high-value",   "80"
+        ] "memory" 20
+    , Run $ SimpleIOMonitor
+        coreTemp
+        [ "--template",         "<icon><value>℃"
+        , "--width",            "3"
+        , "--"
+        , "--icon-pattern",     "\xf2cb\xf2ca\xf2c9\xf2c8\xf2c7"
+        , "--icon-font-no",     "1"
+        , "--icon-normal-color", base03
+        , "--icon-high-color",   base01
+        , "--icon-low-value",   "40"
+        , "--icon-high-value",  "60"
+        , "--icon-min-value",   "20"
+        , "--icon-max-value",   "90"
+        ] "coretemp" 40
     , Run $ DynNetwork
         [ "--template", "<rxipat><rx>kb  <txipat><tx>kb"
         , "--Low",      "102400"
