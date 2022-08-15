@@ -1,5 +1,6 @@
 import           Control.Exception              (SomeException, bracket, catch)
 import           Control.Monad                  (filterM, msum, unless, when)
+import qualified Data.ByteString.Char8          as BS
 import           Data.Function                  ((&))
 import           Data.IORef                     (IORef, newIORef, readIORef,
                                                  writeIORef)
@@ -7,6 +8,8 @@ import           Data.List                      (isPrefixOf, isSubsequenceOf,
                                                  isSuffixOf)
 import qualified Data.Map.Strict                as M
 import           Data.Maybe                     (fromMaybe, mapMaybe)
+import           Data.Time.Clock                (UTCTime, diffUTCTime,
+                                                 getCurrentTime)
 import           Network.Bluetooth              (Device (..), closeClient,
                                                  devices, newClient)
 import           System.Directory               (listDirectory)
@@ -20,16 +23,17 @@ import           XMonad.Hooks.StatusBar.PP      (trim, wrap, xmobarAction,
                                                  xmobarColor, xmobarFont)
 import           Xmobar                         (Align (L), Command (Com),
                                                  Config (..), Date (Date),
-                                                 Monitors (Battery, Brightness, DynNetwork, Volume, Wireless),
+                                                 Monitors (Battery, Brightness, Volume, Wireless),
                                                  Runnable (Run),
                                                  XMonadLog (UnsafeXMonadLog),
                                                  XPosition (TopSize),
                                                  defaultConfig, xmobar)
-import           Xmobar.Plugins.Monitors.Common (Monitor, io,
+import           Xmobar.Plugins.Monitors.Common (Monitor, io, showDigits,
                                                  showPercentWithColors,
-                                                 showWithColors)
+                                                 showWithColors, takeDigits)
 import           Xmobar.Plugins.SimpleIOMonitor (SimpleIOMonitor (SimpleIOMonitor),
-                                                 SimpleIOMonitorOpts, showIcon)
+                                                 SimpleIOMonitorOpts (..),
+                                                 showIcon)
 import           Xmobar.Plugins.SimpleIOReader  (SimpleIOReader (SimpleIOReader))
 
 homeDir :: String
@@ -95,6 +99,55 @@ coreTemp opts = io readTemp >>= (\values -> do
         labelToInput = (++ "input") . reverse . drop 5 . reverse
         read1Line f = read . head . lines <$> readFile f
         hwmonPath = "/sys/bus/platform/devices/coretemp.0/hwmon"
+
+network :: SimpleIOMonitorOpts -> Monitor [String]
+network = go $ unsafeDupablePerformIO (newIORef Nothing)
+  where
+    go :: IORef (Maybe ((Int,Int), UTCTime))
+       -> SimpleIOMonitorOpts -> Monitor [String]
+    go ref opts = do
+        (dr,dt) <- io $ do
+            prev <- readIORef ref
+            n1 <- sumValue <$> readNetwork
+            t1 <- getCurrentTime
+            writeIORef ref $ Just (n1,t1)
+            return $ maybe (0,0) (\(n0,t0) ->
+                let scx = realToFrac $ diffUTCTime t1 t0
+                 in if scx > 0 then diffRate n0 n1 scx else (0,0)) prev
+        let icons = iconPattern opts
+            rxIcon = showIcon opts { iconPattern = [head icons] } dr
+            txIcon = showIcon opts { iconPattern = [icons !! 1] } dt
+        rx <- formatValue dr
+        tx <- formatValue dt
+        return [rxIcon, rx, txIcon, tx]
+      where
+        sumValue = foldr (\(_,(r,t)) (rs,ts) -> (rs + r, ts + t)) (0,0)
+        diffRate (r0,t0) (r1,t1) scx = (rate r0 r1, rate t0 t1)
+          where rate v0 v1 = takeDigits 2 $ fromIntegral (v1 - v0) / scx
+        convUnit v
+          | v < 1024**1 = (v, "B")
+          | v < 1024**2 = (v / 1024**1, "K")
+          | v < 1024**3 = (v / 1024**2, "M")
+          | otherwise   = (v / 1024**3, "G")
+        formatValue v =
+            let (v',s) = convUnit v
+             in (++ s) <$> showWithColors (showDigits 0) v'
+
+    readNetwork = BS.readFile "/proc/net/dev" >>= filterDev
+                . map parseLine . drop2Line
+      where
+        drop2Line = drop 2 . BS.lines
+        parseLine = selectCols . map BS.unpack . BS.words
+        selectCols cols = (init (head cols), (read (cols !! 1), read (cols !! 9)))
+
+    filterDev = filterM (\(d,_) -> predicate d)
+      where
+        predicate dev
+          | dev `elem` excludes = return False
+          | otherwise = (`elem` ["up", "unknown"]) <$> readstate dev
+        excludes = ["lo"]
+        readstate d = head . lines
+                  <$> readFile (printf "/sys/class/net/%s/operstate" d)
 
 wifiIcon :: IO String
 wifiIcon = do
@@ -165,7 +218,7 @@ myCommands =
     [ Run UnsafeXMonadLog
     , Run $ SimpleIOMonitor
         cpuUsage
-        [ "--template",          "<icon><value>%"
+        [ "--template",          "<0><1>%"
         , "--width",             "3"
         , "--"
         , "--icon-pattern",      "\xfb19"
@@ -177,7 +230,7 @@ myCommands =
         ] "cpu" 20
     , Run $ SimpleIOMonitor
         memUsage
-        [ "--template",          "<icon><value>%"
+        [ "--template",          "<0><1>%"
         , "--width",             "3"
         , "--"
         , "--icon-pattern",      "\xf85a"
@@ -189,7 +242,7 @@ myCommands =
         ] "memory" 20
     , Run $ SimpleIOMonitor
         coreTemp
-        [ "--template",         "<icon><value>℃"
+        [ "--template",         "<0><1>℃"
         , "--width",            "3"
         , "--"
         , "--icon-pattern",     "\xf2cb\xf2ca\xf2c9\xf2c8\xf2c7"
@@ -201,17 +254,18 @@ myCommands =
         , "--icon-min-value",   "20"
         , "--icon-max-value",   "90"
         ] "coretemp" 40
-    , Run $ DynNetwork
-        [ "--template", "<rxipat><rx>kb  <txipat><tx>kb"
-        , "--Low",      "102400"
-        , "--High",     "1024000"
-        , "--normal",   base03
-        , "--high",     base01
-        , "--width",    "5"
+    , Run $ SimpleIOMonitor
+        network
+        [ "--template",          "<0><1>  <2><3>"
+        , "--width",             "4"
         , "--"
-        , "--rx-icon-pattern", xmobarFont 1 "\xf6d9"
-        , "--tx-icon-pattern", xmobarFont 1 "\xfa51"
-        ] 20
+        , "--icon-pattern",      "\xf6d9\xfa51"
+        , "--icon-font-no",      "1"
+        , "--icon-normal-color", base03
+        , "--icon-high-color",   base01
+        , "--icon-low-value",    "102400"
+        , "--icon-high-value",   "1024000"
+        ] "network" 20
     , Run $ Brightness
         [ "--template", xmobarFont 1 "<bar>" <> "<percent>%"
         , "--bfore",    "\xf5d9\xf5da\xf5db\xf5dc\xf5dd\xf5dd\xf5de\xf5de\xf5df\xf5df"
@@ -266,7 +320,7 @@ myTemplate =
         [ "%cpu%"             & xmobarActionT "htop -s PERCENT_CPU" "htop" "3"
         , "%memory%"          & xmobarActionT "htop -s PERCENT_MEM" "htop" "3"
         , "%coretemp%"
-        , "%dynnetwork%"      & xmobarActionT "nmtui-edit" "" "3"
+        , "%network%"         & xmobarActionT "nmtui-edit" "" "3"
         , "%bright%"          & xmobarAction  "xmonadctl brightness-up" "4"
                               . xmobarAction  "xmonadctl brightness-down" "5"
         , "%default:Master%"  & xmobarAction  "xmonadctl volume-master-toggle" "1"

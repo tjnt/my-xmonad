@@ -73,6 +73,8 @@ executables:
       - xmobar
       - xmonad-contrib
       - containers
+      - bytestring
+      - time
       - directory
       - dbus-bluetooth
       - my-xmonad

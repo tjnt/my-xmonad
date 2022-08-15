@@ -38,7 +38,7 @@ type FontNo = Maybe Int
 type Color  = Maybe String
 
 data SimpleIOMonitorOpts = SimpleIOMonitorOpts
-    { iconPattern                      :: Maybe [Char]
+    { iconPattern                      :: [Char]
     , iconFontNo                       :: FontNo
     , iconLowC, iconNormalC, iconHighC :: Color
     , iconLowV, iconHighV              :: Float
@@ -47,7 +47,7 @@ data SimpleIOMonitorOpts = SimpleIOMonitorOpts
 
 defaultOpts :: SimpleIOMonitorOpts
 defaultOpts = SimpleIOMonitorOpts
-    { iconPattern = Nothing
+    { iconPattern = []
     , iconFontNo = Nothing
     , iconLowC = Nothing, iconNormalC = Nothing, iconHighC = Nothing
     , iconLowV = 0,  iconHighV = 0
@@ -56,7 +56,7 @@ defaultOpts = SimpleIOMonitorOpts
 
 options :: [OptDescr (SimpleIOMonitorOpts -> SimpleIOMonitorOpts)]
 options =
-    [ Option "" ["icon-pattern"] (ReqArg (\x o -> o { iconPattern = Just x }) "") ""
+    [ Option "" ["icon-pattern"] (ReqArg (\x o -> o { iconPattern = x }) "") ""
     , Option "" ["icon-font-no"] (ReqArg (\x o -> o { iconFontNo = Just (read x) }) "") ""
     , Option "" ["icon-low-color"] (ReqArg (\x o -> o { iconLowC = Just x }) "") ""
     , Option "" ["icon-normal-color"] (ReqArg (\x o -> o { iconNormalC = Just x }) "") ""
@@ -68,7 +68,7 @@ options =
     ]
 
 ioMonitorConfig :: IO MConfig
-ioMonitorConfig = mkMConfig "<icon> <value>" ["icon", "value"]
+ioMonitorConfig = mkMConfig "<0>" (map show [0 :: Int ..])
 
 runIOMonitor :: (SimpleIOMonitorOpts -> Monitor [String])
              -> [String] -> Monitor String
@@ -77,12 +77,12 @@ runIOMonitor f argv = do
     f opts >>= parseTemplate
 
 showIcon :: SimpleIOMonitorOpts -> Float -> String
-showIcon SimpleIOMonitorOpts { iconPattern = Just icons, .. } val =
+showIcon SimpleIOMonitorOpts { iconPattern = [] } _ = ""
+showIcon SimpleIOMonitorOpts { iconPattern = icons, .. } val =
     let icon  = choseIcon icons iconFontNo iconMinV iconMaxV val
         color = withColor iconLowC iconNormalC iconHighC
                           iconLowV iconHighV val
      in color icon
-showIcon SimpleIOMonitorOpts { iconPattern = Nothing } _ = ""
 
 choseIcon :: String -> FontNo -> Float -> Float -> Float -> String
 choseIcon []  _ _ _ _ = ""
