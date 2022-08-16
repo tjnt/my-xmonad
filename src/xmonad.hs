@@ -245,8 +245,8 @@ volumeChange target param = do
 
 volumeToggle, volumeUp, volumeDown :: String -> X ()
 volumeToggle target = volumeChange target "toggle"
-volumeUp     target = volumeChange target "10%+"
-volumeDown   target = volumeChange target "10%-"
+volumeUp     target = volumeChange target "5%+"
+volumeDown   target = volumeChange target "5%-"
 
 -- brightness control
 
@@ -255,7 +255,7 @@ brightnessChange param = do
     maxV <- io $ read <$> readFile fileMax :: X Float
     curV <- io $ read <$> readFile fileCur :: X Float
     let step = maxV / 100
-        minV = step * 10
+        minV = 0
         newV = max minV . min maxV $ curV + step * fromIntegral param
     spawnAndWait $ printf "echo %s | sudo tee %s > /dev/null" (showDigits 0 newV) fileCur
     dunstifyIndicator (showDigits 0 ((newV / maxV) * 100)) "brightness" ""
@@ -267,8 +267,8 @@ brightnessChange param = do
     fileCur = dir <> "brightness"
 
 brightnessUp, brightnessDown :: X ()
-brightnessUp   = brightnessChange 10
-brightnessDown = brightnessChange (-10)
+brightnessUp   = brightnessChange 5
+brightnessDown = brightnessChange (-5)
 
 wifiToggle :: X ()
 wifiToggle = do
