@@ -157,12 +157,10 @@ brightness opts = io readBrightness >>= \v -> do
     val <- showPercentWithColors v
     return [showIcon opts (v * 100), val]
   where
-    readBrightness = do
-        let dir = "/sys/class/backlight/intel_backlight/"
-        maxV <- read <$> readFile (dir <> "max_brightness")
-        curV <- read <$> readFile (dir <> "brightness")
-        return $ curV / maxV
+    readBrightness =
+        (/) <$> read' "brightness" <*> read' "max_brightness"
         `catch` (const $ return 0 :: SomeException -> IO Float)
+    read' f = read <$> readFile ("/sys/class/backlight/intel_backlight/" <> f)
 
 wifiIcon :: IO String
 wifiIcon = do
