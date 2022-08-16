@@ -23,7 +23,7 @@ import           XMonad.Hooks.StatusBar.PP      (trim, wrap, xmobarAction,
                                                  xmobarColor, xmobarFont)
 import           Xmobar                         (Align (L), Command (Com),
                                                  Config (..), Date (Date),
-                                                 Monitors (Battery, Brightness, Volume, Wireless),
+                                                 Monitors (Battery, Volume, Wireless),
                                                  Runnable (Run),
                                                  XMonadLog (UnsafeXMonadLog),
                                                  XPosition (TopSize),
@@ -149,6 +149,18 @@ network = go $ unsafeDupablePerformIO (newIORef Nothing)
         readstate d = head . lines
                   <$> readFile (printf "/sys/class/net/%s/operstate" d)
 
+brightness :: SimpleIOMonitorOpts -> Monitor [String]
+brightness opts = io readBrightness >>= \v -> do
+    val <- showPercentWithColors v
+    return [showIcon opts (v * 100), val]
+  where
+    readBrightness = do
+        let dir = "/sys/class/backlight/intel_backlight/"
+        maxV <- read <$> readFile (dir <> "max_brightness")
+        curV <- read <$> readFile (dir <> "brightness")
+        return $ curV / maxV
+        `catch` (const $ return 0 :: SomeException -> IO Float)
+
 wifiIcon :: IO String
 wifiIcon = do
     stdout <- trim <$> readProcess "wifi" [] ""
@@ -266,14 +278,20 @@ myCommands =
         , "--icon-low-value",    "102400"
         , "--icon-high-value",   "1024000"
         ] "network" 20
-    , Run $ Brightness
-        [ "--template", xmobarFont 1 "<bar>" <> "<percent>%"
-        , "--bfore",    "\xf5d9\xf5da\xf5db\xf5dc\xf5dd\xf5dd\xf5de\xf5de\xf5df\xf5df"
-        , "--bwidth",   "0"
-        , "--width",    "3"
+    , Run $ SimpleIOMonitor
+        brightness
+        [ "--template",          "<0><1>%"
+        , "--width",             "3"
         , "--"
-        , "-D",         "intel_backlight"
-        ] 40
+        , "--icon-pattern",      "\xf5d9\xf5da\xf5db\xf5dc\xf5dd\xf5de\xf5df"
+        , "--icon-font-no",      "1"
+        , "--icon-normal-color", base03
+        , "--icon-high-color",   base01
+        , "--icon-low-value",    "50"
+        , "--icon-high-value",   "80"
+        , "--icon-min-value",    "0"
+        , "--icon-max-value",    "100"
+        ] "brightness" 40
     , Run $ Volume "default" "Master"
         [ "--template", "<status><volume>%"
         , "--bfore",    "\xfa7e\xfa7e\xfa7f\xfa7f\xfa7f\xfa7d\xfa7d\xfa7d\xf028\xf028"
@@ -321,7 +339,7 @@ myTemplate =
         , "%memory%"          & xmobarActionT "htop -s PERCENT_MEM" "htop" "3"
         , "%coretemp%"
         , "%network%"         & xmobarActionT "nmtui-edit" "" "3"
-        , "%bright%"          & xmobarAction  "xmonadctl brightness-up" "4"
+        , "%brightness%"      & xmobarAction  "xmonadctl brightness-up" "4"
                               . xmobarAction  "xmonadctl brightness-down" "5"
         , "%default:Master%"  & xmobarAction  "xmonadctl volume-master-toggle" "1"
                               . xmobarAction  "xmonadctl volume-master-up" "4"
