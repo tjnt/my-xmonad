@@ -50,8 +50,6 @@ xmobarActionT cmd title =
 cpuUsage :: SimpleIOMonitorOpts -> Monitor [String]
 cpuUsage = go $ unsafeDupablePerformIO (readCpu >>= newIORef)
   where
-    readCpu = map read . tail . words . head . lines
-          <$> readFile "/proc/stat"
     go :: IORef [Int] -> SimpleIOMonitorOpts -> Monitor [String]
     go ref opts = do
         diff <- io $ do
@@ -68,6 +66,9 @@ cpuUsage = go $ unsafeDupablePerformIO (readCpu >>= newIORef)
         cpuTotal (u:n:s:_) = sum [u, n, s]
         cpuTotal _         = error "invalid cpu data"
 
+    readCpu = map (maybe 0 fst . BS.readInt) . tail . BS.words
+            . head . BS.lines <$> BS.readFile "/proc/stat"
+
 memUsage :: SimpleIOMonitorOpts -> Monitor [String]
 memUsage opts = io readMem >>= \m -> do
     let total = m M.! "MemTotal:"; free = m M.! "MemFree:"
@@ -78,8 +79,10 @@ memUsage opts = io readMem >>= \m -> do
     val <- showPercentWithColors usedratio
     return [showIcon opts (usedratio * 100), val]
   where
-    readMem = M.fromList . map ((\ ln -> (head ln, read (ln !! 1) :: Float)) . words)
-            . take 8 . lines <$> readFile "/proc/meminfo"
+    readMem = M.fromList . map (conv . map BS.unpack . BS.words)
+            . take 8 . BS.lines <$> BS.readFile "/proc/meminfo"
+    conv (a:b:_) = (a, read b :: Float)
+    conv _       = error "invalid mem data"
 
 coreTemp :: SimpleIOMonitorOpts -> Monitor [String]
 coreTemp opts = io readTemp >>= (\values -> do
