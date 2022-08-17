@@ -231,8 +231,9 @@ myCommands =
     [ Run UnsafeXMonadLog
     , Run $ SimpleIOMonitor
         cpuUsage
-        [ "--template",          "<0><1>%"
-        , "--width",             "3"
+        [ "--template",          "<0><1>"
+        , "--width",             "4"
+        , "--suffix",            "True"
         , "--"
         , "--icon-pattern",      "\xfb19"
         , "--icon-font-no",      "1"
@@ -243,8 +244,9 @@ myCommands =
         ] "cpu" 20
     , Run $ SimpleIOMonitor
         memUsage
-        [ "--template",          "<0><1>%"
-        , "--width",             "3"
+        [ "--template",          "<0><1>"
+        , "--width",             "4"
+        , "--suffix",            "True"
         , "--"
         , "--icon-pattern",      "\xf85a"
         , "--icon-font-no",      "1"
@@ -255,17 +257,17 @@ myCommands =
         ] "memory" 20
     , Run $ SimpleIOMonitor
         coreTemp
-        [ "--template",         "<0><1>℃"
-        , "--width",            "3"
+        [ "--template",          "<0><1>℃"
+        , "--width",             "3"
         , "--"
-        , "--icon-pattern",     "\xf2cb\xf2ca\xf2c9\xf2c8\xf2c7"
-        , "--icon-font-no",     "1"
+        , "--icon-pattern",      "\xf2cb\xf2ca\xf2c9\xf2c8\xf2c7"
+        , "--icon-font-no",      "1"
         , "--icon-normal-color", base03
         , "--icon-high-color",   base01
-        , "--icon-low-value",   "40"
-        , "--icon-high-value",  "60"
-        , "--icon-min-value",   "20"
-        , "--icon-max-value",   "90"
+        , "--icon-low-value",    "40"
+        , "--icon-high-value",   "60"
+        , "--icon-min-value",    "20"
+        , "--icon-max-value",    "90"
         ] "coretemp" 40
     , Run $ SimpleIOMonitor
         network
@@ -281,8 +283,9 @@ myCommands =
         ] "network" 20
     , Run $ SimpleIOMonitor
         brightness
-        [ "--template",          "<0><1>%"
-        , "--width",             "3"
+        [ "--template",          "<0><1>"
+        , "--width",             "4"
+        , "--suffix",            "True"
         , "--"
         , "--icon-pattern",      "\xf5d9\xf5da\xf5db\xf5dc\xf5dd\xf5de\xf5df"
         , "--icon-font-no",      "1"
@@ -294,10 +297,11 @@ myCommands =
         , "--icon-max-value",    "100"
         ] "brightness" 40
     , Run $ Volume "default" "Master"
-        [ "--template", "<status><volume>%"
+        [ "--template", "<status><volume>"
+        , "--width",    "4"
+        , "--suffix",   "True"
         , "--bfore",    "\xfa7e\xfa7e\xfa7f\xfa7f\xfa7f\xfa7d\xfa7d\xfa7d\xf028\xf028"
         , "--bwidth",   "0"
-        , "--width",    "3"
         , "--"
         , "--on",       xmobarFont 1 "<volumebar>"
         , "--off",      xmobarFont 1 "\xfa80"
@@ -306,13 +310,15 @@ myCommands =
         ] 40
     , Run $ SimpleIOReader wifiIcon "wifi" 100
     , Run $ Wireless "wlp3s0"
-        [ "--template", "<quality>%"
-        , "--width",    "3"
+        [ "--template", "<quality>"
+        , "--width",    "4"
+        , "--suffix",   "True"
         ] 40
     , Run $ SimpleIOReader bluetoothIcon "bluetooth" 100
     , Run $ SimpleIOReader deviceIcons "deviceicons" 100
     , Run $ Battery
         [ "--template", "<acstatus>"
+        , "--suffix",   "True"
         , "--bfore",    "\xf244\xf243\xf243\xf243\xf242\xf242\xf242\xf241\xf241\xf240"
         , "--bwidth",   "0"
         , "--Low",      "20"
@@ -322,9 +328,9 @@ myCommands =
         , "--"
         , "-a",         "dunstify -a xmonad -u critical -h int:transient:1 'Battery running out !!'"
         , "-A",         "10"
-        , "-o",         xmobarFont 1 "<leftbar> " <> "<left>% " <> "(<timeleft>) " <> "<watts>w"
-        , "-O",         xmobarFont 1 "<leftbar> " <> "<left>% " <> xmobarFont 1 "\xf0e7 " <> "<watts>w"
-        , "-i",         xmobarFont 1 "\xf1e6 " <> "<left>%"
+        , "-o",         xmobarFont 1 "<leftbar> " <> "<left> " <> "(<timeleft>) " <> "<watts>"
+        , "-O",         xmobarFont 1 "<leftbar> " <> "<left> " <> xmobarFont 1 "\xf0e7 " <> "<watts>"
+        , "-i",         xmobarFont 1 "\xf1e6 " <> "<left>"
         ] 100
     , Run $ SimpleIOReader dunstNotifyCount "dunst" 40
     , Run $ Date dateAndTimeFormat "date" 100
