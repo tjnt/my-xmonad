@@ -781,13 +781,13 @@ myXMobar = statusBarProp "xmobar"
 
     appIcons :: Query [String]
     appIcons = composeOne
-        [ className =? "Termite"     -?> appIconFont 2 "\xe795"
-        , className =? "Firefox"     -?> appIconFont 2 "\xe745"
-        , className =? "Chromium"    -?> appIconFont 2 "\xe743"
+        [ className =? "Termite"     -?> appIconFont 3 "\xe795"
+        , className =? "Firefox"     -?> appIconFont 3 "\xe745"
+        , className =? "Chromium"    -?> appIconFont 3 "\xe743"
         , className ^? "thunderbird" -?> appIconFont 1 "\xf6ed"
-        , className =? "Vieb"        -?> appIconFont 1 "\xe7c5"
-        , className =? "Gvim"        -?> appIconFont 1 "\xe7c5"
-        , pure True                  -?> appIconFont 1 "\xfc63"
+        , className =? "Vieb"        -?> appIconFont 2 "\xe7c5"
+        , className =? "Gvim"        -?> appIconFont 2 "\xe7c5"
+        , pure True                  -?> appIconFont 2 "\xfb13"
         ]
       where
         appIconFont n = appIcon . xmobarFont n

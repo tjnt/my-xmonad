@@ -222,6 +222,7 @@ dateAndTimeFormat = printf "%s %%m/%%d %%a %s %%H:%%M" calendar clock
 myAdditionalFonts :: [String]
 myAdditionalFonts =
     [ "xft:RictyDiminished Nerd Font:style=Regular:size=10"
+    , "xft:RictyDiminished Nerd Font:style=Regular:size=11"
     , "xft:RictyDiminished Nerd Font:style=Regular:size=12"
     , "xft:RictyDiminished Nerd Font:style=Regular:size=20"
     ]
@@ -339,7 +340,7 @@ myCommands =
 
 myTemplate :: String
 myTemplate =
-    xmobarFont 3 "\xe777"
+    xmobarFont 4 "\xe777"
     <> " %UnsafeXMonadLog% }{"
     <> concatMap (wrap " " " ")
         [ "%cpu%"             & xmobarActionT "htop -s PERCENT_CPU" "htop" "3"
