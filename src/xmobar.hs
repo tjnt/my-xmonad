@@ -148,7 +148,7 @@ network = go $ unsafeDupablePerformIO (newIORef Nothing)
         predicate dev
           | dev `elem` excludes = return False
           | otherwise = (`elem` ["up", "unknown"]) <$> readstate dev
-        excludes = ["lo"]
+        excludes = ["lo", "docker0", "vboxnet0"]
         readstate d = head . lines
                   <$> readFile (printf "/sys/class/net/%s/operstate" d)
 
