@@ -21,11 +21,11 @@ import           Theme.Theme                    (base01, base02, base03, base07,
 import           Utils.Run                      (readProcess)
 import           XMonad.Hooks.StatusBar.PP      (trim, wrap, xmobarAction,
                                                  xmobarColor, xmobarFont)
-import           Xmobar                         (Align (L), Command (Com),
-                                                 Config (..), Date (Date),
+import           Xmobar                         (Align (L), Config (..),
+                                                 Date (Date),
                                                  Monitors (Battery, Volume, Wireless),
                                                  Runnable (Run),
-                                                 XMonadLog (UnsafeXMonadLog),
+                                                 XMonadLog (UnsafeXMonadLog, XPropertyLog),
                                                  XPosition (TopSize),
                                                  defaultConfig, xmobar)
 import           Xmobar.Plugins.Monitors.Common (Monitor, io, showDigits,
@@ -335,7 +335,7 @@ myCommands =
         ] 100
     , Run $ SimpleIOReader dunstNotifyCount "dunst" 40
     , Run $ Date dateAndTimeFormat "date" 100
-    , Run $ Com (xmonadDir <> "/scripts/trayer-padding-icon.sh") [] "trayerpad" 100
+    , Run $ XPropertyLog "_XMONAD_TRAYPAD"
     ]
 
 myTemplate :: String
@@ -365,7 +365,7 @@ myTemplate =
                                               \ read -p \\\"press enter, close this.\\\" a'"
                                               "xmobar-cal" "3"
         ]
-    <> "%trayerpad%"
+    <> "%_XMONAD_TRAYPAD%"
 
 main :: IO ()
 main = xmobar $ defaultConfig

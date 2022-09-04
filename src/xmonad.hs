@@ -160,6 +160,7 @@ import           XMonad.Prompt.XMonad                (xmonadPromptCT)
 import qualified XMonad.StackSet                     as W
 import           XMonad.Util.Cursor                  (setDefaultCursor)
 import           XMonad.Util.EZConfig                (mkNamedKeymap)
+import           XMonad.Util.Hacks                   (trayerPaddingXmobarEventHook)
 import           XMonad.Util.NamedActions            (NamedAction,
                                                       addDescrKeys', addName,
                                                       oneName, showKm, subtitle)
@@ -696,6 +697,7 @@ myEventHook :: Event -> X All
 myEventHook = handleEventHook def
           <+> refocusLastWhen isFloat
           <+> minimizeEventHook
+          <+> trayerPaddingXmobarEventHook
           <+> serverModeEventHookCmd' myServerModeHook
 
 -- Startup Hook
@@ -706,7 +708,7 @@ myStartupHook = do
     spawnIfDown "compton -b"
     spawnIfDown "dunst"
     spawnIfDown $ printf
-              "trayer --edge top --align right --widthtype request --height 31 \
+              "trayer -l --edge top --align right --widthtype request --height 31 \
                \--expand true --transparent true --alpha 0 --tint 0x%s \
                \--SetDockType true --SetPartialStrut true" $ tail basebg
     spawnOnce "feh --randomize --bg-fill $HOME/.wallpaper/*"
