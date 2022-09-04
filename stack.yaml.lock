@@ -5,26 +5,26 @@
 
 packages:
 - completed:
-    hackage: xmonad-0.17.0@sha256:fc90c8fa647390c68c902912a5a7417f04025dfe72f7de51b248217f7ca0d484,5533
+    hackage: xmonad-0.17.1@sha256:570207c8cae53eec6131b4e50c6ddaed1f2aefb02b4fd15eb4576a3516babaa8,5558
     pantry-tree:
-      size: 2485
-      sha256: 6fd7c6a64621a088fcbb2e5a66030a78b0832d7341e4c465d3aeb4e668d097a5
+      size: 2486
+      sha256: f9b4652e36a8975347daf3475827bc302abb3cde2b4ad65ed5b0ff5f5ec2ad64
   original:
-    hackage: xmonad-0.17.0
+    hackage: xmonad-0.17.1
 - completed:
-    hackage: xmonad-contrib-0.17.0@sha256:defd04a9ca0e031eb7280b734ccd6d6b73f757babfe4a561a7ff718e75211749,20357
+    hackage: xmonad-contrib-0.17.1@sha256:ba8a48a04648db62017afca053fccebfb7fc2bab3545348050571cd32b897f79,21446
     pantry-tree:
-      size: 21783
-      sha256: 81a4589ef85fed434a852ba1324466b5ad8f4fd752cd88840aa4ea4348a16cec
+      size: 22735
+      sha256: 687d0207514a192d32d988317224993f43b5237561b9a4fc501fe1a73be06971
   original:
-    hackage: xmonad-contrib-0.17.0
+    hackage: xmonad-contrib-0.17.1
 - completed:
-    hackage: xmobar-0.43@sha256:140378e5a03f684e854881963f1e40ac6b9640a495f4f5c22460635fc0a593a1,14899
+    hackage: xmobar-0.44.2@sha256:a2eed5f8833194babd60e45520023cd5698ccb8d40976d1f41a9b53b350297d0,14895
     pantry-tree:
-      size: 9344
-      sha256: 9bc0db9a6b4455c7b11d1418b7843410d74348d380f7d85f55db2bc155edf5cb
+      size: 9498
+      sha256: c7714be550d267369496c484ba727847f50e941d66009d2f8a8268629fe953f8
   original:
-    hackage: xmobar-0.43
+    hackage: xmobar-0.44.2
 - completed:
     hackage: netlink-1.1.1.0@sha256:d83424b5ba9921191449e4b1f53c7cba7f4375f2c55a9b737c77e982e1f40d00,3689
     pantry-tree:
