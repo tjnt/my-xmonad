@@ -708,7 +708,7 @@ myStartupHook = do
     spawnIfDown "compton -b"
     spawnIfDown "dunst"
     spawnIfDown $ printf
-              "trayer -l --edge top --align right --widthtype request --height 31 \
+              "trayer --edge top --align right --widthtype request --height 31 \
                \--expand true --transparent true --alpha 0 --tint 0x%s \
                \--SetDockType true --SetPartialStrut true" $ tail basebg
     spawnOnce "feh --randomize --bg-fill $HOME/.wallpaper/*"
