@@ -17,7 +17,7 @@ import           System.Environment             (getEnv)
 import           System.IO.Unsafe               (unsafeDupablePerformIO)
 import           Text.Printf                    (printf)
 import           Theme.Theme                    (base01, base02, base03, base07,
-                                                 base0C, basebg, myFont)
+                                                 base0C, basebg)
 import           Utils.Run                      (readProcess)
 import           XMonad.Hooks.StatusBar.PP      (trim, wrap, xmobarAction,
                                                  xmobarColor, xmobarFont)
@@ -219,14 +219,6 @@ dateAndTimeFormat = printf "%s %%m/%%d %%a %s %%H:%%M" calendar clock
    calendar = xmobarFont 1 "\xf073"
    clock = xmobarFont 1 "\xf64f"
 
-myAdditionalFonts :: [String]
-myAdditionalFonts =
-    [ "xft:RictyDiminished Nerd Font:style=Regular:size=10"
-    , "xft:RictyDiminished Nerd Font:style=Regular:size=11"
-    , "xft:RictyDiminished Nerd Font:style=Regular:size=12"
-    , "xft:RictyDiminished Nerd Font:style=Regular:size=20"
-    ]
-
 myCommands :: [Runnable]
 myCommands =
     [ Run UnsafeXMonadLog
@@ -368,9 +360,14 @@ myTemplate =
     <> "%_XMONAD_TRAYPAD%"
 
 main :: IO ()
-main = xmobar $ defaultConfig
-    { font = myFont
-    , additionalFonts = myAdditionalFonts
+main = xmobar defaultConfig
+    { font = "Noto Sans Mono CJK JP 12"
+    , additionalFonts =
+        [ "RictyDiminished Nerd Font Regular 14"
+        , "RictyDiminished Nerd Font Regular 15"
+        , "RictyDiminished Nerd Font Regular 16"
+        , "RictyDiminished Nerd Font Regular 24"
+        ]
     , bgColor = basebg
     , fgColor = base07
     , position = TopSize L 100 30
