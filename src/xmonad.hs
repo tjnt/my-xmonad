@@ -237,7 +237,7 @@ volumeChange target param = do
     w <- words . last . lines
         <$> spawnWithOutput (printf "amixer get %s" target)
     when (length w == 6) $
-        let (v, t) = (trimVol (w!!3), trimMut (w!!5))
+        let (v, t) = (trimVol (w!!4), trimMut (w!!5))
             msg = printf "%s volume%s" target $ bool " [mute]" "" (t=="on")
          in dunstifyIndicator v msg ""
   where
