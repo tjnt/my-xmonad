@@ -223,7 +223,7 @@ cycleMonitor (primary, secondary) = do
     handler :: IOException -> IO Int
     handler _ = return 0
     file     = "/tmp/monitor-mode"
-    single   = printf "--output %s --auto --output %s --off" primary secondary
+    single   = printf "--output %s --auto --output %s --off --dpi 144 -s 1920x1080" primary secondary
     rightof  = printf "--output %s --auto --output %s --auto --right-of %s" primary secondary primary
     leftof   = printf "--output %s --auto --output %s --auto --left-of %s" primary secondary primary
     external = printf "--output %s --off --output %s --auto" primary secondary
