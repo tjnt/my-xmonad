@@ -390,7 +390,7 @@ myScratchpads =
     -- , NS "ytop" (termcmd "ytop" "ytop") (title =? "ytop") defaultFloating
     ]
   where
-    termcmd c t = printf "termite --exec %s --title %s" c t
+    termcmd = printf "termite --exec %s --title %s"
 
 -- Key bindings
 
