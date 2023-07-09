@@ -551,6 +551,7 @@ keyBindings conf =
     , ("<XF86MonBrightnessUp>",     brightnessUp,    "monitor brightness up")
     , ("<XF86MonBrightnessDown>",   brightnessDown,  "monitor brightness down")
     , ("<XF86Display>",             cycleMonitor ("eDP1", "HDMI2"),  "cycle monitor mode")
+    , ("S-<XF86Display>",           spawn "xsecurelock",  "lock screen")
     , ("<XF86WLAN>",                wifiToggle,       "toggle wifi on / off")
     , ("<XF86Bluetooth>",           bluetoothToggle,  "toggle bluetooth on / off")
     ]
