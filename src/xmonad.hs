@@ -642,6 +642,7 @@ myManageHook =
         , className =? "mplayer2"       --> doFloat
         , className =? "Pavucontrol"    --> doFloat
         , className =? "Peek"           --> doFloat
+        , className =? "org.remmina.Remmina" --> doFloat
         , className =? "Firefox"
             <&&> resourceAny ["Browser", "Places", "Toolkit"] --> doFloat
         , className ^? "thunderbird"
