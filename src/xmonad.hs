@@ -218,12 +218,12 @@ cycleMonitor :: (String, String) -> X ()
 cycleMonitor (primary, secondary) = do
     n <- (`rem` length mode) . succ <$> io ((read <$> readFile file) `catch` handler)
     io $ n `seq` writeFile file $ show n
-    spawn $ "xrandr " ++ mode !! n
+    spawn $ "xrandr --dpi 144 " ++ mode !! n
   where
     handler :: IOException -> IO Int
     handler _ = return 0
     file     = "/tmp/monitor-mode"
-    single   = printf "--output %s --auto --output %s --off --dpi 144 -s 1920x1080" primary secondary
+    single   = printf "--output %s --auto --output %s --off" primary secondary
     rightof  = printf "--output %s --auto --output %s --auto --right-of %s" primary secondary primary
     leftof   = printf "--output %s --auto --output %s --auto --left-of %s" primary secondary primary
     external = printf "--output %s --off --output %s --auto" primary secondary
