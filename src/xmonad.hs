@@ -284,7 +284,7 @@ bluetoothToggle = do
 clipboardHistory :: String -> X()
 clipboardHistory opt = do
     clipsh <- (<> "/scripts/clip.sh") <$> asks (cfgDir . directories)
-    spawnTerminal $ printf "--exec '%s %s' --title clipboard" clipsh opt
+    spawnTerminal $ printf "--title clipboard --command %s %s" clipsh opt
 
 captureScreen :: X()
 captureScreen = spawn $
@@ -337,7 +337,7 @@ applicationMenu = Node (TSNode "Applications" "Open application menu" (return ()
             -- _ <- desktopEntryCategories e  -- ignore categories not set
             let comment = fromMaybe "" $ desktopEntryComment e
                 cmd = if fromMaybe False (desktopEntryTerminal e)
-                         then spawnTerminal $ printf "--exec '%s'" exec
+                         then spawnTerminal $ printf "--command '%s'" exec
                          else spawn exec
             Just $ Node (TSNode name comment cmd) []
 
@@ -385,22 +385,22 @@ myTreeSelectAction = do
 myScratchpads :: NamedScratchpads
 myScratchpads =
     [ NS "pulsemixer" (termcmd "pulsemixer" "pulsemixer") (title =? "pulsemixer") defaultFloating
-    , NS "terminal" "termite --title scratch-terminal" (title =? "scratch-terminal") defaultFloating
+    , NS "terminal" "alacritty --title scratch-terminal" (title =? "scratch-terminal") defaultFloating
     , NS "qalculate" "qalculate-gtk" (title =? "Qalculate!") defaultFloating
     -- , NS "ytop" (termcmd "ytop" "ytop") (title =? "ytop") defaultFloating
     ]
   where
-    termcmd = printf "termite --exec %s --title %s"
+    termcmd = printf "alacritty --title %s --command %s"
 
 -- Key bindings
 
 keyBindings :: XConfig Layout -> [((KeyMask, KeySym), NamedAction)]
 keyBindings conf =
     category "launching terminal"
-    [ ("M-<Return>",     spawnTerminal "--exec tmux",                    "launch terminal")
-    , ("M-S-<Return>",   spawnTerminalAndDo doCenterFloat "--exec=tmux", "launch terminal (float)")
-    , ("M-C-<Return>",   spawnTerminal "",                               "launch terminal without tmux")
-    , ("M-C-S-<Return>", spawnTerminalAndDo doCenterFloat "",            "launch terminal without tmux (float)")
+    [ ("M-<Return>",     spawnTerminal "--command tmux",                    "launch terminal")
+    , ("M-S-<Return>",   spawnTerminalAndDo doCenterFloat "--command tmux", "launch terminal (float)")
+    , ("M-C-<Return>",   spawnTerminal "",                                  "launch terminal without tmux")
+    , ("M-C-S-<Return>", spawnTerminalAndDo doCenterFloat "",               "launch terminal without tmux (float)")
     ] ++
     category "launching extensions"
     [ ("M-p",    shellPromptHere myXPConfig,  "launch shell prompt")
@@ -531,12 +531,12 @@ keyBindings conf =
     , ("M-<F3>",     spawnHere "firefox",                  "firefox")
     , ("M-<F4>",     spawnHere "firefox -private-window",  "firefox (private)")
     , ("M-<F5>",     spawnHere "thunderbird",              "thunderbird")
-    , ("M-<F7>",     spawnTerminalOrClose "--exec ytop --title ytop" (title =? "ytop"), "ytop")
-    , ("M-S-<F7>",   spawnTerminalOrClose "--exec htop --title htop" (title =? "htop"), "htop")
-    , ("M-<F8>",     spawnTerminalOrClose "--exec nmtui" (title ^? "nmtui"), "nmtui")
+    , ("M-<F7>",     spawnTerminalOrClose "--title ytop --command ytop" (title =? "ytop"), "ytop")
+    , ("M-S-<F7>",   spawnTerminalOrClose "--title htop --command htop" (title =? "htop"), "htop")
+    , ("M-<F8>",     spawnTerminalOrClose "--title nmtui --command nmtui" (title ^? "nmtui"), "nmtui")
     , ("M-<F9>",     namedScratchpadAction myScratchpads "pulsemixer", "pulsemixer")
-    , ("M-<F10>",    spawnTerminalOrClose "--exec bluetooth-tui" (title =? "bluetooth-tui"), "bluetooth-tui")
-    , ("M-<F11>",    spawnTerminalOrClose "--exec hcalc" (title =? "hcalc"), "hcalc")
+    , ("M-<F10>",    spawnTerminalOrClose "--title bluetooth-tui --command bluetooth-tui" (title =? "bluetooth-tui"), "bluetooth-tui")
+    , ("M-<F11>",    spawnTerminalOrClose "--title hcalc --command hcalc" (title =? "hcalc"), "hcalc")
     , ("M-S-<F11>",  namedScratchpadAction myScratchpads "qalculate", "qalculate")
     , ("M-<F12>",    namedScratchpadAction myScratchpads "terminal",  "terminal (scratchpad)")
     ] ++
@@ -576,7 +576,7 @@ myKeys conf = keys conf
     showHelp xs = addName "Show Keybindings" $ do
         path <- io . bracket (openTempFile "/tmp" "xmonad-keyguide.txt") (hClose . snd)
                    $ \(p,h) -> hPutStr h (unlines (showKm xs)) >> return p
-        spawnTerminal $ printf "--exec 'sh -c \"less %s ; rm -f %s\"'" path path
+        spawnTerminal $ printf "--command 'sh -c \"less %s ; rm -f %s\"'" path path
 
 -- Mouse bindings
 
@@ -786,7 +786,8 @@ myXMobar = statusBarProp "xmobar"
 
     appIcons :: Query [String]
     appIcons = composeOne
-        [ className =? "Termite"     -?> appIconFont 3 "\xe795"
+        [ className =? "Alacritty"   -?> appIconFont 3 "\xe795"
+        , className =? "Termite"     -?> appIconFont 3 "\xe795"
         , className =? "Firefox"     -?> appIconFont 3 "\xe745"
         , className =? "Chromium"    -?> appIconFont 3 "\xe743"
         , className ^? "thunderbird" -?> appIconFont 1 "\xf6ed"
@@ -803,7 +804,7 @@ main :: IO ()
 main = xmonad . withUrgencyHook (BorderUrgencyHook base0B)
      . ewmhFullscreen . ewmh . withSB myXMobar . docks $ def
     { modMask = mod4Mask
-    , terminal = "termite"
+    , terminal = "alacritty"
     , workspaces = map show [1..5]
     , borderWidth = 4
     , normalBorderColor = base06
