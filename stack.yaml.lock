@@ -19,12 +19,12 @@ packages:
   original:
     hackage: xmonad-contrib-0.17.1
 - completed:
-    hackage: xmobar-0.45@sha256:8845b68837ef59323deacda8a27a363e17e99c42019b348eeff94a4f2d9a909d,14911
+    hackage: xmobar-0.47.2@sha256:d4642346c3c3f2f59999204a8c25fd5a60a7fb14fd885b3ceb4dfac31e5ded98,14934
     pantry-tree:
-      sha256: bcc0846ac538ffb307d766059388573dbfbf4359322cad3cef7bddad67fcfb48
+      sha256: a52dca4e1245990aafe01b5140c15219b3f850b552023c558c1cb63950d54b9e
       size: 9769
   original:
-    hackage: xmobar-0.45
+    hackage: xmobar-0.47.2
 - completed:
     hackage: netlink-1.1.1.0@sha256:d83424b5ba9921191449e4b1f53c7cba7f4375f2c55a9b737c77e982e1f40d00,3689
     pantry-tree:
