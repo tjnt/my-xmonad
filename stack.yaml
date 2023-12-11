@@ -18,7 +18,7 @@
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
 #resolver: lts-18.28
-resolver: lts-20.26
+resolver: lts-21.21
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -46,11 +46,6 @@ extra-deps:
   - xmobar-0.47.2
   # for xmobar
   - netlink-1.1.1.0
-  # - libmpd-0.9.2.0
-  - cairo-0.13.8.2@sha256:ef1709c3c4d2c6d68a9a51d9f220dccc0745f6468d2d0868c15a7ecdf8f325a1,4078
-  - pango-0.13.8.2@sha256:d4057ebddade4cde3e25d7755b5e030e7a7e56fe7365afd37916a7bba46d3fd9,3917
-  - glib-0.13.8.2@sha256:f44b829e741b3c3244d523f60b058701dfc067ff64c2ba61d43be4cccfc2663d,3156
-  - gtk2hs-buildtools-0.13.8.3@sha256:207229eee7abff12aba2740b32131522086275e46f2e72a0f5bbc3cb781e9d4d,5304
   # my library
   # - archive: ../dbus-bluetooth.tar.gz
   - git: https://github.com/tjnt/dbus-bluetooth.git 
