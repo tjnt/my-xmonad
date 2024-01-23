@@ -654,7 +654,7 @@ myManageHook =
         , title =? "clipboard"          --> doRectFloat (W.RationalRect 0 0 0.4 1.0)
         , title =? "hcalc"              --> doRectFloat (W.RationalRect 0 0 0.4 0.4)
         , title ^? "nmtui"              --> doFloat
-        , title =? "bluetooth-tui"      --> doFloat
+        , title =? "bluetooth-tui"      --> doRectFloat (W.RationalRect 0 0 0.5 0.5)
         , title =? "screen-capture"     --> doFloat
         , title =? "xmobar-cal"         --> doRectFloat (W.RationalRect 0.7 0 0.3 0.3)
         , title =? "Qalculate!"         --> doFloat
@@ -788,7 +788,7 @@ myXMobar = statusBarProp "xmobar"
     appIcons = composeOne
         [ className =? "Alacritty"   -?> appIconFont 3 "\xe795"
         , className =? "Termite"     -?> appIconFont 3 "\xe795"
-        , className =? "Firefox"     -?> appIconFont 3 "\xe745"
+        , className =? "firefox"     -?> appIconFont 3 "\xe745"
         , className =? "Chromium"    -?> appIconFont 3 "\xe743"
         , className ^? "thunderbird" -?> appIconFont 1 "\xf6ed"
         , className =? "Vieb"        -?> appIconFont 2 "\xe7c5"
