@@ -106,6 +106,7 @@ import           XMonad.Hooks.InsertPosition         (Focus (Newer),
                                                       insertPosition)
 import           XMonad.Hooks.ManageDocks            (ToggleStruts (ToggleStruts),
                                                       avoidStruts, docks)
+import qualified XMonad.Hooks.ManageHelpers          as XHM
 import           XMonad.Hooks.ManageHelpers          (composeOne, doCenterFloat,
                                                       isDialog, isFullscreen,
                                                       (-?>))
@@ -456,6 +457,7 @@ keyBindings conf =
     , ("M-S-t",  sinkAll,                      "sink all floating windows")
     , ("M-g c",  floatAndDo doCenterFloat,     "float the focused window and move center")
     , ("M-g f",  floatAndDo doFullFloat,       "float the focused window with full screen")
+    , ("M-g S-f",floatAndDo XHM.doFullFloat,   "float the focused window with full screen (ignore docks)")
     , ("M-g h",  floatAndDo doLeftHalfFloat,   "float the focused window with left half screen")
     , ("M-g l",  floatAndDo doRightHalfFloat,  "float the focused window with right half screen")
     , ("M-g k",  floatAndDo doUpperHalfFloat,  "float the focused window with upper half screen")
@@ -658,7 +660,7 @@ myManageHook =
         , title =? "screen-capture"     --> doFloat
         , title =? "xmobar-cal"         --> doRectFloat (W.RationalRect 0.7 0 0.3 0.3)
         , title =? "Qalculate!"         --> doFloat
-        , isFullscreen                  --> doFullFloat
+        , isFullscreen                  --> XHM.doFullFloat
         , isDialog                      --> doFloat
         ]
     <+> namedScratchpadManageHook myScratchpads
