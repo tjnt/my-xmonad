@@ -709,7 +709,7 @@ myEventHook = handleEventHook def
 myStartupHook :: X ()
 myStartupHook = do
     setDefaultCursor xC_left_ptr
-    spawnIfDown "compton -b"
+    spawnIfDown "picom -b"
     spawnIfDown "dunst"
     spawnIfDown $ printf
               "trayer --edge top --align right --widthtype request --height 31 \
