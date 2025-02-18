@@ -716,6 +716,7 @@ myStartupHook = do
                \--expand true --transparent true --alpha 0 --tint 0x%s \
                \--SetDockType true --SetPartialStrut true" $ tail basebg
     spawnOnce "feh --randomize --bg-fill $HOME/.wallpaper/*"
+    spawnOnce "xset s 3600 3600" -- screen timeout
     spawnIfDown "xss-lock -n /usr/libexec/xsecurelock/dimmer -l -- xsecurelock"
     spawnIfDown "xbindkeys"
     spawnIfDown "dropbox start"
