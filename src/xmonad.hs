@@ -578,7 +578,7 @@ myKeys conf = keys conf
     showHelp xs = addName "Show Keybindings" $ do
         path <- io . bracket (openTempFile "/tmp" "xmonad-keyguide.txt") (hClose . snd)
                    $ \(p,h) -> hPutStr h (unlines (showKm xs)) >> return p
-        spawnTerminal $ printf "--command 'sh -c \"less %s ; rm -f %s\"'" path path
+        spawnTerminal $ printf "--command sh -c 'less %s ; rm -f %s'" path path
 
 -- Mouse bindings
 
