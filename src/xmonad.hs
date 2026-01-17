@@ -529,7 +529,8 @@ keyBindings conf =
     , ("M-]",    dunstHistoryPop,  "show dunst notification from history")
     ] ++
     category "launch applications"
-    [ ("M-<F2>",     spawnHere "chromium",                 "chromium")
+    [ ("M-<F1>",     spawnHere "chromium --profile-directory=\"Default\"",   "chromium work")
+    , ("M-<F2>",     spawnHere "chromium --profile-directory=\"Profile 1\"", "chromium dev")
     , ("M-<F3>",     spawnHere "firefox",                  "firefox")
     , ("M-<F4>",     spawnHere "firefox -private-window",  "firefox (private)")
     , ("M-<F5>",     spawnHere "thunderbird",              "thunderbird")
