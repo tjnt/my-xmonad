@@ -767,8 +767,9 @@ myPP = xmobarPP
         icon = printf "<icon=%s/>"
 
     extMinimizedCount = withMinimized $ \ws -> do
-        let n = length ws
-        return $ if n == 0 then Nothing else Just $ action n
+        return $ case length ws of
+            0 -> Nothing
+            n -> Just $ action n
       where
         action n = xmobarAction "xmonadctl restore-minimized-all" "1"
                  . xmobarAction "xmonadctl restore-minimized-sel" "3"
