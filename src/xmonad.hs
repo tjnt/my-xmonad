@@ -688,6 +688,8 @@ myServerModeHook = return
     , ("next-layout",           cycleThroughLayouts myLayoutsCycle)
     , ("prev-layout",           cycleThroughLayouts (reverse myLayoutsCycle))
     , ("toggle-insert-mode",    toggleInsertMode)
+    , ("restore-minimized-all",  restoreAllMinimized)
+    , ("restore-minimized-sel",  restoreSelectedMinimized)
     ]
     <> workspaceCommands
   where
@@ -766,7 +768,11 @@ myPP = xmobarPP
 
     extMinimizedCount = withMinimized $ \ws -> do
         let n = length ws
-        return $ if n == 0 then Nothing else Just $ "[" ++ show n ++ "]"
+        return $ if n == 0 then Nothing else Just $ action n
+      where
+        action n = xmobarAction "xmonadctl restore-minimized-all" "1"
+                 . xmobarAction "xmonadctl restore-minimized-sel" "3"
+                 $ "[" ++ show n ++ "]"
 
     extToggleHookPP = fmap clickable . maybe (Just iconAbove) return
                   <$> willHookAllNewPP "insertBelow" (const iconBelow)
