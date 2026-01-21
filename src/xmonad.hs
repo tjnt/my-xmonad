@@ -743,11 +743,11 @@ myPP = xmobarPP
     , ppOutput          = putStrLn
     , ppWsSep           = " "
     , ppSep             = "  "
-    , ppExtras          = [extToggleHookPP]
+    , ppExtras          = [extToggleHookPP, extMinimizedCount]
     }
   where
-    order (w:l:t:e:xs) = w:l:e:t:xs
-    order xs           = xs
+    order (w:l:t:xs) = (w:l:xs) ++ [t]
+    order xs         = xs
 
     ppLayoutIcons = clickable . fromMaybe "？" . (layoutIcons M.!?)
       where
@@ -763,6 +763,10 @@ myPP = xmobarPP
             , ("Full",   icon "layout-full.xpm")
             ]
         icon = printf "<icon=%s/>"
+
+    extMinimizedCount = withMinimized $ \ws -> do
+        let n = length ws
+        return $ if n == 0 then Nothing else Just $ "[" ++ show n ++ "]"
 
     extToggleHookPP = fmap clickable . maybe (Just iconAbove) return
                   <$> willHookAllNewPP "insertBelow" (const iconBelow)
