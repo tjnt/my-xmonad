@@ -723,7 +723,7 @@ myStartupHook = do
     spawnOnce "xset dpms 600 1200 2400" -- screen timeout
     spawnIfDown "xss-lock -n /usr/libexec/xsecurelock/dimmer -l -- xsecurelock"
     spawnIfDown "xbindkeys"
-    spawnIfDown "dropbox start"
+    spawnIfDown "XDG_CURRENT_DESKTOP=Unity dropbox start"
     spawnIfDown "clipd"
     -- spawnOnce "nm-tray"
     -- spawnOnce "pnmixer"
